@@ -9,12 +9,17 @@
      (compartir del móvil, wa.me, Facebook, página de subida de cada red).
    Se carga DESPUÉS del script de index.html y sustituye sus funciones.
 
-   GENERADOR DE IMÁGENES DE VERDAD
-   Mientras no haya clave, las imágenes son fotos libres de Unsplash elegidas
-   por palabras del texto. Para que la IA las dibuje de cero, se despliega
-   conectores/imagen-ia-worker.js (Cloudflare Worker gratis) con la clave como
-   secreto y se pone su dirección en window.CHISPA_IA_URL. La clave NUNCA va
-   en este fichero: el Worker la guarda y el navegador solo ve el resultado.
+   GENERADOR DE IMÁGENES = MOTOR INTERCAMBIABLE (ver «MOTOR DE IMAGEN» abajo)
+   Hoy: fotos libres de Unsplash elegidas por palabras del texto. Mañana:
+   nuestro propio servidor de IA, poniendo antes de este script
+     window.CHISPA_MOTOR={proveedor:"servidor",url:"https://…/imagen"}
+   Hay un servidor de ejemplo en conectores/imagen-ia-worker.js. La clave del
+   modelo NUNCA va en este fichero: la guarda el servidor.
+
+   PUBLICAR DIRECTO (sin herramientas puente de pago)
+   Con las APIs oficiales (Meta Graph, TikTok Content Posting, YouTube Data)
+   a través de nuestro servidor: window.CHISPA_PUBLICADOR={url:"https://…/publicar",
+   conectada:function(red){…}}. Sin eso, se abre la red con el contenido listo.
    ===================================================================== */
 (function(){
 "use strict";
@@ -182,6 +187,39 @@ function promptDe(p){
   var cat={paella:"Spanish lobster paella in a wide pan",coctel:"colourful cocktails and mojitos on a bar counter",plato:"plated Mediterranean dish of the day",evento:"lively restaurant evening with live music and warm lights",terraza:"sunny Mediterranean restaurant terrace",brunch:"Mediterranean breakfast with coffee and toast",postre:"elegant homemade dessert",marisco:"fresh seafood platter",burger:"gourmet burger",tapas:"Spanish tapas table",local:"cozy Mediterranean restaurant interior"}[p.cat]||"restaurant food";
   return "Professional food photography for Instagram, "+cat+", restaurant in Palma de Mallorca, natural light, shallow depth of field, appetizing, no text, no logos. Context: "+(p.titulo||"")+". "+(p.txt||"").slice(0,200);
 }
+/* ---------------------------------------------------------------------
+   MOTOR DE IMAGEN INTERCAMBIABLE
+   Una sola función: CHISPA_MOTOR.generar(pedido) → Promise<medio>.
+   El proveedor se elige con CHISPA_MOTOR.proveedor:
+     "fotos"    → fotos libres de Unsplash elegidas por el texto (gratis, sin clave). Por defecto.
+     "servidor" → NUESTRO servidor de IA (o el Worker de conectores/imagen-ia-worker.js).
+                  Recibe {prompt, formato, ancho, alto, cantidad} y devuelve {url} o {urls:[…]}.
+                  La clave del modelo vive en el servidor, nunca en este fichero.
+   Otro proveedor: CHISPA_MOTOR.proveedores.nombre = function(pedido){ return Promise<medio> }
+   Si el proveedor elegido falla, cae solo a "fotos" para que nunca quede en blanco.
+   --------------------------------------------------------------------- */
+var MOTOR=window.CHISPA_MOTOR=window.CHISPA_MOTOR||{};
+MOTOR.url=MOTOR.url||window.CHISPA_IA_URL||"";
+MOTOR.proveedor=MOTOR.proveedor||(MOTOR.url?"servidor":"fotos");
+MOTOR.proveedores=MOTOR.proveedores||{};
+MOTOR.proveedores.fotos=function(q){
+  var n=q.cantidad||1,sl=[];
+  for(var s=0;s<n;s++){var f=fotoDe(q.cat,q.semilla+s*2);sl.push({url:fotoUrl(f[0],q.ancho,q.alto),cred:f[1]});}
+  return Promise.all(sl.map(function(s){return cargarImg(s.url).catch(function(){});})).then(function(){
+    return n>1?{tipo:"foto",slides:sl,url:sl[0].url,cred:sl[0].cred}:{tipo:"foto",url:sl[0].url,cred:sl[0].cred};});
+};
+MOTOR.proveedores.servidor=function(q){
+  if(!MOTOR.url)return Promise.reject(new Error("Sin dirección del servidor de IA"));
+  return fetch(MOTOR.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:q.prompt,formato:q.formato,ancho:q.ancho,alto:q.alto,cantidad:q.cantidad||1})})
+    .then(function(r){if(!r.ok)throw new Error("El servidor de IA respondió "+r.status);return r.json();})
+    .then(function(j){var urls=j&&(j.urls||(j.url?[j.url]:[]));if(!urls||!urls.length)throw new Error("El servidor no devolvió imagen");
+      return Promise.all(urls.map(cargarImg)).then(function(){var sl=urls.map(function(u){return {url:u,cred:""};});
+        return sl.length>1?{tipo:"ia",slides:sl,url:sl[0].url,cred:""}:{tipo:"ia",url:urls[0],cred:""};});});
+};
+MOTOR.generar=function(q){
+  var fn=MOTOR.proveedores[MOTOR.proveedor]||MOTOR.proveedores.fotos;
+  return fn(q).catch(function(e){if(fn===MOTOR.proveedores.fotos)throw e;try{console.warn("Motor de imagen «"+MOTOR.proveedor+"» falló; uso fotos:",e&&e.message);}catch(x){}return MOTOR.proveedores.fotos(q);});
+};
 var PASOS=["Leyendo tu texto","Eligiendo la mejor imagen","Ajustando luz y encuadre","Animando el texto"];
 window.crearImagenIA=function(i){
   var p=window._posts&&window._posts[i];if(!p)return;
@@ -191,22 +229,8 @@ window.crearImagenIA=function(i){
   var t0=Date.now(),k=0,iv=setInterval(function(){k=(k+1)%PASOS.length;var e=$("cmPaso_"+i);if(e)e.textContent=PASOS[k];},450);
   var w=1080,h=vertical(p)?1920:(p.formato==="carrusel"?1350:1080);
   var listo=function(media){clearInterval(iv);var d=Math.max(0,1300-(Date.now()-t0));setTimeout(function(){p.creando=false;p.media=media;p.slide=0;repintar(i);toast(media.tipo==="ia"?"✨ Imagen creada por IA":"✨ Imagen lista · pulsa ↻ para otra versión");},d);};
-  var porFoto=function(){
-    var base=SEM+i*3+(p.foto||0);
-    if(p.formato==="carrusel"){
-      var sl=[0,1,2].map(function(s){var f=fotoDe(p.cat,base+s*2);return {url:fotoUrl(f[0],w,h),cred:f[1]};});
-      Promise.all(sl.map(function(s){return cargarImg(s.url).catch(function(){});})).then(function(){listo({tipo:"foto",slides:sl,url:sl[0].url,cred:sl[0].cred});});
-    }else{
-      var f=fotoDe(p.cat,base),u=fotoUrl(f[0],w,h);
-      cargarImg(u).then(function(){listo({tipo:"foto",url:u,cred:f[1]});},function(){listo({tipo:"foto",url:u,cred:f[1]});});
-    }
-  };
-  if(window.CHISPA_IA_URL){
-    fetch(window.CHISPA_IA_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:promptDe(p),formato:p.formato,ancho:w,alto:h})})
-      .then(function(r){if(!r.ok)throw 0;return r.json();})
-      .then(function(j){if(!j||!j.url)throw 0;return cargarImg(j.url).then(function(){listo({tipo:"ia",url:j.url,cred:""});});})
-      .catch(function(){porFoto();});
-  }else porFoto();
+  MOTOR.generar({prompt:promptDe(p),cat:p.cat,formato:p.formato,ancho:w,alto:h,cantidad:p.formato==="carrusel"?3:1,semilla:SEM+i*3+(p.foto||0)})
+    .then(listo,function(){clearInterval(iv);p.creando=false;repintar(i);toast("No se pudo crear la imagen. Prueba otra vez.");});
 };
 window.cmSlide=function(i,d){var p=window._posts[i];var n=p.media.slides.length;p.slide=((p.slide||0)+d+n)%n;repintarMedio(i);};
 window.cmRepetir=function(i){repintarMedio(i);};
@@ -550,6 +574,17 @@ function prepararArchivo(p,vert){
 window.cmEnviar=function(id){
   var p=window._posts[PUB.i],r=red(id),st=$("cmSt_"+id),texto=textoCompleto(p),n=N();
   var set=function(t,ok){if(st){st.textContent=t;st.className="st"+(ok?" ok":"");}};
+  // 1) Publicación directa por API oficial, si nuestro servidor tiene la cuenta conectada
+  var PD=window.CHISPA_PUBLICADOR;
+  if(PD&&PD.url&&p.media&&!(PD._fallo&&PD._fallo[id])&&(!PD.conectada||PD.conectada(id))){
+    set("Publicando directamente en "+r.nm+"…");
+    prepararArchivo(p,r.vert).then(function(b){var fd=new FormData();fd.append("red",id);fd.append("texto",texto);fd.append("fecha",p.fecha||"");fd.append("archivo",b,nombreArchivo(p,ext(b)));
+      return fetch(PD.url,{method:"POST",body:fd,credentials:"include"});})
+    .then(function(res){if(!res.ok)throw new Error("respuesta "+res.status);PUB.hecho[id]="Publicado directamente";set("✓ Publicado directamente en "+r.nm,true);})
+    .catch(function(e){set("La publicación directa falló ("+(e&&e.message||"error")+"). Pulsa otra vez para hacerlo a mano.");PD._fallo=PD._fallo||{};PD._fallo[id]=1;});
+    return;
+  }
+  // 2) Sin permiso todavía: se abre la red con el contenido listo
   copiar(texto);
   var web=n.web||"https://el-paraiso-eight.vercel.app/";
   // WhatsApp y Facebook en ordenador: enlace directo de compartir
