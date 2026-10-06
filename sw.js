@@ -1,6 +1,6 @@
 // Chispa · service worker (red primero, caché de respaldo para abrir sin conexión)
 var CACHE = 'chispa-v1';
-var ASSETS = ['./', './index.html', './chispa-habla.html', './manifest.json', './icono-192.png', './icono-512.png'];
+var ASSETS = ['./', './index.html', './chispa-habla.html', './mi-negocio.js', './manifest.json', './icono-192.png', './icono-512.png'];
 self.addEventListener('install', function (e) {
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS).catch(function () {}); }));

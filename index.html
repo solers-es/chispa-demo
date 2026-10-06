@@ -186,6 +186,8 @@
   .empty{color:var(--tx3);font-size:13.5px;text-align:center;padding:20px}
   /* ---------- estudio de contenido ---------- */
   @media(max-width:560px){.seg button{padding:7px 9px;font-size:11.5px}.top .wrap{gap:8px}.logo{font-size:17px}}
+  @media(max-width:640px){.top .wrap{flex-wrap:wrap;height:auto;padding-top:8px;padding-bottom:8px;gap:6px}.seg{margin-left:0;width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}.seg button{flex:1 0 auto}}
+  html,body{max-width:100%;overflow-x:clip}
   .est{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:30px;border:1px solid}
   .est.probando{background:rgba(96,165,250,.14);color:var(--azul);border-color:rgba(96,165,250,.4)}
   .est.creciendo{background:rgba(255,204,51,.12);color:var(--amber);border-color:rgba(255,204,51,.35)}
@@ -1131,5 +1133,7 @@ else if(_h.indexOf("panel")>=0){vista("panel");}
 <!-- Calendario, órdenes a Chispa y estadísticas (trabajador A) -->
 <link rel="stylesheet" href="chispa-agenda.css">
 <script src="chispa-agenda.js"></script>
+<!-- Mi negocio, conexiones y botones (trabajador B) -->
+<script src="mi-negocio.js"></script>
 </body>
 </html>
