@@ -18,22 +18,24 @@
   /* ---------- datos reales de El Paraíso (de su web y su ficha de Google) ---------- */
   var PARAISO = {
     nombre: 'El Paraíso Bar Restaurante',
-    sector: 'Restaurante · cocina caribeña y mediterránea',
+    sector: 'Bar restaurante · cocina dominicana · buen ambiente',
     ciudad: 'Palma de Mallorca',
     direccion: "Carrer d'Anselm Turmeda, 5, 07010 Palma",
-    logoUrl: 'https://el-paraiso-eight.vercel.app/fotos/logo.png',
-    web: 'https://el-paraiso-eight.vercel.app/',
-    reserva: 'https://el-paraiso-eight.vercel.app/reservas.html',
+    logoUrl: 'marca/elparaiso-logo.png',
+    web: 'https://el-paraiso-eight.vercel.app/links',
+    club: 'https://el-paraiso-eight.vercel.app',
+    reserva: 'https://api.whatsapp.com/send?phone=34689980202&text=Hola%2C+quiero+reservar+una+mesa+en+El+Paraiso',
     telefono: '971 37 90 28',
-    whatsapp: '971 37 90 28', // decisión de Stalin: el WhatsApp de Chispa es el fijo del local
-    instagram: 'https://www.instagram.com/elparaisobarrestaurante/',
+    whatsapp: '689 98 02 02',        // móvil: el botón «Reserva por wasap» de los clientes
+    whatsappApi: '971 37 90 28',     // fijo del local: el número de la API de WhatsApp de Chispa (decisión de Stalin)
+    instagram: 'https://instagram.com/elparaisobarrestaurante',
     facebook: 'https://www.facebook.com/people/El-Paraiso-Bar-Restaurante-Mallorca/',
-    tiktok: '',
+    tiktok: 'https://www.tiktok.com/@elparaisomallorca29',
     youtube: '',
     google: 'https://www.google.com/maps/place/?q=place_id:ChIJl-sOCm2TlxIRwxpJzz76Phg',
     resenas: 'https://g.page/r/CcMaSc8--j4YEBM/review'
   };
-  var CAMPOS = ['nombre', 'sector', 'ciudad', 'direccion', 'logoUrl', 'web', 'reserva', 'telefono', 'whatsapp',
+  var CAMPOS = ['nombre', 'sector', 'ciudad', 'direccion', 'logoUrl', 'web', 'club', 'reserva', 'telefono', 'whatsapp', 'whatsappApi',
     'instagram', 'facebook', 'tiktok', 'youtube', 'google', 'resenas'];
 
   /* Rellena lo que falte con los datos de El Paraíso, una sola vez y sin pisar
@@ -47,8 +49,16 @@
         if (esParaiso && !n[k]) n[k] = PARAISO[k];
       });
       if (esParaiso && n.nombre === 'El Paraíso') n.nombre = PARAISO.nombre;
-      n._datosB = 1;
+      n._datosB = 2;
       guardar();
+    }
+    if (n._datosB < 2 && /para[ií]so/i.test(n.nombre || '')) {
+      // 07/10/2026: enlaces exactos que dio Stalin; se sustituyen los anteriores por defecto
+      var viejos = { logoUrl: ['https://el-paraiso-eight.vercel.app/fotos/logo.png'], web: ['https://el-paraiso-eight.vercel.app/'],
+        reserva: ['https://el-paraiso-eight.vercel.app/reservas.html'], instagram: ['https://www.instagram.com/elparaisobarrestaurante/'],
+        whatsapp: ['971 37 90 28'], sector: ['Restaurante · cocina caribeña y mediterránea', 'Restaurante'] };
+      CAMPOS.forEach(function (k) { if (!n[k] || (viejos[k] && viejos[k].indexOf(n[k]) >= 0)) n[k] = PARAISO[k]; });
+      n._datosB = 2; guardar();
     }
     CAMPOS.forEach(function (k) { if (n[k] === undefined) n[k] = ''; });
     S.conexiones = S.conexiones || {};
@@ -71,11 +81,13 @@
   /* Cada campo: cómo se normaliza y qué dominios valen. Devuelve {v, ok, msg}. */
   var REGLAS = {
     web: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser una dirección web (https://…)' }; },
+    club: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser un enlace (https://…)' }; },
+    whatsappApi: function (s) { var d = soloDigitos(s); return { v: (s || '').trim(), ok: !s || d.replace('+', '').length >= 9, msg: 'Pon el número (9 cifras o con +34)' }; },
     reserva: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser un enlace (TheFork, tu web de reservas…)' }; },
-    logoUrl: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Pega el enlace de una imagen (https://…/logo.png)' }; },
+    logoUrl: function (s) { s = (s || '').trim(); if (/^[\w./-]+\.(png|jpe?g|webp|svg)$/i.test(s) && !/^[\w-]+\.[a-z]{2,}\//i.test(s)) return { v: s, ok: true }; s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Pega el enlace de una imagen (https://…/logo.png)' }; },
     telefono: function (s) { var d = soloDigitos(s); return { v: (s || '').trim(), ok: !s || d.replace('+', '').length >= 9, msg: 'Un teléfono tiene al menos 9 cifras' }; },
     whatsapp: function (s) {
-      var t = (s || '').trim(), m = t.match(/wa\.me\/(\d+)/);
+      var t = (s || '').trim(), m = t.match(/wa\.me\/(\d+)/) || t.match(/[?&]phone=(\d+)/);
       if (m) t = m[1];
       var d = soloDigitos(t);
       return { v: t, ok: !t || d.replace('+', '').length >= 9, msg: 'Pon el número de WhatsApp (9 cifras o con +34)' };
@@ -149,6 +161,7 @@
     switch (tipo) {
       case 'reserva': return n.reserva || '';
       case 'web': return n.web || '';
+      case 'club': return n.club || '';
       case 'tel': return n.telefono ? 'tel:' + telE164(n.telefono) : '';
       case 'whatsapp': {
         if (!n.whatsapp) return '';
@@ -161,8 +174,8 @@
     }
     return '';
   }
-  var CAMPO_DE = { reserva: 'reserva', web: 'web', tel: 'telefono', whatsapp: 'whatsapp', instagram: 'instagram', facebook: 'facebook', tiktok: 'tiktok', youtube: 'youtube', google: 'google', resenas: 'resenas' };
-  var NOMBRE_DE = { reserva: 'el enlace de reservas', web: 'tu web', tel: 'tu teléfono', whatsapp: 'tu WhatsApp', instagram: 'tu Instagram', facebook: 'tu Facebook', tiktok: 'tu TikTok', youtube: 'tu YouTube', google: 'tu ficha de Google', resenas: 'el enlace de reseñas' };
+  var CAMPO_DE = { club: 'club', reserva: 'reserva', web: 'web', tel: 'telefono', whatsapp: 'whatsapp', instagram: 'instagram', facebook: 'facebook', tiktok: 'tiktok', youtube: 'youtube', google: 'google', resenas: 'resenas' };
+  var NOMBRE_DE = { club: 'el enlace del club', reserva: 'el enlace de reservas', web: 'tu web', tel: 'tu teléfono', whatsapp: 'tu WhatsApp', instagram: 'tu Instagram', facebook: 'tu Facebook', tiktok: 'tu TikTok', youtube: 'tu YouTube', google: 'tu ficha de Google', resenas: 'el enlace de reseñas' };
 
   function irA(url) {
     if (!url) return false;
@@ -239,7 +252,7 @@
       : '<div class="mn-logo">' + esc(n.logo || '🍽️') + '</div>';
   }
   function completado() {
-    var n = S.negocio, k = ['nombre', 'web', 'reserva', 'telefono', 'whatsapp', 'instagram', 'facebook', 'tiktok', 'youtube', 'google'];
+    var n = S.negocio, k = ['nombre', 'web', 'reserva', 'telefono', 'whatsapp', 'instagram', 'facebook', 'tiktok', 'youtube', 'google', 'club'];
     var c = k.filter(function (x) { return !!n[x]; }).length;
     return Math.round(c / k.length * 100);
   }
@@ -256,6 +269,7 @@
       '<div style="margin-top:6px;height:7px;background:var(--bg2);border-radius:9px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:var(--grad)"></div></div>' +
       '<div style="font-size:11.5px;color:var(--tx3);margin-top:3px">Ficha completa al ' + pct + ' % · estos datos los usan TODOS los botones de Chispa (Reservar, Ver web, WhatsApp, Llamar…)</div></div></div></div>' +
 
+      fichaGoogleHtml() +
       '<div class="card"><h3>⚡ Rellénalo en un momento</h3>' +
       '<label class="lb">Pega aquí cualquier enlace (Instagram, web, reservas, Google…) y Chispa lo pone en su sitio</label>' +
       '<div class="row" style="gap:8px"><input class="inp" id="mnPega" placeholder="https://www.instagram.com/tunegocio/" autocomplete="off" autocapitalize="off" style="flex:3">' +
@@ -285,7 +299,10 @@
       campo('reserva', 'Enlace de reservas', 'https://… (TheFork, tu web de reservas…)', { ir: 1 }) +
       campo('web', 'Web', 'https://tunegocio.com', { ir: 1 }) +
       campo('telefono', 'Teléfono', '971 00 00 00', { ir: 1, tipo: 'tel' }) +
-      campo('whatsapp', 'WhatsApp', '600 00 00 00', { ir: 1, tipo: 'tel' }) + '</div></div>' +
+      campo('whatsapp', 'WhatsApp de reservas (el que escriben los clientes)', '600 00 00 00', { ir: 1, tipo: 'tel' }) +
+      campo('club', 'Club de clientes / fidelización', 'https://…', { ir: 1 }) +
+      campo('whatsappApi', 'Número para la API de WhatsApp de Chispa', '971 00 00 00', { tipo: 'tel' }) + '</div>' +
+      '<p style="font-size:11.5px;color:var(--tx3);margin:6px 0 0">«Reservar» abre el enlace de reservas (puede ser un WhatsApp). El número de la API es el fijo del local: ese número no puede tener WhatsApp normal instalado.</p></div>' +
 
       '<div class="card"><h3>📲 Redes sociales</h3><div class="mn-grid">' +
       campo('instagram', 'Instagram', '@tunegocio', { ir: 1 }) +
@@ -306,6 +323,75 @@
       '<button class="btn pp" style="width:100%" onclick="guardarAjustes()">💾 Guardar cambios</button>' +
       '<div class="row" style="margin-top:10px;gap:8px"><button class="btn g sm" style="flex:none" onclick="mnRestaurarParaiso()">↺ Poner los datos de El Paraíso</button>' +
       '<button class="btn g sm" style="flex:none" onclick="resetTodo()">↺ Reiniciar demo</button></div>';
+  }
+
+  /* ---------- ficha de Google: conectar, horario, fotos y novedades ---------- */
+  function horario() {
+    var n = S.negocio;
+    if (!n.horario || n.horario.length !== 7) n.horario = (window.ChispaFicha ? ChispaFicha.HORARIO_PARAISO : []).map(function (d) { return Object.assign({}, d); });
+    return n.horario;
+  }
+  function estadoFicha() {
+    var F = window.ChispaFicha;
+    if (F && F.conectado()) return ['si', '✓ Conectada: ' + (F.ficha() && F.ficha().titulo || 'tu ficha')];
+    if (F && F.configurado()) return ['no', 'Lista para conectar'];
+    return ['no', 'Pendiente del permiso de Google'];
+  }
+  function fichaGoogleHtml() {
+    var e = estadoFicha(), dias = (window.ChispaFicha ? ChispaFicha.DIAS_ES : []), h = horario();
+    return '<div class="card" style="border-color:rgba(255,204,51,.45);background:linear-gradient(180deg,rgba(255,204,51,.07),transparent)">' +
+      '<h3 style="justify-content:space-between;flex-wrap:wrap"><span>📍 Tu ficha de Google · lo más importante</span><span class="chip ' + (e[0] === 'si' ? '' : 'amb') + '">' + e[1] + '</span></h3>' +
+      '<p style="font-size:13px;color:var(--tx2);margin:0 0 10px">Es lo primero que ve quien te busca en Google y en Maps. Chispa publica tus novedades y ofertas ahí, cambia el horario y sube fotos, igual que en Instagram.</p>' +
+      '<div class="row" style="gap:8px">' +
+      '<button class="btn pp sm" style="flex:none" onclick="mnFichaConectar()">🔗 Conectar mi ficha</button>' +
+      '<button class="btn g sm" style="flex:none" onclick="mnFichaVer(\'mnHorario\')">🕒 Horario</button>' +
+      '<button class="btn g sm" style="flex:none" onclick="mnFichaVer(\'mnFotos\')">📸 Fotos</button>' +
+      '<button class="btn g sm" style="flex:none" onclick="mnFichaVer(\'mnNovedad\')">📝 Publicar novedad</button>' +
+      '<button class="btn g sm" style="flex:none" onclick="abrirCta(\'google\')">Ver mi ficha ↗</button></div>' +
+      '<details id="mnHorario" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">🕒 Horario de la ficha</summary>' +
+      '<div style="margin-top:8px">' + dias.map(function (d, i) {
+        var x = h[i] || {};
+        return '<div class="row" style="align-items:center;gap:8px;margin:5px 0"><div style="flex:0 0 86px;min-width:0;font-size:13px">' + d + '</div>' +
+          '<input class="inp" type="time" id="mnH_a' + i + '" value="' + esc(x.a || '') + '" style="flex:1;min-width:0;padding:8px"' + (x.cerrado ? ' disabled' : '') + '>' +
+          '<input class="inp" type="time" id="mnH_c' + i + '" value="' + esc(x.c || '') + '" style="flex:1;min-width:0;padding:8px"' + (x.cerrado ? ' disabled' : '') + '>' +
+          '<label style="flex:none;min-width:0;font-size:12px;display:flex;gap:4px;align-items:center"><input type="checkbox" id="mnH_x' + i + '"' + (x.cerrado ? ' checked' : '') + ' onchange="mnHorCerrado(' + i + ',this.checked)">Cerrado</label></div>';
+      }).join('') +
+      '<button class="btn pp sm" style="margin-top:6px" onclick="mnHorarioGoogle()">💾 Guardar y actualizar en Google</button></div></details>' +
+      '<details id="mnFotos" style="margin-top:8px"><summary style="cursor:pointer;font-weight:700">📸 Subir una foto a la ficha</summary>' +
+      '<label class="lb" style="margin-top:8px">Enlace público de la foto (las que crea Chispa ya lo tienen)</label><input class="inp" id="mnFotoUrl" placeholder="https://…/plato.jpg" autocapitalize="off">' +
+      '<label class="lb" style="margin-top:8px">Tipo</label><select id="mnFotoCat"><option value="FOOD_AND_DRINK">Comida y bebida</option><option value="INTERIOR">Interior</option><option value="EXTERIOR">Fachada</option><option value="TEAMS">Equipo</option><option value="COVER">Portada</option><option value="LOGO">Logo</option></select>' +
+      '<button class="btn pp sm" style="margin-top:8px" onclick="mnFotoGoogle()">⬆️ Subir a Google</button></details>' +
+      '<details id="mnNovedad" style="margin-top:8px"><summary style="cursor:pointer;font-weight:700">📝 Publicar una novedad u oferta en la ficha</summary>' +
+      '<textarea id="mnNovTxt" style="margin-top:8px" placeholder="Ej: Este domingo, paella para compartir. ¡Reserva tu mesa!"></textarea>' +
+      '<label style="display:flex;gap:6px;align-items:center;font-size:13px;margin-top:6px"><input type="checkbox" id="mnNovOf"> Es una oferta (sale con la etiqueta «Oferta» 7 días)</label>' +
+      '<button class="btn pp sm" style="margin-top:8px" onclick="mnNovedadGoogle()">📍 Publicar en Google</button></details></div>';
+  }
+  function mnFichaVer(id) { var d = $(id); if (d) { d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
+  function mnFichaConectar() {
+    var F = window.ChispaFicha;
+    if (F && F.configurado()) { F.conectar().then(function (f) { toast('📍 Ficha conectada: ' + f.titulo); panel('ajustes'); }).catch(function (e) { toast('Google: ' + e.message); }); return; }
+    panel('conectar'); setTimeout(function () { var c = $('cx_google'); if (c) c.scrollIntoView({ behavior: 'smooth' }); }, 60);
+  }
+  function mnHorCerrado(i, si) { var a = $('mnH_a' + i), c = $('mnH_c' + i); if (a) a.disabled = si; if (c) c.disabled = si; }
+  function leerHorario() {
+    var h = horario();
+    for (var i = 0; i < 7; i++) {
+      var x = $('mnH_x' + i); if (!x) continue;
+      h[i] = x.checked ? { cerrado: true } : { a: $('mnH_a' + i).value, c: $('mnH_c' + i).value };
+      if (!x.checked && (!h[i].a || !h[i].c)) { toast('Falta la hora de ' + ChispaFicha.DIAS_ES[i]); return null; }
+    }
+    return h;
+  }
+  function mnHorarioGoogle() { var h = leerHorario(); if (!h) return; guardar(); ChispaFicha.actualizarHorario(h); }
+  function mnFotoGoogle() {
+    var u = conHttps(($('mnFotoUrl') || {}).value || '');
+    if (!urlValida(u)) { toast('Pega el enlace de la foto (https://…)'); return; }
+    ChispaFicha.subirFoto(u, $('mnFotoCat').value);
+  }
+  function mnNovedadGoogle() {
+    var t = (($('mnNovTxt') || {}).value || '').trim();
+    if (!t) { toast('Escribe la novedad primero 🙂'); return; }
+    ChispaFicha.publicar({ texto: t, oferta: $('mnNovOf').checked ? (S.negocio.oferta || t.slice(0, 58)) : '' });
   }
 
   function mnValidar(k) {
@@ -436,6 +522,19 @@
   /* ---------- guía «Conecta tu negocio en 5 minutos» ---------- */
   var GUIA = [
     {
+      id: 'google', ic: '📍', nm: 'Google (ficha de tu negocio) · paso más importante', campo: 'google',
+      pasos: [
+        'Busca tu negocio en Google Maps. Si pone «¿Eres el propietario?», <b>reclama la ficha</b> y verifica (postal, llamada o vídeo).',
+        'En la ficha: <b>Compartir → Copiar enlace</b> y pégalo en «Mi negocio» → Ficha de Google.',
+        'En el perfil: <b>Pedir reseñas</b> → copia el enlace (g.page/r/…) y pégalo en «Enlace para pedir reseñas».',
+        'Pon tu web y tu enlace de reservas en la ficha (botón «Reservar»), con <code>?o=google</code>.'
+      ],
+      abrir: [['Buscar mi negocio', '#buscar'], ['Google Business Profile', 'https://business.google.com/']],
+      perm: '<b>Permiso oficial:</b> <b>Google Business Profile API</b>, permiso <code>https://www.googleapis.com/auth/business.manage</code>. Con ese único permiso Chispa: <b>publica novedades y ofertas</b> en la ficha (<code>localPosts.create</code>), <b>cambia el horario</b> (Business Information API, <code>locations.patch</code> con <code>regularHours</code>), <b>sube fotos</b> (<code>media.create</code>) y <b>contesta reseñas</b> (<code>reviews.updateReply</code>). ' +
+        'Se usa el mismo cliente OAuth de Google que el apartado Reseñas. ' +
+        'Hay que <b>pedir acceso a Google</b> con su formulario (la ficha debe estar verificada y tener más de 60 días); hasta que lo aprueban, el cupo es 0.'
+    },
+    {
       id: 'instagram', ic: '📸', nm: 'Instagram', campo: 'instagram',
       pasos: [
         'En la app de Instagram: <b>Perfil → ☰ → Tipo de cuenta y herramientas → Cambiar a cuenta profesional → Empresa</b>. Gratis y sin perder nada.',
@@ -481,29 +580,19 @@
         'Google tiene que <b>verificar</b> la app y pasar la <b>auditoría de YouTube</b>; mientras tanto los vídeos subidos por API quedan en privado. Cupo: 10.000 unidades al día y subir un vídeo gasta unas 1.600.'
     },
     {
-      id: 'google', ic: '📍', nm: 'Google (ficha de tu negocio)', campo: 'google',
-      pasos: [
-        'Busca tu negocio en Google Maps. Si pone «¿Eres el propietario?», <b>reclama la ficha</b> y verifica (postal, llamada o vídeo).',
-        'En la ficha: <b>Compartir → Copiar enlace</b> y pégalo en «Mi negocio» → Ficha de Google.',
-        'En el perfil: <b>Pedir reseñas</b> → copia el enlace (g.page/r/…) y pégalo en «Enlace para pedir reseñas».',
-        'Pon tu web y tu enlace de reservas en la ficha (botón «Reservar»), con <code>?o=google</code>.'
-      ],
-      abrir: [['Buscar mi negocio', '#buscar'], ['Google Business Profile', 'https://business.google.com/']],
-      perm: '<b>Permiso oficial:</b> <b>Google Business Profile API</b>, permiso <code>https://www.googleapis.com/auth/business.manage</code>. Sirve para leer y <b>contestar reseñas</b> (<code>reviews.updateReply</code>) y publicar novedades y ofertas en la ficha (<code>localPosts</code>). ' +
-        'Hay que <b>pedir acceso a Google</b> con su formulario (la ficha debe estar verificada y tener más de 60 días); hasta que lo aprueban, el cupo es 0.'
-    },
-    {
       id: 'whatsapp', ic: '💬', nm: 'WhatsApp', campo: 'whatsapp',
       pasos: [
-        'Pon tu número en «Mi negocio» → WhatsApp: el botón «💬 WhatsApp» de tus posts ya funciona (abre el chat con «Quería reservar mesa» escrito). Esto <b>no necesita ningún permiso</b>.',
+        'Pon tu móvil de reservas en «Mi negocio» → WhatsApp de reservas: los botones «📅 Reservar» y «💬 WhatsApp» de tus posts ya abren ese chat con el mensaje escrito. Esto <b>no necesita ningún permiso</b>.',
+        'Para que Chispa conteste sola se usa <b>otro número: el fijo del local</b> (en «Número para la API de WhatsApp de Chispa»).',
         'Recomendado: usa <b>WhatsApp Business</b> (gratis) en el móvil del local, con horario y respuesta automática de ausencia.'
       ],
       abrir: [['WhatsApp Business', 'https://www.whatsapp.com/business']],
       perm: '<b>Solo si quieres que Chispa conteste sola:</b> WhatsApp Business Platform (Cloud API) de Meta, directa y sin intermediarios, permiso <code>whatsapp_business_messaging</code> (y <code>whatsapp_business_management</code>), con pago por conversación. ' +
-        '<b>⚠️ Importante:</b> Chispa usa el <b>número fijo del local</b>. Para darlo de alta en la Platform, ese número <b>no puede tener instalado WhatsApp ni WhatsApp Business normal</b> en ningún móvil (si lo tiene, hay que borrar esa cuenta antes). Un fijo sirve: Meta verifica el código con una <b>llamada de voz</b>.'
+        '<b>⚠️ Importante:</b> Chispa usa el <b>número fijo del local</b> (no el móvil de reservas). Para darlo de alta en la Platform, ese número <b>no puede tener instalado WhatsApp ni WhatsApp Business normal</b> en ningún móvil (si lo tiene, hay que borrar esa cuenta antes). Un fijo sirve: Meta verifica el código con una <b>llamada de voz</b>.'
     }
   ];
   function vConectar() {
+    // la ficha de Google va destacada arriba
     sembrar();
     var n = S.negocio, cx = S.conexiones, hechos = GUIA.filter(function (g) { return cx[g.id]; }).length;
     var html = '<div class="hd"><h2>🔗 Conecta tu negocio en 5 minutos</h2><button class="btn g sm" onclick="panel(\'ajustes\')">🏪 Mi negocio</button></div>' +
@@ -512,7 +601,7 @@
       '<div style="font-size:12px;color:var(--tx3);margin-top:4px">' + hechos + ' de ' + GUIA.length + ' listos</div></div>';
     GUIA.forEach(function (g) {
       var tiene = !!n[g.campo];
-      html += '<div class="cx" id="cx_' + g.id + '"><h3><span>' + g.ic + ' ' + g.nm + '</span>' +
+      html += '<div class="cx" id="cx_' + g.id + '"' + (g.id === 'google' ? ' style="border-color:rgba(255,204,51,.5);background:linear-gradient(180deg,rgba(255,204,51,.07),var(--panel))"' : '') + '><h3><span>' + g.ic + ' ' + g.nm + '</span>' +
         '<span class="est ' + (tiene ? 'si' : 'no') + '">' + (tiene ? '✓ Enlace puesto' : 'Falta el enlace') + '</span></h3>' +
         '<ol>' + g.pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ol>' +
         '<div class="row" style="gap:8px;margin-top:10px">' +
@@ -607,7 +696,8 @@
     mnValidar: mnValidar, mnProbar: mnProbar, mnPegar: mnPegar, mnBuscarGoogle: mnBuscarGoogle, mnBuscarMaps: mnBuscarMaps,
     mnDatosPublicos: mnDatosPublicos, mnUsarOsm: mnUsarOsm, mnInfoPlaces: mnInfoPlaces, mnIcono: mnIcono,
     mnRestaurarParaiso: mnRestaurarParaiso, mnHecho: mnHecho, mnAbrir: mnAbrir, mnVentas: mnVentas,
-    chispaEnlace: enlace, nuevoAnuncio: nuevoAnuncio
+    chispaEnlace: enlace, nuevoAnuncio: nuevoAnuncio,
+    mnFichaVer: mnFichaVer, mnFichaConectar: mnFichaConectar, mnHorCerrado: mnHorCerrado, mnHorarioGoogle: mnHorarioGoogle, mnFotoGoogle: mnFotoGoogle, mnNovedadGoogle: mnNovedadGoogle
   };
   for (var k in G) window[k] = G[k];
 
