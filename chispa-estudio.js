@@ -368,19 +368,19 @@ function dibujar(x,W,H,p,fuente,t,dur){
   x.fillStyle=g;x.fillRect(0,0,W,H);
   // brillo que cruza
   if(!(p.media&&p.media.esVideo)){var sw=((t*1000)%7000)/7000;if(sw<.45){var px=-W*.6+(sw/.45)*W*2.2;var gs=x.createLinearGradient(px-W*.25,0,px+W*.25,H*.3);gs.addColorStop(0,"rgba(255,236,190,0)");gs.addColorStop(.5,"rgba(255,236,190,.16)");gs.addColorStop(1,"rgba(255,236,190,0)");x.fillStyle=gs;x.fillRect(0,0,W,H);}}
-  if(Lw===3){x.strokeStyle="rgba(255,255,255,.7)";x.lineWidth=Math.max(2,u*.25);rr(x,3.6*u,3.6*u,W-7.2*u,H-7.2*u,2*u);x.stroke();}
+  if(Lw===3){x.strokeStyle="rgba(255,255,255,.7)";x.lineWidth=Math.max(2,u*.25);if(V)rr(x,3.6*u,14*u,W-7.2*u,H-44*u,2*u);else rr(x,3.6*u,3.6*u,W-7.2*u,H-7.2*u,2*u);x.stroke();}
   // marca
   var aB=ease(t/0.6);x.globalAlpha=aB;
   x.font="700 "+(3.6*u)+"px Inter, sans-serif";x.textBaseline="middle";
-  var bx=5.5*u,by=9*u,lbl=n.nombre||"";
-  if(Lw===3){var bw=8*u+2*u+x.measureText(lbl).width;bx=(W-bw)/2;by=11.5*u;}
+  var bx=5.5*u,by=(V?21:9)*u,lbl=n.nombre||"";
+  if(Lw===3){var bw=8*u+2*u+x.measureText(lbl).width;bx=(W-bw)/2;by=(V?23:11.5)*u;}
   x.fillStyle="rgba(255,255,255,.92)";x.beginPath();x.arc(bx+4*u,by,4*u,0,7);x.fill();
   x.font=(4.4*u)+"px sans-serif";x.textAlign="center";x.fillStyle="#111";x.fillText(n.logo||"🍽️",bx+4*u,by+.2*u);
   x.textAlign="left";x.font="700 "+(3.6*u)+"px Inter, sans-serif";x.fillStyle="#fff";x.fillText(lbl,bx+10*u,by);
   x.globalAlpha=1;
   if(p.sinTexto)return;
   // oferta
-  if(n.oferta){var ao=ease((t-1.9)/0.5);if(ao>0){x.save();x.globalAlpha=ao;x.font="800 "+(3.6*u)+"px Inter, sans-serif";var ot="🔥 "+n.oferta,ow=x.measureText(ot).width+6.4*u;x.translate(W-5*u-ow/2,8*u);x.rotate(.05);x.scale(.6+.4*ao,.6+.4*ao);var go=x.createLinearGradient(-ow/2,0,ow/2,0);go.addColorStop(0,"#fb7185");go.addColorStop(1,"#ffb020");x.fillStyle=go;rr(x,-ow/2,-3.6*u,ow,7.2*u,3.6*u);x.fill();x.fillStyle="#2a0b0b";x.textAlign="center";x.fillText(ot,0,.2*u);x.restore();}}
+  if(n.oferta){var ao=ease((t-1.9)/0.5);if(ao>0){x.save();x.globalAlpha=ao;x.font="800 "+(3.6*u)+"px Inter, sans-serif";var ot="🔥 "+n.oferta,ow=x.measureText(ot).width+6.4*u;x.translate(W-5*u-ow/2,(V?20:8)*u);x.rotate(.05);x.scale(.6+.4*ao,.6+.4*ao);var go=x.createLinearGradient(-ow/2,0,ow/2,0);go.addColorStop(0,"#fb7185");go.addColorStop(1,"#ffb020");x.fillStyle=go;rr(x,-ow/2,-3.6*u,ow,7.2*u,3.6*u);x.fill();x.fillStyle="#2a0b0b";x.textAlign="center";x.fillText(ot,0,.2*u);x.restore();}}
   // titular
   var serif=(Lw===1||Lw===2),fs=(Lw===1?11:Lw===2?11.5:Lw===3?9:10.5)*u*(V?(Lw===3?1.1:1.14):1);
   var font=(Lw===1?"italic 600 ":serif?"600 ":"800 ")+fs+"px "+(serif?"Fraunces, Georgia, serif":"Inter, sans-serif");
@@ -390,7 +390,7 @@ function dibujar(x,W,H,p,fuente,t,dur){
   var cta=(p.ctas&&p.ctas[0]?p.ctas[0].t.replace(/^\S+\s/,""):"Reserva tu mesa")+" →";
   var kH=kick?7*u:0,cH=12*u,blockH=kH+3*u+lines.length*lh+cH;
   var center=(Lw===1||Lw===3),left=6.5*u;
-  var y0=(Lw===1)?(H-blockH)/2:H-(V?16:Lw===3?10:7)*u-blockH;
+  var y0=(Lw===1)?(H-blockH)/2:H-(V?44:Lw===3?10:7)*u-blockH;
   x.textBaseline="alphabetic";x.shadowColor="rgba(0,0,0,.45)";x.shadowBlur=18;
   // frase pequeña
   if(kick){var ak=ease((t-.25)/.7);if(ak>0){x.save();x.globalAlpha=ak;x.font="700 "+(3.6*u)+"px Inter, sans-serif";var kw=x.measureText(kick.toUpperCase()).width+kick.length*.5*u+5.2*u;var kx=center?(W-kw)/2:left;kx+=(1-ak)*-12;
