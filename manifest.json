@@ -1,0 +1,16 @@
+{
+  "name": "Chispa — marketing con IA",
+  "short_name": "Chispa",
+  "description": "El robot de IA que lleva el marketing de tu negocio: crea posts y vídeos, planifica la semana y publica por ti.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "es",
+  "background_color": "#0b0d12",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,1053 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chispa — tu marketing en automático</title>
+<meta name="theme-color" content="#8b5cf6">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chispa">
+<link rel="apple-touch-icon" href="icono-180.png">
+<link rel="icon" type="image/png" href="icono-192.png">
+<script>if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<meta name="description" content="Chispa: el robot de IA que gestiona el marketing de tu negocio. Escribe, diseña, programa, publica y responde por ti.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0b0d12;--bg2:#0f131b;--panel:#141821;--panel2:#1a1f2b;--line:#232a38;
+    --tx:#e9edf4;--tx2:#a3adbf;--tx3:#6f7a8d;
+    --amber:#ffcc33;--amber2:#ffb020;--purple:#8b5cf6;--purple2:#a78bfa;
+    --verde:#34d399;--rojo:#fb7185;--azul:#60a5fa;
+    --grad:linear-gradient(135deg,#a78bfa,#ffcc33);
+    --acc:#8b5cf6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--tx);font:15px/1.55 -apple-system,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--purple2);text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+  /* ---------- barra superior ---------- */
+  .top{position:sticky;top:0;z-index:30;background:rgba(11,13,18,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .top .wrap{display:flex;align-items:center;gap:16px;height:62px}
+  .logo{font-weight:800;font-size:20px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+  .logo .sp{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .bolt{width:30px;height:30px;border-radius:9px;background:var(--grad);display:grid;place-items:center;color:#1a1200;font-size:18px;box-shadow:0 0 18px rgba(255,204,51,.35)}
+  .seg{margin-left:auto;display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+  .seg button{border:0;background:transparent;color:var(--tx2);font-weight:700;font-size:13px;padding:8px 14px;border-radius:9px;cursor:pointer;white-space:nowrap}
+  .seg button.on{background:var(--grad);color:#1a1200}
+  /* ---------- botones ---------- */
+  .btn{border:0;cursor:pointer;font-weight:800;border-radius:12px;padding:13px 22px;font-size:15px;color:#1a1200;background:var(--grad);box-shadow:0 8px 26px rgba(139,92,246,.28)}
+  .btn:active{transform:translateY(1px)}
+  .btn.pp{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff}
+  .btn.g{background:var(--panel2);color:var(--tx);border:1px solid var(--line);box-shadow:none}
+  .btn.sm{padding:8px 14px;font-size:13px;border-radius:9px}
+  .chip{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:30px;background:rgba(139,92,246,.15);color:var(--purple2);border:1px solid rgba(139,92,246,.35)}
+  .chip.amb{background:rgba(255,204,51,.12);color:var(--amber);border-color:rgba(255,204,51,.3)}
+  /* ---------- landing ---------- */
+  .hero{position:relative;text-align:center;padding:54px 0 30px;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:-40% 20% auto;height:520px;background:radial-gradient(closest-side,rgba(139,92,246,.22),transparent 70%);filter:blur(10px);z-index:0}
+  .hero .wrap{position:relative;z-index:1}
+  .robot{width:132px;height:132px;margin:0 auto 20px;border-radius:30px;background:linear-gradient(160deg,#1c2230,#0d1017);border:1px solid var(--line);display:grid;place-items:center;font-size:66px;box-shadow:0 0 0 6px rgba(139,92,246,.08),0 20px 60px rgba(0,0,0,.6);position:relative}
+  .robot::after{content:"";position:absolute;inset:-2px;border-radius:30px;background:var(--grad);opacity:.25;z-index:-1;filter:blur(14px)}
+  h1.big{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 14px;font-weight:800;letter-spacing:-1px}
+  h1.big .sp{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{font-size:clamp(15px,2vw,19px);color:var(--tx2);max-width:620px;margin:0 auto 26px}
+  .heroCta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .talk{font-size:17px;padding:16px 28px;border-radius:40px}
+  .talk .mic{margin-right:8px}
+  .mini{margin-top:14px;font-size:12px;color:var(--tx3)}
+  /* secciones */
+  section{padding:30px 0}
+  h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.5px;margin:0 0 6px;text-align:center}
+  .lead{text-align:center;color:var(--tx2);max-width:620px;margin:0 auto 24px}
+  .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:820px){.feats{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.feats{grid-template-columns:1fr}}
+  .feat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .feat .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:24px;background:rgba(139,92,246,.12);margin-bottom:10px}
+  .feat h3{margin:0 0 4px;font-size:16px}
+  .feat p{margin:0;color:var(--tx2);font-size:13.5px}
+  /* precios */
+  .planes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+  @media(max-width:820px){.planes{grid-template-columns:1fr}}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column}
+  .plan.best{border-color:var(--purple);box-shadow:0 0 0 1px var(--purple) inset,0 16px 50px rgba(139,92,246,.2);position:relative}
+  .plan.best::before{content:"⭐ EL MÁS ELEGIDO";position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--grad);color:#1a1200;font-size:10.5px;font-weight:800;padding:4px 12px;border-radius:30px;white-space:nowrap}
+  .plan h3{margin:0 0 2px;font-size:19px}
+  .plan .price{font-size:40px;font-weight:800;letter-spacing:-1px;margin:6px 0 2px}
+  .plan .price small{font-size:15px;color:var(--tx3);font-weight:600}
+  .plan ul{list-style:none;padding:0;margin:14px 0 18px;flex:1}
+  .plan li{padding:7px 0 7px 26px;position:relative;font-size:13.5px;color:var(--tx2);border-bottom:1px solid var(--line)}
+  .plan li::before{content:"✓";position:absolute;left:0;color:var(--verde);font-weight:800}
+  .plan .btn{width:100%;text-align:center}
+  /* solers */
+  .solers{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(255,204,51,.06));border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .solers .t{flex:1;min-width:240px}
+  .solers h3{margin:0 0 4px;font-size:18px}
+  .solers p{margin:0;color:var(--tx2);font-size:14px}
+  .solers .pills{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13px}
+  footer{border-top:1px solid var(--line);margin-top:30px;padding:20px 0;text-align:center;color:var(--tx3);font-size:12px}
+  /* ---------- panel ---------- */
+  .app{display:none;grid-template-columns:230px 1fr;gap:18px;padding:18px 0 50px}
+  .app.on{display:grid}
+  @media(max-width:820px){.app{grid-template-columns:1fr}}
+  .nav{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px;height:max-content;position:sticky;top:76px}
+  @media(max-width:820px){.nav{position:static;display:flex;overflow-x:auto;gap:6px}}
+  .nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--tx2);font-weight:700;font-size:14px;padding:11px 12px;border-radius:11px;cursor:pointer;white-space:nowrap;text-align:left}
+  .nav button.on{background:var(--panel2);color:var(--tx)}
+  .nav button.on .ic{filter:drop-shadow(0 0 6px rgba(255,204,51,.5))}
+  .nav .ic{font-size:17px}
+  .main{min-width:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+  .card h3{margin:0 0 12px;font-size:17px;display:flex;align-items:center;gap:8px}
+  .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .hd h2{text-align:left;margin:0;font-size:22px}
+  .inp,textarea,select{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--tx);border-radius:11px;padding:11px 13px;font:inherit;font-size:14px}
+  textarea{min-height:76px;resize:vertical}
+  label.lb{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--tx3);font-weight:700;margin:0 0 5px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:120px}
+  /* post preview */
+  .post{background:var(--bg2);border:1px solid var(--line);border-radius:14px;overflow:hidden;max-width:420px}
+  .post .ph{display:flex;align-items:center;gap:9px;padding:11px 13px}
+  .post .av{width:34px;height:34px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#1a1200;font-weight:800}
+  .post .img{aspect-ratio:1/1;background:linear-gradient(135deg,#2a2140,#3a2d12);display:grid;place-items:center;color:var(--tx2);font-size:13px;text-align:center;padding:16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .post .bd{padding:12px 13px;font-size:13.5px}
+  .post .tags{color:var(--purple2);font-size:12.5px;margin-top:6px}
+  .ideas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:760px){.ideas{grid-template-columns:1fr}}
+  .ideac{margin:0}
+  .ang{font-weight:800;font-size:12.5px;color:var(--purple2);margin-bottom:8px}
+  .por{font-size:11.5px;color:var(--tx3);margin-top:8px;line-height:1.35}
+  .post .img.hasimg{padding:0;display:block;aspect-ratio:1/1}
+  .post .img img{width:100%;height:100%;object-fit:cover;display:block}
+  /* calendario */
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+  @media(max-width:600px){.cal{grid-template-columns:repeat(2,1fr)}}
+  .cal .dh{font-size:11px;color:var(--tx3);text-transform:uppercase;font-weight:700;text-align:center;padding-bottom:2px}
+  @media(max-width:600px){.cal .dh{display:none}}
+  .day{background:var(--bg2);border:1px solid var(--line);border-radius:10px;min-height:86px;padding:7px;cursor:pointer}
+  .day:hover{border-color:var(--purple)}
+  .day .dn{font-size:11px;color:var(--tx3);margin-bottom:4px}
+  .ev{font-size:11px;background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.3);color:var(--purple2);border-radius:6px;padding:3px 5px;margin-bottom:3px;line-height:1.25;overflow:hidden}
+  .ev.amb{background:rgba(255,204,51,.12);border-color:rgba(255,204,51,.3);color:var(--amber)}
+  /* bandeja */
+  .msg{display:flex;gap:11px;padding:13px;border:1px solid var(--line);border-radius:13px;margin-bottom:11px;background:var(--bg2)}
+  .msg .av{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:18px;background:var(--panel2)}
+  .msg .co{flex:1;min-width:0}
+  .msg .nm{font-weight:700;font-size:13.5px}
+  .msg .nm small{color:var(--tx3);font-weight:500;margin-left:6px}
+  .msg .tx{font-size:13.5px;color:var(--tx);margin:3px 0 8px}
+  .sugg{background:rgba(52,211,153,.08);border:1px dashed rgba(52,211,153,.4);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--tx)}
+  .sugg .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--verde);font-weight:800;margin-bottom:3px}
+  .msg .acts{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+  /* stats */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  @media(max-width:700px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px}
+  .kpi .n{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .kpi .n.a{color:var(--amber)} .kpi .n.p{color:var(--purple2)} .kpi .n.v{color:var(--verde)} .kpi .n.b{color:var(--azul)}
+  .kpi .l{font-size:12px;color:var(--tx3);margin-top:3px}
+  .kpi .up{font-size:11.5px;color:var(--verde);font-weight:700}
+  .ch{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+  .ch h3{margin:0 0 10px;font-size:15px}
+  .chbox{position:relative;height:260px}
+  /* ---------- modal / chat ---------- */
+  .ov{display:none;position:fixed;inset:0;z-index:50;background:rgba(5,6,10,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px}
+  .ov.on{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;width:100%;max-width:480px;max-height:88vh;overflow:auto;padding:20px}
+  .modal h3{margin:0 0 12px;font-size:18px}
+  .modal .x{float:right;cursor:pointer;color:var(--tx3);font-size:22px;line-height:1;border:0;background:none}
+  /* chat */
+  .chat{background:var(--panel);border:1px solid var(--line);border-radius:18px;width:100%;max-width:440px;height:min(620px,88vh);display:flex;flex-direction:column;overflow:hidden}
+  .chat .ch-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,rgba(139,92,246,.15),transparent)}
+  .chat .ch-h .av{width:40px;height:40px;border-radius:12px;background:var(--grad);display:grid;place-items:center;font-size:22px}
+  .chat .ch-h .st{font-size:11.5px;color:var(--verde)}
+  .chat .ch-h .x{margin-left:auto;background:none;border:0;color:var(--tx3);font-size:22px;cursor:pointer}
+  .stream{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .bub{max-width:82%;padding:10px 13px;border-radius:15px;font-size:14px;line-height:1.45}
+  .bub.ia{background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:5px;align-self:flex-start}
+  .bub.me{background:var(--grad);color:#1a1200;font-weight:600;border-bottom-right-radius:5px;align-self:flex-end}
+  .qs{display:flex;flex-wrap:wrap;gap:7px;padding:10px 14px;border-top:1px solid var(--line)}
+  .qs button{background:var(--panel2);border:1px solid var(--line);color:var(--tx);font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:30px;cursor:pointer}
+  .qs button:hover{border-color:var(--purple)}
+  .typing{align-self:flex-start;color:var(--tx3);font-size:13px;padding:4px 6px}
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(24px);background:#14301f;border:1px solid rgba(52,211,153,.5);color:#d1fae5;font-weight:700;padding:12px 20px;border-radius:30px;opacity:0;transition:.28s;z-index:70;font-size:14px;max-width:90vw;text-align:center}
+  #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  .empty{color:var(--tx3);font-size:13.5px;text-align:center;padding:20px}
+  /* ---------- estudio de contenido ---------- */
+  @media(max-width:560px){.seg button{padding:7px 9px;font-size:11.5px}.top .wrap{gap:8px}.logo{font-size:17px}}
+  .est{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:30px;border:1px solid}
+  .est.probando{background:rgba(96,165,250,.14);color:var(--azul);border-color:rgba(96,165,250,.4)}
+  .est.creciendo{background:rgba(255,204,51,.12);color:var(--amber);border-color:rgba(255,204,51,.35)}
+  .est.monetizando{background:rgba(52,211,153,.12);color:var(--verde);border-color:rgba(52,211,153,.4)}
+  .est.pausado{background:rgba(111,122,141,.14);color:var(--tx3);border-color:var(--line)}
+  .canal{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:10px;flex-wrap:wrap}
+  .canal .ci{width:42px;height:42px;border-radius:11px;background:var(--panel2);display:grid;place-items:center;font-size:22px;flex:none}
+  .canal .cc{flex:1;min-width:150px}
+  .canal .cn{font-weight:800;font-size:14.5px}
+  .canal .cm{font-size:12px;color:var(--tx3);margin-top:2px}
+  .canal .cact{display:flex;gap:6px;flex-wrap:wrap}
+  .epi{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--purple);border-radius:11px;padding:12px 14px;margin-bottom:9px}
+  .epi .en{font-size:11px;color:var(--purple2);font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+  .epi .et{font-weight:700;font-size:14px;margin:3px 0}
+  .epi .cliff{font-size:12.5px;color:var(--amber);margin-top:4px}
+  .gseg{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px}
+  .gseg .gl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+  .gseg .gt{font-size:13.5px;color:var(--tx)}
+  .gseg.gancho{border-left:3px solid var(--rojo)} .gseg.gancho .gl{color:var(--rojo)}
+  .gseg.des{border-left:3px solid var(--purple)} .gseg.des .gl{color:var(--purple2)}
+  .gseg.rem{border-left:3px solid var(--amber)} .gseg.rem .gl{color:var(--amber)}
+  .gseg.cta{border-left:3px solid var(--verde)} .gseg.cta .gl{color:var(--verde)}
+  .via{display:flex;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:10px}
+  .via .vn{width:30px;height:30px;border-radius:50%;background:var(--grad);color:#1a1200;font-weight:800;display:grid;place-items:center;flex:none;font-size:14px}
+  .via .vt{font-weight:800;font-size:14.5px}
+  .via .vd{font-size:13px;color:var(--tx2);margin-top:2px}
+  .via .vp{font-size:12.5px;color:var(--amber);font-weight:700;margin-top:3px}
+  .warn{background:rgba(251,113,133,.09);border:1px solid rgba(251,113,133,.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:var(--tx)}
+  .warn b{color:var(--rojo)}
+  .checklist{list-style:none;padding:0;margin:0}
+  .checklist li{padding:9px 0 9px 28px;position:relative;font-size:13.5px;color:var(--tx2);border-bottom:1px solid var(--line)}
+  .checklist li::before{content:"✓";position:absolute;left:4px;color:var(--verde);font-weight:800}
+  /* ---------- plan semana / oferta / marca / micro-anim ---------- */
+  .post{position:relative}
+  .pacc{height:3px;background:var(--acc,var(--purple))}
+  .ofbadge{position:absolute;top:10px;right:10px;z-index:3;background:linear-gradient(135deg,#fb7185,#ffb020);color:#2a0b0b;font-weight:800;font-size:12px;padding:5px 11px;border-radius:30px;box-shadow:0 6px 18px rgba(0,0,0,.45);transform:rotate(2deg)}
+  .prop{background:linear-gradient(135deg,rgba(139,92,246,.14),rgba(255,204,51,.06));border-color:rgba(139,92,246,.35)!important}
+  .prop .pl{font-size:11.5px;font-weight:800;color:var(--purple2);text-transform:uppercase;letter-spacing:.4px}
+  .planrow{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line)}
+  .planrow:last-child{border-bottom:0}
+  .planrow .pd{flex:none;width:44px;height:44px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--tx2)}
+  .planrow .pc{flex:1;min-width:0}
+  .planrow .pm{font-size:11.5px;color:var(--tx3);margin-top:2px}
+  .chip.tpost{background:rgba(96,165,250,.14);color:var(--azul);border-color:rgba(96,165,250,.4)}
+  .chip.treel{background:rgba(139,92,246,.15);color:var(--purple2)}
+  .chip.thist{background:rgba(52,211,153,.12);color:var(--verde);border-color:rgba(52,211,153,.4)}
+  .chip.tof{background:rgba(255,204,51,.14);color:var(--amber);border-color:rgba(255,204,51,.4)}
+  .sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+  .sw.on{border-color:#fff;box-shadow:0 0 0 2px var(--purple)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  .ideac,.via,.canal,.epi,.planrow,.gseg{animation:fadeUp .3s ease both}
+  .btn{transition:transform .08s,box-shadow .2s,filter .18s}
+  .btn:hover{filter:brightness(1.07)}
+  .ideac{transition:transform .15s,border-color .15s}
+  .ideac:hover{transform:translateY(-2px);border-color:rgba(139,92,246,.45)}
+  .feat,.plan,.kpi{transition:transform .15s,border-color .15s}
+  .feat:hover,.kpi:hover{transform:translateY(-2px)}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+  <div class="logo"><span class="bolt">⚡</span> <span class="sp">Chispa</span></div>
+  <div class="seg">
+    <button id="segA" class="on" onclick="vista('landing')">Ver como cliente</button>
+    <button id="segB" onclick="vista('panel')">Panel del negocio</button>
+    <button id="segC" onclick="vista('estudio')">Estudio de contenido</button>
+  </div>
+</div></div>
+
+<!-- ===================== LANDING ===================== -->
+<div id="landing">
+  <div class="hero"><div class="wrap">
+    <div class="robot">🤖</div>
+    <h1 class="big">Deja de hacer tu marketing.<br><span class="sp">Chispa lo hace por ti.</span></h1>
+    <p class="sub">El robot de inteligencia artificial que escribe tus publicaciones, te las diseña, las programa, las publica en Instagram y Facebook y hasta responde a tus clientes. Tú atiendes tu negocio; Chispa llena tus redes.</p>
+    <div class="heroCta">
+      <button class="btn pp talk" onclick="abrirChat()"><span class="mic">🎤</span> TOCA PARA HABLAR</button>
+      <button class="btn g" onclick="vista('panel')">Ver cómo funciona por dentro ›</button>
+    </div>
+    <div class="mini">Habla con Chispa y te lo explica en 30 segundos · <span class="chip">demo</span> la voz real se conecta con ElevenLabs</div>
+  </div></div>
+
+  <section><div class="wrap">
+    <h2>Todo tu marketing, en automático</h2>
+    <p class="lead">Lo que antes te llevaba horas (o pagabas a una agencia), Chispa lo hace sola, cada día.</p>
+    <div class="feats">
+      <div class="feat"><div class="ic">✍️</div><h3>Escribe tus posts</h3><p>Textos que venden, con el tono de tu negocio. Tú das la idea, Chispa la convierte en publicación.</p></div>
+      <div class="feat"><div class="ic">🎨</div><h3>Crea las imágenes</h3><p>Diseña la foto o el cartel de cada publicación. Sin saber diseño ni pagar a nadie.</p></div>
+      <div class="feat"><div class="ic">📅</div><h3>Programa y publica</h3><p>Deja tu semana entera lista de una vez. Chispa publica a la hora que más te ven.</p></div>
+      <div class="feat"><div class="ic">💬</div><h3>Responde por ti</h3><p>Contesta comentarios y mensajes con respuestas que tú apruebas con un clic.</p></div>
+      <div class="feat"><div class="ic">📣</div><h3>Prepara tus anuncios</h3><p>Monta el anuncio de Instagram/Facebook listo para lanzar, con texto, imagen y público.</p></div>
+      <div class="feat"><div class="ic">📈</div><h3>Te dice qué funciona</h3><p>Ves tu alcance, seguidores e interacciones claros, y Chispa aprende qué publicar más.</p></div>
+    </div>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2>Un precio para cada negocio</h2>
+    <p class="lead">Sin permanencia. Pruebas, y si no te llena las redes, lo dejas.</p>
+    <div class="planes">
+      <div class="plan">
+        <h3>Básico</h3><div class="price">29 €<small>/mes</small></div>
+        <span class="chip amb">Para empezar</span>
+        <ul><li>Posts escritos por IA</li><li>Programación automática</li><li>1 red social</li><li>Calendario de contenido</li></ul>
+        <button class="btn g" onclick="elegir('Básico')">Empezar</button>
+      </div>
+      <div class="plan best">
+        <h3>Pro</h3><div class="price">59 €<small>/mes</small></div>
+        <span class="chip">Lo más completo</span>
+        <ul><li>Todo lo de Básico +</li><li>Imágenes creadas por IA</li><li>Instagram + Facebook</li><li>Anuncios preparados</li><li>Avatar que atiende a tus clientes</li></ul>
+        <button class="btn pp" onclick="elegir('Pro')">Quiero Pro</button>
+      </div>
+      <div class="plan">
+        <h3>Equipo</h3><div class="price">99 €<small>/mes</small></div>
+        <span class="chip amb">Negocios con volumen</span>
+        <ul><li>Todo lo de Pro +</li><li>Gestión de anuncios en Meta</li><li>Respuestas automáticas 24/7</li><li>Varios usuarios</li><li>Soporte prioritario</li></ul>
+        <button class="btn g" onclick="elegir('Equipo')">Hablar con ventas</button>
+      </div>
+    </div>
+  </div></section>
+
+  <section><div class="wrap">
+    <div class="solers">
+      <div class="t">
+        <h3>⚡ Con la fuerza de Solers</h3>
+        <p>Chispa es de Solers, los mismos que hacen <b>Brigada</b> (software de obra) y <b>GestorOS</b> (software fiscal y contable). Si tienes un negocio de reformas o necesitas tu facturación al día, Chispa también te los presenta — todo bajo un mismo techo.</p>
+      </div>
+      <div class="pills">
+        <div class="pill">🏗️ Brigada</div>
+        <div class="pill">🧾 GestorOS</div>
+        <div class="pill">⚡ Chispa</div>
+      </div>
+    </div>
+  </div></section>
+
+  <footer>Prototipo · la IA está simulada con ejemplos · sin base de datos · © Solers</footer>
+</div>
+
+<!-- ===================== PANEL ===================== -->
+<div class="app" id="app">
+  <div class="nav" id="nav"></div>
+  <div class="main" id="main"></div>
+</div>
+
+<!-- ===================== ESTUDIO DE CONTENIDO ===================== -->
+<div class="app" id="estudioApp">
+  <div class="nav" id="enav"></div>
+  <div class="main" id="emain"></div>
+</div>
+
+<!-- chat overlay -->
+<div class="ov" id="chatOv">
+  <div class="chat">
+    <div class="ch-h">
+      <div class="av">🤖</div>
+      <div><div style="font-weight:800">Chispa</div><div class="st">● en línea · asistente de IA</div></div>
+      <button class="x" onclick="cerrarChat()">×</button>
+    </div>
+    <div class="stream" id="stream"></div>
+    <div class="qs" id="qs"></div>
+  </div>
+</div>
+
+<!-- modal genérico -->
+<div class="ov" id="modalOv"><div class="modal" id="modalBox"></div></div>
+
+<div id="toast"></div>
+
+<script>
+/* ============ estado ============ */
+var KEY="chispa_proto_v1";
+var DIAS=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+function nuevo(){return{
+  negocio:{nombre:"El Paraíso",tono:"Cercano y con chispa",logo:"🍽️",red:"Instagram + Facebook",sector:"Restaurante",ciudad:"Palma de Mallorca",direccion:"",telefono:"",reserva:"",web:"",instagram:"",facebook:"",tiktok:"",oferta:"",color:"#8b5cf6"},
+  programados:[
+    {dia:0,txt:"Menú del día 🍲",tipo:"p"},
+    {dia:1,txt:"Reel: cómo hacemos el arroz",tipo:"a"},
+    {dia:3,txt:"Reseña de un cliente ⭐",tipo:"p"},
+    {dia:4,txt:"Oferta findes: 2x1 postres",tipo:"a"},
+    {dia:5,txt:"Fotos del brunch del sábado",tipo:"p"}
+  ],
+  bandeja:[
+    {av:"👩",nm:"Marta R.",red:"comentario en Instagram",tx:"¿Abrís los domingos a mediodía?",sug:"¡Hola Marta! 🙌 Sí, los domingos abrimos de 13:00 a 16:30. ¿Te reservamos mesa?",hecho:false},
+    {av:"🧔",nm:"Toni",red:"mensaje directo",tx:"Quiero reservar para 8 personas el viernes",sug:"¡Genial, Toni! Para 8 personas el viernes tenemos hueco a las 21:00. ¿Te va bien? Dime un teléfono y lo dejamos cerrado. 📞",hecho:false},
+    {av:"👵",nm:"Carmen",red:"comentario en Facebook",tx:"La paella estaba buenísima 😍",sug:"¡Muchas gracias, Carmen! 😍 Nos alegra un montón. ¡Te esperamos pronto otra vez!",hecho:false}
+  ],
+  anuncios:[],
+  historial:[],
+  canales:[
+    {ic:"🤖",nombre:"IA en 60 segundos",nicho:"Tecnología / IA",reds:"YouTube + TikTok",estado:"creciendo",videos:23},
+    {ic:"🗣️",nombre:"English con trucos",nicho:"Idiomas",reds:"TikTok + Reels",estado:"probando",videos:8},
+    {ic:"📜",nombre:"Historias que no sabías",nicho:"Historia / curiosidades",reds:"YouTube Shorts",estado:"monetizando",videos:61},
+    {ic:"⚡",nombre:"Productividad brutal",nicho:"Productividad / software",reds:"Reels + Shorts",estado:"pausado",videos:14}
+  ],
+  contenidoCal:[
+    {dia:0,txt:"IA: 3 apps que no conocías",red:"TT"},
+    {dia:1,txt:"Inglés: 5 errores típicos",red:"IG"},
+    {dia:2,txt:"Historia: el error que lo cambió todo",red:"YT"},
+    {dia:4,txt:"IA: automatiza tu día",red:"TT"},
+    {dia:5,txt:"Serie misterio · episodio 2",red:"YT"}
+  ]
+};}
+var S;
+try{S=JSON.parse(localStorage.getItem(KEY))||nuevo();}catch(e){S=nuevo();}
+(function(){var d={nombre:"El Paraíso",tono:"Cercano y con chispa",logo:"🍽️",red:"Instagram + Facebook",sector:"Restaurante",ciudad:"Palma de Mallorca",direccion:"",telefono:"",reserva:"",web:"",instagram:"",facebook:"",tiktok:"",oferta:"",color:"#8b5cf6"};S.negocio=S.negocio||{};for(var k in d){if(S.negocio[k]===undefined)S.negocio[k]=d[k];}if(S.negocio.nombre==="Restaurante Es Molí"){S.negocio.nombre="El Paraíso";S.negocio.sector="Restaurante";S.negocio.ciudad="Palma de Mallorca";}})();
+if(!S.canales)S.canales=nuevo().canales;
+if(!S.contenidoCal)S.contenidoCal=nuevo().contenidoCal;
+function guardar(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ============ util ============ */
+function $(id){return document.getElementById(id);}
+function esc(s){return(s==null?"":""+s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("on");},2600);}
+function modal(html){$("modalBox").innerHTML='<button class="x" onclick="cerrarModal()">×</button>'+html;$("modalOv").classList.add("on");}
+function cerrarModal(){$("modalOv").classList.remove("on");}
+$("modalOv").addEventListener("click",function(e){if(e.target===this)cerrarModal();});
+
+/* ============ vistas ============ */
+function vista(v){
+  $("landing").style.display=v==="landing"?"block":"none";
+  $("app").classList.toggle("on",v==="panel");
+  $("estudioApp").classList.toggle("on",v==="estudio");
+  $("segA").classList.toggle("on",v==="landing");
+  $("segB").classList.toggle("on",v==="panel");
+  $("segC").classList.toggle("on",v==="estudio");
+  window.scrollTo(0,0);
+  if(v==="panel")panel(TAB);
+  if(v==="estudio")estudio(ETAB);
+}
+
+/* ============ chat demo ============ */
+var GUION={
+  inicio:"¡Hola! Soy Chispa ⚡ Me encargo del marketing de tu negocio para que tú no tengas que pensar en redes. ¿Qué te gustaría saber?",
+  "¿Qué haces exactamente?":"Escribo tus publicaciones, te creo las imágenes, las programo y las publico en Instagram y Facebook. Y cuando alguien comenta o te escribe, le preparo la respuesta para que tú solo la apruebes. Todo con el estilo de tu negocio. 🙌",
+  "¿Cuánto cuesta?":"Desde 29 €/mes el plan Básico. El que más eligen es el Pro, 59 €/mes, que ya incluye imágenes, Instagram + Facebook y anuncios preparados. Sin permanencia: si no te llena las redes, lo dejas. 💜",
+  "¿Y si no sé de redes?":"¡Perfecto, para eso estoy yo! Tú me dices una idea en una frase (o ni eso) y yo hago el resto. No necesitas saber diseñar, ni escribir, ni a qué hora publicar. Yo aprendo qué funciona en tu negocio.",
+  "Quiero probarlo":"¡Me encanta! 🎉 Te activo una cuenta de prueba y en 2 minutos tienes tu primera semana de publicaciones lista. Pulsa “Ver cómo funciona por dentro” y mira el panel con un negocio de ejemplo.",
+  "¿Publicas los anuncios?":"Te dejo el anuncio montado (texto, imagen y público) listo para lanzar en Meta. En el plan Equipo puedo gestionarlos yo directamente una vez conectas tu cuenta publicitaria. 📣"
+};
+var PREGS=["¿Qué haces exactamente?","¿Cuánto cuesta?","¿Y si no sé de redes?","¿Publicas los anuncios?","Quiero probarlo"];
+function abrirChat(){
+  $("chatOv").classList.add("on");
+  $("stream").innerHTML="";
+  $("qs").innerHTML="";
+  iaDice(GUION.inicio,pintarPregs);
+}
+function cerrarChat(){$("chatOv").classList.remove("on");}
+$("chatOv").addEventListener("click",function(e){if(e.target===this)cerrarChat();});
+function pintarPregs(){
+  var q=$("qs");q.innerHTML="";
+  PREGS.forEach(function(p){
+    var b=document.createElement("button");b.textContent=p;b.onclick=function(){preguntar(p);};q.appendChild(b);
+  });
+}
+function preguntar(p){
+  $("qs").innerHTML="";
+  var s=$("stream");
+  var me=document.createElement("div");me.className="bub me";me.textContent=p;s.appendChild(me);s.scrollTop=s.scrollHeight;
+  iaDice(GUION[p]||"Buena pregunta 🙂 Eso te lo cuento mejor en una llamada rápida. ¿Te la agendo?",function(){
+    if(p==="Quiero probarlo"){
+      var b=document.createElement("button");b.className="btn pp sm";b.style.margin="4px 0 0";b.textContent="Abrir el panel de ejemplo ›";b.onclick=function(){cerrarChat();vista('panel');};
+      $("stream").appendChild(b);$("stream").scrollTop=$("stream").scrollHeight;
+    }
+    pintarPregs();
+  });
+}
+function iaDice(txt,cb){
+  var s=$("stream");
+  var t=document.createElement("div");t.className="typing";t.textContent="Chispa está escribiendo…";s.appendChild(t);s.scrollTop=s.scrollHeight;
+  setTimeout(function(){
+    s.removeChild(t);
+    var b=document.createElement("div");b.className="bub ia";b.textContent=txt;s.appendChild(b);s.scrollTop=s.scrollHeight;
+    if(cb)cb();
+  },700);
+}
+function elegir(plan){
+  vista('landing');
+  modal('<h3>Plan '+esc(plan)+' 💜</h3><p style="color:var(--tx2)">¡Buena elección! En el producto real, aquí se abriría el alta con pago (Stripe) y en 2 minutos Chispa te deja la primera semana de publicaciones lista.</p><p><span class="chip">demo</span> esto es un prototipo, no se cobra nada.</p><button class="btn pp" style="width:100%;margin-top:6px" onclick="cerrarModal();vista(\'panel\')">Ver el panel de ejemplo ›</button>');
+}
+
+/* ============ PANEL ============ */
+var TAB="asistente";
+var TABS=[
+  {id:"asistente",ic:"✨",nm:"Asistente"},
+  {id:"calendario",ic:"📅",nm:"Calendario"},
+  {id:"bandeja",ic:"💬",nm:"Comentarios y DMs"},
+  {id:"anuncios",ic:"📣",nm:"Anuncios"},
+  {id:"stats",ic:"📈",nm:"Estadísticas"},
+  {id:"ajustes",ic:"⚙️",nm:"Mi negocio"}
+];
+function pintarNav(){
+  $("nav").innerHTML=TABS.map(function(t){
+    return '<button class="'+(t.id===TAB?"on":"")+'" onclick="panel(\''+t.id+'\')"><span class="ic">'+t.ic+'</span> '+t.nm+(t.id==="bandeja"&&pendientes()? ' <span class="chip" style="margin-left:auto">'+pendientes()+'</span>':'')+'</button>';
+  }).join("");
+}
+function pendientes(){return S.bandeja.filter(function(m){return !m.hecho;}).length;}
+function panel(tab){
+  TAB=tab;pintarNav();
+  var m=$("main");
+  if(tab==="asistente"){m.innerHTML=vAsistente();proponerHoy();}
+  else if(tab==="calendario")m.innerHTML=vCalendario();
+  else if(tab==="bandeja")m.innerHTML=vBandeja();
+  else if(tab==="anuncios")m.innerHTML=vAnuncios();
+  else if(tab==="stats"){m.innerHTML=vStats();dibujarStats();}
+  else if(tab==="ajustes")m.innerHTML=vAjustes();
+}
+
+/* --- asistente --- */
+var ANGULOS=[
+  {k:"🎯 Gancho directo", por:"Dice lo bueno en los primeros 3 segundos: es lo que más retiene.",
+   v:["{idea} 🔥\n\nEn {neg} ya lo tenemos listo para ti. Pásate hoy.","Esto es {idea} 😋\n\nEn {neg} no te lo puedes perder."], tags:["#{tag}","#Palma","#Mallorca"]},
+  {k:"🔥 Oferta / urgencia", por:"La oferta y la urgencia empujan a venir YA.",
+   v:["Solo esta semana: {idea} 😍\n\nCorre a {neg} antes de que vuele. 📲","¡Hoy toca {idea}! ⏰\n\nTe guardamos sitio en {neg}, pero date prisa."], tags:["#oferta","#{tag}","#Mallorca"]},
+  {k:"❓ Pregunta que engancha", por:"Preguntar dispara los comentarios (+26%), y eso sube el alcance.",
+   v:["¿Ya probaste {idea}? 👀\n\nCuéntanoslo en comentarios 👇 En {neg} te esperamos.","Oye, ¿{idea}? 🤔 Hoy en {neg}. ¿Te animas?"], tags:["#{tag}","#Palma","#foodie"]},
+  {k:"📍 Enfoque local", por:"Lo local hace que la gente de la zona lo comparta con sus amigos.",
+   v:["Si estás por Palma, esto es para ti: {idea} 💛\n\n{neg}, tu sitio de siempre.","Palma, atención 📣 {idea} en {neg}. Etiqueta a quien se viene."], tags:["#Palma","#Mallorca","#{tag}"]}
+];
+window._fotos={}; window._posts=[];
+function hashIdea(idea){
+  var stop={de:1,la:1,el:1,los:1,las:1,un:1,una:1,del:1,en:1,con:1,para:1,que:1,una:1};
+  var w=(idea||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9 ]/g,"").trim().split(/\s+/);
+  for(var i=0;i<w.length;i++){ if(w[i] && w[i].length>2 && !stop[w[i]]) return w[i]; }
+  return "oferta";
+}
+function vAsistente(){
+  var of=S.negocio.oferta;
+  return '<div class="hd"><h2>✨ ¿Qué publicamos hoy?</h2><button class="btn pp sm" onclick="planSemana()">🗓️ Plan de la semana</button></div>'+
+  '<div class="card"><label class="lb">Dime la idea en una frase (o deja que Chispa proponga)</label>'+
+  '<textarea id="idea" placeholder="Ej: la paella de los domingos, oferta de brunch, nueva carta de postres…"></textarea>'+
+  '<div class="row" style="margin-top:10px;gap:8px">'+
+    '<button class="btn pp" style="flex:none" onclick="generar()">⚡ Que Chispa lo escriba</button>'+
+    '<button class="btn g" style="flex:none" onclick="$(\'idea\').value=ejemploIdea()">💡 Dame una idea</button>'+
+    '<button class="btn g" style="flex:none" onclick="ponerOferta()">🔥 '+(of?"Oferta: "+esc(of).slice(0,22):"Añadir oferta")+'</button>'+
+  '</div>'+
+  '<div class="row" style="margin-top:10px;gap:8px;align-items:center;flex-wrap:wrap"><label class="lb" style="margin:0 2px 0 0">Formato</label>'+
+    FORMATOS.map(function(f){return '<button class="btn '+(window._formato===f.id?"pp":"g")+' sm fmtb" style="flex:none" data-f="'+f.id+'" onclick="setFormato(\''+f.id+'\')">'+f.ic+' '+f.nm+'</button>';}).join("")+
+  '</div></div>'+
+  '<div id="resultado"></div>';
+}
+var FORMATOS=[{id:"post",ic:"🖼️",nm:"Post"},{id:"carrusel",ic:"🎠",nm:"Carrusel"},{id:"historia",ic:"📸",nm:"Historia"},{id:"reel",ic:"🎬",nm:"Reel"}];
+window._formato=window._formato||"post";window._fotosArr={};window._cIdx={};
+function setFormato(f){window._formato=f;var bs=document.querySelectorAll(".fmtb");for(var i=0;i<bs.length;i++){var on=bs[i].getAttribute("data-f")===f;bs[i].className="btn "+(on?"pp":"g")+" sm fmtb";}toast("Formato: "+f);}
+function fmtAspect(){return (window._formato==="reel"||window._formato==="historia")?"9/16":"1/1";}
+function ejemploIdea(){var e=["La paella de los domingos","Nuevo menú de temporada","2x1 en postres este finde","Reseña de 5 estrellas de un cliente","Fotos del brunch del sábado","Reserva ya tu cena de empresa"];return e[Math.floor(Math.random()*e.length)];}
+function cabeceraNegocio(){var n=S.negocio;return '<div class="ph"><div class="av">'+esc(n.logo)+'</div><div><div style="font-weight:700;font-size:13px">'+esc(n.nombre)+'</div><div style="font-size:11px;color:var(--tx3)">'+esc(n.ciudad||n.red)+'</div></div></div>';}
+function abrirCta(tipo){var n=S.negocio;
+  if(tipo==="reserva"){ n.reserva?window.open(n.reserva,"_blank"):toast("Añade tu enlace de reserva en 'Mi negocio' 🙂"); }
+  else if(tipo==="web"){ n.web?window.open(n.web,"_blank"):toast("Añade tu web en 'Mi negocio' 🙂"); }
+  else if(tipo==="tel"){ n.telefono?window.open("tel:"+n.telefono.replace(/\s/g,""),"_blank"):toast("Añade tu teléfono en 'Mi negocio' 🙂"); }}
+function ctaBotones(){var n=S.negocio,h='<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px">';
+  h+='<button class="btn pp" style="flex:none" onclick="abrirCta(\'reserva\')">📅 Reservar</button>';
+  h+='<button class="btn g" style="flex:none" onclick="abrirCta(\'web\')">🌐 Ver web</button>';
+  if(n.telefono)h+='<button class="btn g" style="flex:none" onclick="abrirCta(\'tel\')">📞 Llamar</button>';
+  return h+'</div>';}
+function avisoConectar(){return '<div style="background:#1a1430;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--tx2);margin-top:12px">🔗 Para que se publique en todas tus redes, conecta tus cuentas.<br><button class="btn g sm" style="margin-top:7px" onclick="conectarCuentas()">Conectar Instagram / Facebook / TikTok</button></div>';}
+function conectarCuentas(){toast("Conexión de cuentas — próximamente (demo)");}
+function generar(ideaOpt,auto){
+  var idea=(typeof ideaOpt==="string"&&ideaOpt)?ideaOpt:(($("idea")&&$("idea").value||"").trim());
+  if(!idea){toast("Escribe una idea primero 🙂");return;}
+  if($("idea"))$("idea").value=idea;
+  var n=S.negocio, tag=hashIdea(idea), donde=n.nombre+(n.ciudad?(", en "+n.ciudad):"");
+  window._fotos={}; window._posts=[]; window._fotosArr={}; window._cIdx={};
+  var fmtNm={post:"🖼️ Post",carrusel:"🎠 Carrusel",historia:"📸 Historia",reel:"🎬 Reel"}[window._formato]||"🖼️ Post";
+  var html='';
+  if(auto)html+='<div class="card prop"><div class="pl">⚡ Propuesta de hoy</div><div style="font-size:13.5px;color:var(--tx2);margin-top:4px">Te he preparado esto sobre <b style="color:var(--tx)">'+esc(idea)+'</b>. Cámbialo arriba o elige una de estas y publícala con un clic.</div></div>';
+  html+='<div class="hd" style="margin-top:4px"><h2>'+(auto?"Elige tu publicación":"✅ Chispa te preparó varias ideas")+'</h2><button class="btn g sm" onclick="generar()">↻ Más ideas</button></div>';
+  html+='<p style="color:var(--tx3);font-size:12.5px;margin:-4px 0 10px">Para <b>'+esc(donde)+'</b>'+(n.oferta?' · oferta activa: <b style="color:var(--amber)">'+esc(n.oferta)+'</b>':'')+'. Elige la que más te guste, crea la imagen con IA o sube tu foto, y publícala. <span style="color:var(--tx3)">🎨 Imagen IA: demo · en real se conecta con Flux por uso (céntimos).</span></p><div class="ideas">';
+  ANGULOS.forEach(function(a,i){
+    var txt=a.v[Math.floor(Math.random()*a.v.length)].replace(/{idea}/g,idea).replace(/{neg}/g,donde);
+    if(n.oferta)txt+="\n\n🔥 "+n.oferta;
+    var tags=a.tags.map(function(t){return t.replace("{tag}",tag);}).join(" ");
+    window._posts[i]={txt:txt,tags:tags};
+    html+='<div class="card ideac"><div class="ang">'+a.k+' <span class="chip" style="margin-left:6px">'+fmtNm+'</span></div>'+
+      '<div class="post">'+ofertaBadge()+'<div class="pacc"></div>'+cabeceraNegocio()+
+        '<div class="img" id="img_'+i+'" style="aspect-ratio:'+fmtAspect()+'">🎨 Pulsa <b style="color:var(--amber)">Crear imagen con IA</b><br><small>o sube tu foto 👇</small></div>'+
+        '<div class="bd">'+esc(txt).replace(/\n/g,"<br>")+'<div class="tags">'+esc(tags)+'</div>'+ctaBotones()+'</div></div>'+
+      '<div class="por">💡 '+esc(a.por)+'</div>'+
+      '<input type="file" accept="image/*" id="file_'+i+'" style="display:none" onchange="subirFoto('+i+',this)">'+
+      '<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px">'+
+        '<button class="btn pp" style="flex:none" onclick="crearImagenIA('+i+')">🎨 Crear imagen con IA</button>'+
+        '<button class="btn g" style="flex:none" onclick="document.getElementById(\'file_'+i+'\').click()">📷 Subir foto</button>'+
+        '<button class="btn g" style="flex:none" onclick="programarGen('+i+')">📅 Programar</button>'+
+        '<button class="btn" style="flex:none" onclick="publicarGen('+i+')">🚀 Publicar</button></div></div>';
+  });
+  html+='</div>'+avisoConectar();
+  $("resultado").innerHTML=html;
+  if(!auto)$("resultado").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function subirFoto(i,inp){var f=inp.files&&inp.files[0];if(!f)return;if(!/^image\//.test(f.type)){toast("Elige una imagen 🙂");return;}
+  var r=new FileReader();r.onload=function(e){window._fotosArr[i]=[e.target.result];window._cIdx[i]=0;window._fotos[i]=e.target.result;pintImg(i);toast("Foto añadida ✓");};r.readAsDataURL(f);}
+/* --- imagen creada por IA (canvas) + carrusel --- */
+function sombrea(hex,f){try{var c=hex.replace("#","");var r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),b=parseInt(c.substr(4,2),16);r=Math.max(0,Math.min(255,Math.round(r*f)));g=Math.max(0,Math.min(255,Math.round(g*f)));b=Math.max(0,Math.min(255,Math.round(b*f)));return "rgb("+r+","+g+","+b+")";}catch(e){return hex;}}
+function genCartel(tema,n,s,total){
+  var vert=(window._formato==="reel"||window._formato==="historia");
+  var W=1080,H=vert?1920:1080,cv=document.createElement("canvas");cv.width=W;cv.height=H;var x=cv.getContext("2d");
+  var col=n.color||"#8b5cf6";
+  var g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,sombrea(col,1.05));g.addColorStop(.55,sombrea(col,.55));g.addColorStop(1,"#0b0d12");x.fillStyle=g;x.fillRect(0,0,W,H);
+  // burbujas suaves
+  x.globalAlpha=.10;x.fillStyle="#ffffff";for(var k=0;k<6;k++){x.beginPath();x.arc((k*223)%W,(k*337)%H,120+(k*40)%180,0,7);x.fill();}x.globalAlpha=1;
+  // marca arriba
+  x.fillStyle="rgba(0,0,0,.28)";x.fillRect(0,0,W,120);
+  x.font="bold 46px Arial";x.fillStyle="#ffffff";x.textBaseline="middle";x.fillText((n.logo||"⚡")+"  "+(n.nombre||"Tu negocio"),48,60);
+  x.font="26px Arial";x.fillStyle="rgba(255,255,255,.85)";x.textAlign="right";x.fillText((n.ciudad||""),W-48,60);x.textAlign="left";
+  // titular central
+  var titulo=tema||"Promoción";if(total>1)titulo=(s+1===total?"Y además…":(s===0?titulo:"Y también…"));
+  x.font="bold "+(vert?104:92)+"px Arial";x.fillStyle="#ffffff";x.shadowColor="rgba(0,0,0,.45)";x.shadowBlur=18;
+  var pal=(titulo||"").split(" "),ln=[],cur="",max=vert?14:16;
+  for(var w=0;w<pal.length;w++){var t=(cur+" "+pal[w]).trim();if(t.length>max){ln.push(cur);cur=pal[w];}else cur=t;}if(cur)ln.push(cur);
+  var lh=vert?120:108,y0=H/2-(ln.length-1)*lh/2;
+  for(var li=0;li<ln.length;li++)x.fillText(ln[li],60,y0+li*lh);
+  x.shadowBlur=0;
+  // chip oferta
+  if(n.oferta){x.fillStyle="#ef4444";var ow=x.measureText.call(x,"")&&0;x.font="bold 44px Arial";var oTxt="🔥 "+n.oferta;var tw=x.measureText(oTxt).width+56;x.fillRect(60,H-200,tw,80);x.fillStyle="#fff";x.fillText(oTxt,88,H-160);}
+  // pie
+  x.font="30px Arial";x.fillStyle="rgba(255,255,255,.9)";x.fillText("👉 "+(n.reserva?"Reserva ya":"Ven a probarlo"),60,H-80);
+  if(total>1){x.font="26px Arial";x.textAlign="right";x.fillText((s+1)+" / "+total,W-48,H-80);x.textAlign="left";}
+  return cv.toDataURL("image/jpeg",0.9);
+}
+function crearImagenIA(i){
+  var n=S.negocio, tema=(window._posts&&window._posts[i]?(($("idea")&&$("idea").value)||"").trim():""); if(!tema)tema=(($("idea")&&$("idea").value)||"Promoción").trim();
+  var total=(window._formato==="carrusel")?3:1, arr=[];
+  for(var s=0;s<total;s++)arr.push(genCartel(tema,n,s,total));
+  window._fotosArr[i]=arr;window._cIdx[i]=0;window._fotos[i]=arr[0];pintImg(i);
+  toast("Imagen creada por IA ✓"+(total>1?" ("+total+" diapositivas)":""));
+}
+function pintImg(i){
+  var d=document.getElementById("img_"+i);if(!d)return;var arr=window._fotosArr[i]||[],idx=window._cIdx[i]||0;
+  if(!arr.length){return;}
+  d.style.aspectRatio=fmtAspect();d.classList.add("hasimg");
+  var nav="";
+  if(arr.length>1){var dots="";for(var k=0;k<arr.length;k++)dots+='<span style="width:7px;height:7px;border-radius:50%;background:'+(k===idx?"#fff":"rgba(255,255,255,.4)")+';display:inline-block;margin:0 2px"></span>';
+    nav='<button onclick="cambiaSlide('+i+',-1)" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer">‹</button>'+
+        '<button onclick="cambiaSlide('+i+',1)" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer">›</button>'+
+        '<div style="position:absolute;bottom:8px;left:0;right:0;text-align:center">'+dots+'</div>';}
+  d.style.position="relative";
+  d.innerHTML='<img src="'+arr[idx]+'" alt="imagen" style="width:100%;height:100%;object-fit:cover;display:block">'+nav+
+    '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px">✨ Imagen creada por IA</div>';
+}
+function cambiaSlide(i,dir){var arr=window._fotosArr[i]||[];if(arr.length<2)return;window._cIdx[i]=(window._cIdx[i]+dir+arr.length)%arr.length;window._fotos[i]=arr[window._cIdx[i]];pintImg(i);}
+function programarGen(i){var p=window._posts&&window._posts[i];var idea=p?p.txt.split("\n")[0]:($("idea").value||"Publicación");
+  S.programados.push({dia:Math.floor(Math.random()*7),txt:idea.slice(0,38),tipo:"p"});guardar();toast("Programado ✓ lo verás en el Calendario");}
+function publicarGen(i){
+  var p=(window._posts&&window._posts[i])||{txt:"",tags:""},foto=window._fotos&&window._fotos[i];
+  var img=foto?'<img src="'+foto+'" style="width:100%;border-radius:10px;max-height:260px;object-fit:cover;display:block">':'<div class="img" style="aspect-ratio:16/9;border-radius:10px">🖼️ Sin foto — súbela para que se vea la promo</div>';
+  modal('<h3>Así se verá tu anuncio</h3><div class="post" style="max-width:none">'+ofertaBadge()+'<div class="pacc"></div>'+cabeceraNegocio()+
+    '<div style="border-top:1px solid var(--line)">'+img+'</div>'+
+    '<div class="bd">'+esc(p.txt).replace(/\n/g,"<br>")+'<div class="tags">'+esc(p.tags)+'</div>'+ctaBotones()+'</div></div>'+
+    avisoConectar()+'<button class="btn pp" style="width:100%;margin-top:12px" onclick="confirmarPublicar('+i+')">🚀 Publicar ahora (demo)</button>');
+}
+function confirmarPublicar(i){S.historial.push({cuando:Date.now()});guardar();cerrarModal();toast("🚀 Publicado en "+S.negocio.red+" ✓ (demo)");}
+
+/* --- oferta / marca / propuesta --- */
+function ofertaBadge(){var o=S.negocio.oferta;return o?'<div class="ofbadge">🔥 '+esc(o)+'</div>':'';}
+function refrescarActual(){if($("app").classList.contains("on"))panel(TAB);}
+function aplicarMarca(){try{document.documentElement.style.setProperty("--acc",S.negocio.color||"#8b5cf6");}catch(e){}}
+function setColor(btn,c){S.negocio.color=c;aplicarMarca();guardar();var ps=btn.parentNode.querySelectorAll(".sw");for(var i=0;i<ps.length;i++)ps[i].classList.remove("on");btn.classList.add("on");toast("Color de marca ✓");}
+function proponerHoy(){generar(ejemploIdea(),true);}
+function ponerOferta(){
+  var o=S.negocio.oferta||"",chips=["-10% esta semana","2x1 en mojitos","Combo familiar 29,90€","Postre gratis con tu menú","Happy hour 18-20h"];
+  modal('<h3>🔥 Oferta / descuento</h3><p style="color:var(--tx3);font-size:12.5px;margin:0 0 8px">Aparece como un sello llamativo en todos tus anuncios y se menciona en el texto.</p>'+
+    '<label class="lb">¿Qué oferta destacas?</label><input class="inp" id="ofTxt" value="'+esc(o)+'" placeholder="Ej: -10% esta semana">'+
+    '<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">'+chips.map(function(c){return '<button class="btn g sm" style="flex:none" onclick="$(\'ofTxt\').value=\''+esc(c).replace(/'/g,"")+'\'">'+esc(c)+'</button>';}).join("")+'</div>'+
+    '<div class="row" style="margin-top:14px;gap:8px"><button class="btn pp" style="flex:1" onclick="guardarOferta()">Guardar oferta</button>'+(o?'<button class="btn g" style="flex:none" onclick="S.negocio.oferta=\'\';guardar();cerrarModal();refrescarActual();toast(\'Oferta quitada\')">Quitar</button>':'')+'</div>');
+}
+function guardarOferta(){S.negocio.oferta=($("ofTxt").value||"").trim();guardar();cerrarModal();refrescarActual();toast(S.negocio.oferta?"Oferta activada ✓ aparece en tus anuncios":"Oferta quitada");}
+
+/* --- plan de la semana --- */
+var PLANPOOL={
+  post:["El plato estrella de hoy 🍽️","Reseña de 5★ de un cliente ⭐","Nuestra carta, en una foto","Te esperamos en {ciu} 💛","El rincón favorito del local"],
+  reel:["Cómo preparamos la Picalonga 🎬","Plan de finde: Paella de Bogavante 🥘","El montaje de un mojito, paso a paso 🍹","La cocina en acción 🔥","Del fuego a tu mesa"],
+  historia:["El ambiente de esta noche 📸","Lo que se cuece hoy","Entre bastidores del equipo","Un día en {neg}"],
+  oferta:["{of}","2x1 en mojitos este jueves 🍹","Combo del finde para el grupo","Botella + refrescos para compartir"]
+};
+var PLANORDEN=["post","reel","historia","oferta","post","reel","oferta"];
+var PLANPLAT=["Instagram","TikTok","Instagram","Facebook","Instagram","TikTok","Facebook"];
+function genPlan(){
+  var ciu=(S.negocio.ciudad||"Mallorca").split(",")[0],neg=S.negocio.nombre,of=S.negocio.oferta||"Oferta de la semana";
+  return PLANORDEN.map(function(tp,i){
+    var arr=PLANPOOL[tp],g=arr[Math.floor(Math.random()*arr.length)].replace("{ciu}",ciu).replace("{neg}",neg).replace("{of}",of);
+    return {dia:i,tipo:tp,g:g,plat:PLANPLAT[i]};
+  });
+}
+function tipLbl(t){return {post:"Post",reel:"Reel",historia:"Historia",oferta:"Oferta"}[t]||t;}
+function tipChip(t){return {post:"tpost",reel:"treel",historia:"thist",oferta:"tof"}[t]||"";}
+function tipIc(t){return {post:"📝",reel:"🎬",historia:"📸",oferta:"🔥"}[t]||"📝";}
+function planSemana(){window._plan=genPlan();renderPlan();}
+function renderPlan(){
+  var P=window._plan||[];
+  var html='<div class="hd" style="margin-top:4px"><h2>🗓️ Tu plan de la semana</h2><button class="btn g sm" onclick="planSemana()">↻ Otra semana</button></div>';
+  html+='<div class="card prop"><div class="pl">⚡ Chispa te propone la semana entera</div><div style="font-size:13.5px;color:var(--tx2);margin-top:4px">7 publicaciones, una por día, pensadas para <b style="color:var(--tx)">'+esc(S.negocio.nombre)+'</b>. Revisa, edita lo que quieras y vuélcalas al calendario.</div></div>';
+  html+='<div class="card">';
+  P.forEach(function(e,i){
+    html+='<div class="planrow"><div class="pd">'+DIAS[e.dia]+'</div><div class="pc"><span class="chip '+tipChip(e.tipo)+'">'+tipIc(e.tipo)+' '+tipLbl(e.tipo)+'</span> <b>'+esc(e.g)+'</b><div class="pm">📲 '+esc(e.plat)+'</div></div><div style="display:flex;gap:6px"><button class="btn g sm" onclick="editPlan('+i+')">✎</button><button class="btn g sm" onclick="delPlan('+i+')">🗑</button></div></div>';
+  });
+  html+='</div><button class="btn pp" style="width:100%;margin-bottom:8px" onclick="pilotoPlan()">🤖 Aprobar y programar la semana entera</button>'+
+    '<button class="btn g" style="width:100%" onclick="volcarPlan()">✅ Volcar las '+P.length+' publicaciones al calendario</button>';
+  $("resultado").innerHTML=html;$("resultado").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function pilotoPlan(){var P=window._plan||[];P.forEach(function(e){S.programados.push({dia:e.dia,txt:(tipIc(e.tipo)+" "+e.g).slice(0,38),tipo:(e.tipo==="oferta"?"a":"p")});});guardar();toast("🤖 Semana programada ✓ "+P.length+" publicaciones");panel("calendario");}
+function editPlan(i){
+  var e=window._plan[i];
+  modal('<h3>Editar publicación</h3><label class="lb">Día</label><select id="plDia">'+DIAS.map(function(n,ix){return '<option value="'+ix+'" '+(ix===e.dia?"selected":"")+'>'+n+'</option>';}).join("")+'</select>'+
+    '<label class="lb" style="margin-top:10px">Tipo</label><select id="plTipo">'+["post","reel","historia","oferta"].map(function(t){return '<option value="'+t+'" '+(t===e.tipo?"selected":"")+'>'+tipLbl(t)+'</option>';}).join("")+'</select>'+
+    '<label class="lb" style="margin-top:10px">Gancho / idea</label><input class="inp" id="plG" value="'+esc(e.g)+'">'+
+    '<label class="lb" style="margin-top:10px">Red</label><select id="plPlat">'+["Instagram","TikTok","Facebook"].map(function(p){return '<option '+(p===e.plat?"selected":"")+'>'+p+'</option>';}).join("")+'</select>'+
+    '<button class="btn pp" style="width:100%;margin-top:14px" onclick="guardarPlan('+i+')">Guardar</button>');
+}
+function guardarPlan(i){var e=window._plan[i];e.dia=parseInt($("plDia").value);e.tipo=$("plTipo").value;e.g=$("plG").value||e.g;e.plat=$("plPlat").value;cerrarModal();renderPlan();toast("Publicación actualizada ✓");}
+function delPlan(i){window._plan.splice(i,1);renderPlan();toast("Quitada del plan");}
+function volcarPlan(){var P=window._plan||[];P.forEach(function(e){S.programados.push({dia:e.dia,txt:(tipIc(e.tipo)+" "+e.g).slice(0,38),tipo:(e.tipo==="oferta"?"a":"p")});});guardar();toast("✅ "+P.length+" publicaciones en tu Calendario");panel("calendario");}
+
+/* --- calendario --- */
+function vCalendario(){
+  var html='<div class="hd"><h2>📅 Calendario de contenido</h2><button class="btn pp sm" onclick="addEvento()">+ Añadir publicación</button></div>';
+  html+='<div class="card"><div class="cal">';
+  DIAS.forEach(function(d){html+='<div class="dh">'+d+'</div>';});
+  for(var i=0;i<7;i++){
+    html+='<div class="day" onclick="addEvento('+i+')"><div class="dn">'+DIAS[i]+'</div>';
+    S.programados.forEach(function(e,ix){
+      if(e.dia===i)html+='<div class="ev '+(e.tipo==="a"?"amb":"")+'" onclick="event.stopPropagation();borrarEvento('+ix+')" title="Clic para borrar">'+(e.tipo==="a"?"📣 ":"")+esc(e.txt)+'</div>';
+    });
+    html+='</div>';
+  }
+  html+='</div><p style="color:var(--tx3);font-size:12.5px;margin:12px 0 0">💡 Toca un día para añadir · toca una publicación para borrarla · 📣 = anuncio</p></div>';
+  return html;
+}
+function addEvento(dia){
+  var d=(typeof dia==="number")?dia:0;
+  modal('<h3>Añadir publicación</h3><label class="lb">Día</label><select id="evDia">'+
+    DIAS.map(function(n,i){return '<option value="'+i+'" '+(i===d?"selected":"")+'>'+n+'</option>';}).join("")+'</select>'+
+    '<label class="lb" style="margin-top:10px">Contenido</label><input class="inp" id="evTxt" placeholder="Ej: Oferta del finde">'+
+    '<label class="lb" style="margin-top:10px">Tipo</label><select id="evTipo"><option value="p">Publicación</option><option value="a">Anuncio</option></select>'+
+    '<button class="btn pp" style="width:100%;margin-top:14px" onclick="guardarEvento()">Añadir</button>');
+}
+function guardarEvento(){
+  var txt=($("evTxt").value||"").trim();if(!txt){toast("Escribe el contenido");return;}
+  S.programados.push({dia:parseInt($("evDia").value),txt:txt.slice(0,38),tipo:$("evTipo").value});guardar();cerrarModal();panel("calendario");toast("Añadido al calendario ✓");
+}
+function borrarEvento(ix){S.programados.splice(ix,1);guardar();panel("calendario");toast("Publicación borrada");}
+
+/* --- bandeja --- */
+function vBandeja(){
+  var html='<div class="hd"><h2>💬 Comentarios y mensajes</h2><span class="chip">'+pendientes()+' por aprobar</span></div>';
+  html+='<div class="card" style="background:rgba(255,204,51,.06);border-color:rgba(255,204,51,.25)"><div style="font-size:13.5px;color:var(--tx2)">🛡️ <b style="color:var(--tx)">Control de calidad:</b> Chispa prepara la respuesta, pero no se publica hasta que tú la apruebas. Así nunca dice una tontería con el nombre de tu negocio.</div></div>';
+  if(!S.bandeja.length)return html+'<div class="empty">Todo respondido 🎉</div>';
+  S.bandeja.forEach(function(m,ix){
+    html+='<div class="msg"><div class="av">'+esc(m.av)+'</div><div class="co">'+
+      '<div class="nm">'+esc(m.nm)+'<small>'+esc(m.red)+'</small></div>'+
+      '<div class="tx">“'+esc(m.tx)+'”</div>'+
+      (m.hecho?'<div class="sugg" style="border-style:solid;border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.12)"><div class="lbl">✓ Respondido</div>'+esc(m.sug)+'</div>'
+        :'<div class="sugg"><div class="lbl">⚡ Respuesta sugerida por Chispa</div>'+esc(m.sug)+'</div>'+
+         '<div class="acts"><button class="btn pp sm" onclick="aprobar('+ix+')">✓ Aprobar y enviar</button>'+
+         '<button class="btn g sm" onclick="editarResp('+ix+')">✎ Editar</button></div>')+
+      '</div></div>';
+  });
+  return html;
+}
+function aprobar(ix){S.bandeja[ix].hecho=true;guardar();panel("bandeja");toast("Respuesta enviada ✓");}
+function editarResp(ix){
+  modal('<h3>Editar respuesta</h3><textarea id="edResp">'+esc(S.bandeja[ix].sug)+'</textarea><button class="btn pp" style="width:100%;margin-top:12px" onclick="guardarResp('+ix+')">Guardar y enviar</button>');
+}
+function guardarResp(ix){S.bandeja[ix].sug=$("edResp").value;S.bandeja[ix].hecho=true;guardar();cerrarModal();panel("bandeja");toast("Respuesta enviada ✓");}
+
+/* --- anuncios --- */
+function vAnuncios(){
+  var html='<div class="hd"><h2>📣 Anuncios</h2><button class="btn pp sm" onclick="nuevoAnuncio()">+ Crear anuncio</button></div>';
+  html+='<div class="card"><h3>Crear un anuncio nuevo</h3>'+
+    '<label class="lb">Objetivo</label><select id="adObj"><option>Conseguir más reservas</option><option>Más seguidores</option><option>Promocionar una oferta</option><option>Dar a conocer el negocio</option></select>'+
+    '<div class="row" style="margin-top:10px"><div><label class="lb">Público</label><input class="inp" id="adPub" value="Palma y alrededores · 20 km · 18-55 años"></div>'+
+    '<div><label class="lb">Presupuesto (€/día)</label><input class="inp" id="adPres" type="number" value="10"></div></div>'+
+    '<button class="btn pp" style="margin-top:14px" onclick="prepararAnuncio()">⚡ Que Chispa prepare el anuncio</button></div>'+
+    '<div id="adRes"></div>';
+  if(S.anuncios.length){
+    html+='<div class="card"><h3>Anuncios preparados</h3>'+S.anuncios.map(function(a){
+      return '<div style="border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px"><b>'+esc(a.obj)+'</b> · '+esc(a.pres)+' €/día<br><span style="color:var(--tx3);font-size:12.5px">'+esc(a.pub)+'</span><br><span class="chip amb" style="margin-top:6px">Listo para publicar en Meta</span></div>';
+    }).join("")+'</div>';
+  }
+  return html;
+}
+function prepararAnuncio(){
+  var obj=$("adObj").value,pub=$("adPub").value,pres=$("adPres").value,n=S.negocio;
+  var donde=n.nombre+(n.ciudad?(", en "+n.ciudad):"");
+  var copy="📣 "+obj+" en "+donde+". ¡Ven a probarlo! Reserva tu sitio y disfruta. 😋";
+  if(n.oferta)copy+=" 🔥 "+n.oferta;
+  var ciu=(n.ciudad||"Mallorca").split(" ")[0];
+  $("adRes").innerHTML='<div class="card"><h3>✅ Anuncio preparado por Chispa</h3>'+
+    '<div class="post" style="max-width:none">'+ofertaBadge()+'<div class="pacc"></div>'+cabeceraNegocio()+
+      '<div class="img" style="aspect-ratio:16/9">🖼️ Creatividad IA<br><small>(o sube tu foto desde el Asistente)</small></div>'+
+      '<div class="bd">'+esc(copy)+'<div class="tags">#'+esc(ciu)+' #oferta</div>'+ctaBotones()+'</div></div>'+
+    '<div style="margin:12px 0;font-size:13px;color:var(--tx2)">Objetivo: <b>'+esc(obj)+'</b> · Público: '+esc(pub)+' · '+esc(pres)+' €/día (~'+(pres*30)+' €/mes)</div>'+
+    avisoConectar()+
+    '<button class="btn pp" style="width:100%;margin-top:12px" onclick="guardarAnuncio(\''+esc(obj).replace(/'/g,"")+'\','+pres+',\''+esc(pub).replace(/'/g,"")+'\')">Guardar como listo</button></div>';
+  $("adRes").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function nuevoAnuncio(){$("adObj")&&$("adObj").scrollIntoView({behavior:"smooth"});}
+function guardarAnuncio(obj,pres,pub){S.anuncios.push({obj:obj,pres:pres,pub:pub});guardar();panel("anuncios");toast("Anuncio guardado ✓ listo para Meta");}
+
+/* --- stats --- */
+function vStats(){
+  return '<div class="hd"><h2>📈 Cómo van tus redes</h2><span class="chip">últimos 30 días</span></div>'+
+  '<div class="kpis">'+
+    '<div class="kpi"><div class="n a">18.420</div><div class="l">Alcance</div><div class="up">▲ 34%</div></div>'+
+    '<div class="kpi"><div class="n p">+312</div><div class="l">Seguidores nuevos</div><div class="up">▲ 21%</div></div>'+
+    '<div class="kpi"><div class="n v">1.247</div><div class="l">Interacciones</div><div class="up">▲ 48%</div></div>'+
+    '<div class="kpi"><div class="n b">'+(S.programados.length)+'</div><div class="l">Posts programados</div></div>'+
+  '</div>'+
+  '<div class="row" style="gap:12px;flex-wrap:wrap;margin-bottom:16px">'+
+    '<div class="card" style="flex:1;min-width:230px;margin:0;background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(139,92,246,.05));border-color:rgba(52,211,153,.35)"><div style="font-size:11.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;font-weight:800">⏰ Mejor hora para publicar</div><div style="font-size:30px;font-weight:800;color:var(--verde);margin-top:4px">20:00 h</div><div style="font-size:12px;color:var(--tx2)">y 13:00 h los findes · Chispa programa a esas horas sola</div></div>'+
+    '<div class="card" style="flex:1;min-width:230px;margin:0;background:linear-gradient(135deg,rgba(255,204,51,.12),rgba(139,92,246,.05));border-color:rgba(255,204,51,.35)"><div style="font-size:11.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;font-weight:800">🏆 Top publicación de la semana</div><div style="font-size:15px;font-weight:700;color:var(--tx);margin-top:4px">“La Picalonga para compartir” 🍗</div><div style="font-size:12px;color:var(--tx2)">4.820 alcance · 287 interacciones · 31 guardados</div></div>'+
+  '</div>'+
+  '<div class="ch"><h3>Alcance por semana</h3><div class="chbox"><canvas id="c1"></canvas></div></div>'+
+  '<div class="row"><div class="ch" style="flex:1"><h3>Interacciones por red</h3><div class="chbox"><canvas id="c2"></canvas></div></div>'+
+  '<div class="ch" style="flex:1"><h3>Mejores horas para publicar</h3><div class="chbox"><canvas id="c3"></canvas></div></div></div>';
+}
+var charts=[];
+function dibujarStats(){
+  charts.forEach(function(c){try{c.destroy();}catch(e){}});charts=[];
+  var gx={color:"#232a38"},tc={color:"#a3adbf"};
+  charts.push(new Chart($("c1"),{type:"line",data:{labels:["Sem 1","Sem 2","Sem 3","Sem 4"],datasets:[{label:"Alcance",data:[3200,4100,4800,6320],borderColor:"#ffcc33",backgroundColor:"rgba(255,204,51,.15)",fill:true,tension:.35,borderWidth:3,pointBackgroundColor:"#ffcc33"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:gx,ticks:tc},y:{grid:gx,ticks:tc}}}}));
+  charts.push(new Chart($("c2"),{type:"bar",data:{labels:["Instagram","Facebook"],datasets:[{label:"Interacciones",data:[820,427],backgroundColor:["#8b5cf6","#60a5fa"],borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:gx,ticks:tc},y:{grid:gx,ticks:tc}}}}));
+  charts.push(new Chart($("c3"),{type:"bar",data:{labels:["9h","13h","17h","20h","22h"],datasets:[{label:"Interés",data:[30,65,45,90,72],backgroundColor:"#34d399",borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:gx,ticks:tc},y:{grid:gx,ticks:tc}}}}));
+}
+
+/* --- ajustes --- */
+function vAjustes(){
+  var n=S.negocio, logos=["🍽️","✂️","🔧","🏗️","☕","💅","🐶","🏠","👗","🥐"];
+  function f(id,lb,val,ph){return '<label class="lb" style="margin-top:10px">'+lb+'</label><input class="inp" id="'+id+'" value="'+esc(val||"")+'" placeholder="'+esc(ph||"")+'">';}
+  return '<div class="hd"><h2>⚙️ Mi negocio</h2></div>'+
+  '<div class="card"><p style="color:var(--tx3);font-size:12.5px;margin:0 0 6px">Estos datos los usa Chispa en TODOS tus posts y anuncios (nombre, ciudad y los enlaces de reserva y web).</p>'+
+  f("ajNom","Nombre del negocio",n.nombre,"El Paraíso")+
+  '<label class="lb" style="margin-top:10px">Logo / icono</label><div class="row" style="gap:6px;flex-wrap:wrap">'+
+    logos.map(function(l){return '<button class="btn g sm" style="flex:none;font-size:20px;'+(l===n.logo?"border-color:var(--purple)":"")+'" onclick="S.negocio.logo=\''+l+'\';guardar();panel(\'ajustes\')">'+l+'</button>';}).join("")+'</div>'+
+  f("ajSector","Qué es / sector",n.sector,"Restaurante, peluquería…")+
+  f("ajCiudad","Ciudad",n.ciudad,"Palma de Mallorca")+
+  f("ajDir","Dirección",n.direccion,"C/ Ejemplo, 12")+
+  f("ajTel","Teléfono",n.telefono,"600 00 00 00")+
+  f("ajReserva","Enlace de reserva",n.reserva,"https://… (TheFork, tu web…)")+
+  f("ajWeb","Enlace web",n.web,"https://tunegocio.com")+
+  f("ajIg","Instagram",n.instagram,"@tunegocio")+
+  f("ajFb","Facebook",n.facebook,"facebook.com/tunegocio")+
+  f("ajTt","TikTok",n.tiktok,"@tunegocio")+
+  '<label class="lb" style="margin-top:10px">Tono de voz</label><select id="ajTono">'+
+    ["Cercano y con chispa","Elegante y formal","Divertido y gamberro","Profesional y claro"].map(function(t){return '<option '+(t===n.tono?"selected":"")+'>'+t+'</option>';}).join("")+'</select>'+
+  '<label class="lb" style="margin-top:10px">Redes conectadas</label><select id="ajRed">'+
+    ["Instagram + Facebook","Solo Instagram","Solo Facebook","Instagram + Facebook + TikTok"].map(function(r){return '<option '+(r===n.red?"selected":"")+'>'+r+'</option>';}).join("")+'</select>'+
+  f("ajOferta","Oferta activa (sale como sello 🔥 en tus anuncios)",n.oferta,"-10% esta semana, 2x1 en mojitos…")+
+  '<label class="lb" style="margin-top:10px">Color de marca</label><div class="row" style="gap:8px;flex-wrap:wrap">'+
+    ["#8b5cf6","#ffb020","#fb7185","#34d399","#60a5fa","#f97316","#ec4899"].map(function(c){return '<button class="sw'+(c===n.color?" on":"")+'" style="background:'+c+'" onclick="setColor(this,\''+c+'\')"></button>';}).join("")+'</div>'+
+  '<div style="margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:11px;background:rgba(139,92,246,.06)"><div class="row" style="align-items:center;justify-content:space-between;gap:10px"><div><div style="font-weight:700">🤖 Piloto automático</div><div style="font-size:12px;color:var(--tx3)">Chispa crea y programa tu semana sola. Publicará por ti en cuanto conectes tus cuentas.</div></div><button class="btn '+(n.piloto?"pp":"g")+' sm" style="flex:none" onclick="togglePiloto()">'+(n.piloto?"✓ Activado":"Activar")+'</button></div></div>'+
+  '<button class="btn pp" style="margin-top:16px" onclick="guardarAjustes()">💾 Guardar cambios</button>'+
+  '<button class="btn g" style="margin-top:8px;margin-left:8px" onclick="resetTodo()">↺ Reiniciar demo</button></div>';
+}
+function togglePiloto(){S.negocio.piloto=!S.negocio.piloto;guardar();panel("ajustes");toast(S.negocio.piloto?"🤖 Piloto automático activado (demo)":"Piloto automático desactivado");}
+function guardarAjustes(){var n=S.negocio;
+  n.nombre=$("ajNom").value||n.nombre;n.sector=$("ajSector").value;n.ciudad=$("ajCiudad").value;n.direccion=$("ajDir").value;n.telefono=$("ajTel").value;n.reserva=$("ajReserva").value;n.web=$("ajWeb").value;n.instagram=$("ajIg").value;n.facebook=$("ajFb").value;n.tiktok=$("ajTt").value;n.tono=$("ajTono").value;n.red=$("ajRed").value;n.oferta=($("ajOferta")?$("ajOferta").value:n.oferta);
+  aplicarMarca();guardar();toast("Guardado ✓ Chispa ya usa los datos de tu negocio");panel("ajustes");}
+function resetTodo(){S=nuevo();guardar();panel("asistente");toast("Demo reiniciada");}
+
+/* ============ ESTUDIO DE CONTENIDO ============ */
+var ETAB="cartera";
+var ETABS=[
+  {id:"cartera",ic:"📺",nm:"Cartera de canales"},
+  {id:"serie",ic:"🎬",nm:"Miniserie"},
+  {id:"guion",ic:"🎯",nm:"Guion viral"},
+  {id:"ecal",ic:"🗓️",nm:"Calendario"},
+  {id:"ingresos",ic:"💶",nm:"Ingresos"},
+  {id:"reglas",ic:"🛡️",nm:"Reglas del robot"}
+];
+function pintarENav(){
+  $("enav").innerHTML=ETABS.map(function(t){
+    return '<button class="'+(t.id===ETAB?"on":"")+'" onclick="estudio(\''+t.id+'\')"><span class="ic">'+t.ic+'</span> '+t.nm+'</button>';
+  }).join("");
+}
+function estudio(tab){
+  ETAB=tab;pintarENav();
+  var m=$("emain");
+  if(tab==="cartera")m.innerHTML=vCartera();
+  else if(tab==="serie")m.innerHTML=vSerie();
+  else if(tab==="guion")m.innerHTML=vGuion();
+  else if(tab==="ecal")m.innerHTML=vEcal();
+  else if(tab==="ingresos")m.innerHTML=vIngresos();
+  else if(tab==="reglas")m.innerHTML=vReglas();
+}
+
+/* --- cartera de canales --- */
+function vCartera(){
+  var html='<div class="hd"><h2>📺 Cartera de canales</h2><button class="btn pp sm" onclick="addCanal()">+ Nuevo canal</button></div>';
+  html+='<div class="card" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.3)"><div style="font-size:13.5px;color:var(--tx2)">🎯 <b style="color:var(--tx)">Modelo cartera:</b> se lanzan muchos canales baratos, se doblan los 1-2 que pegan y se pausan los que no. Es un juego de probabilidad — la mayoría no explota, y no pasa nada: el robot hace viable esa escala que a mano es imposible.</div></div>';
+  if(!S.canales.length)html+='<div class="empty">Aún no hay canales. Crea el primero.</div>';
+  S.canales.forEach(function(c,ix){
+    html+='<div class="canal"><div class="ci">'+esc(c.ic)+'</div><div class="cc">'+
+      '<div class="cn">'+esc(c.nombre)+' <span class="est '+esc(c.estado)+'">'+esc(c.estado)+'</span></div>'+
+      '<div class="cm">'+esc(c.nicho)+' · '+esc(c.reds)+' · '+c.videos+' vídeos</div></div>'+
+      '<div class="cact"><button class="btn g sm" onclick="togglePausa('+ix+')">'+(c.estado==="pausado"?"▶ Activar":"⏸ Pausar")+'</button>'+
+      '<button class="btn g sm" onclick="editCanal('+ix+')">✎</button>'+
+      '<button class="btn g sm" onclick="borrarCanal('+ix+')">🗑</button></div></div>';
+  });
+  return html;
+}
+var NICHOS=["Tecnología / IA","Idiomas","Historia / curiosidades","Productividad / software","Finanzas (ojo: riesgo)","Motivación","Salud (ojo: riesgo)"];
+function addCanal(){
+  modal('<h3>Nuevo canal</h3><label class="lb">Nombre</label><input class="inp" id="caNom" placeholder="Ej: Ciencia en 1 minuto">'+
+    '<label class="lb" style="margin-top:10px">Nicho</label><select id="caNicho">'+NICHOS.map(function(n){return '<option>'+esc(n)+'</option>';}).join("")+'</select>'+
+    '<label class="lb" style="margin-top:10px">Redes</label><select id="caReds"><option>YouTube + TikTok</option><option>TikTok + Reels</option><option>YouTube Shorts</option><option>Reels + Shorts</option><option>Las tres</option></select>'+
+    '<button class="btn pp" style="width:100%;margin-top:14px" onclick="guardarCanal()">Crear canal</button>');
+}
+function guardarCanal(){
+  var n=($("caNom").value||"").trim();if(!n){toast("Ponle un nombre al canal");return;}
+  var ics=["🎥","🔥","🌟","🎬","📡","🧠","🎙️"];
+  S.canales.unshift({ic:ics[Math.floor(Math.random()*ics.length)],nombre:n,nicho:$("caNicho").value,reds:$("caReds").value,estado:"probando",videos:0});
+  guardar();cerrarModal();estudio("cartera");toast("Canal creado ✓ estado: probando");
+}
+function togglePausa(ix){var c=S.canales[ix];c.estado=(c.estado==="pausado")?"probando":"pausado";guardar();estudio("cartera");toast(c.estado==="pausado"?"Canal pausado":"Canal activado");}
+function editCanal(ix){
+  var c=S.canales[ix];
+  modal('<h3>Editar canal</h3><label class="lb">Nombre</label><input class="inp" id="edNom" value="'+esc(c.nombre)+'">'+
+    '<label class="lb" style="margin-top:10px">Estado</label><select id="edEst">'+
+    ["probando","creciendo","monetizando","pausado"].map(function(e){return '<option '+(e===c.estado?"selected":"")+'>'+e+'</option>';}).join("")+'</select>'+
+    '<label class="lb" style="margin-top:10px">Nº de vídeos</label><input class="inp" id="edVid" type="number" value="'+c.videos+'">'+
+    '<button class="btn pp" style="width:100%;margin-top:14px" onclick="guardarEditCanal('+ix+')">Guardar</button>');
+}
+function guardarEditCanal(ix){var c=S.canales[ix];c.nombre=$("edNom").value||c.nombre;c.estado=$("edEst").value;c.videos=parseInt($("edVid").value)||0;guardar();cerrarModal();estudio("cartera");toast("Canal actualizado ✓");}
+function borrarCanal(ix){S.canales.splice(ix,1);guardar();estudio("cartera");toast("Canal borrado");}
+
+/* --- miniserie --- */
+var SERIES={
+  "Historia / curiosidades":{tema:"Misterios de la historia",eps:[
+    {t:"El mapa que no debería existir",c:"¿Cómo dibujaron la Antártida sin hielo… 300 años antes de descubrirla?"},
+    {t:"La ciudad que desapareció en una noche",c:"Y lo que encontraron debajo lo cambia todo…"},
+    {t:"El mensaje que tardó 2.000 años en leerse",c:"Hasta que una IA lo descifró. Lo que decía, en el próximo."},
+    {t:"El error de cálculo que salvó a millones",c:"Pero el que lo cometió nunca lo supo…"},
+    {t:"Lo que había dentro de la tumba sellada",c:"Fin de la serie — y el giro que nadie vio venir."}
+  ]},
+  "Tecnología / IA":{tema:"IA que ya cambia tu vida",eps:[
+    {t:"La app que hace tu trabajo en 10 segundos",c:"Y la mayoría ni sabe que existe…"},
+    {t:"Cómo la IA te espía (y cómo evitarlo)",c:"El truco del final te sorprende."},
+    {t:"3 negocios que puedes montar hoy con IA",c:"El tercero casi nadie lo hace…"},
+    {t:"La herramienta gratis que vale como 5 de pago",c:"Mañana te enseño a usarla paso a paso."},
+    {t:"Lo que viene en IA el año que viene",c:"Fin de la serie. Guárdalo, porque va a pasar."}
+  ]},
+  "Idiomas":{tema:"Inglés que de verdad se usa",eps:[
+    {t:"5 frases que te hacen sonar nativo",c:"La número 2 casi nadie la enseña…"},
+    {t:"El error que te delata como principiante",c:"Y cómo arreglarlo en 1 día."},
+    {t:"Cómo entender películas sin subtítulos",c:"El método del final es oro."},
+    {t:"Palabras que crees que sabes… y no",c:"La última te va a doler 😅"},
+    {t:"Tu plan de 30 días para hablar fluido",c:"Fin de la serie. Empieza hoy."}
+  ]}
+};
+function vSerie(){
+  var opts=Object.keys(SERIES).map(function(n){return '<option>'+esc(n)+'</option>';}).join("");
+  return '<div class="hd"><h2>🎬 Planificador de miniserie</h2></div>'+
+  '<div class="card" style="background:rgba(255,204,51,.06);border-color:rgba(255,204,51,.25)"><div style="font-size:13.5px;color:var(--tx2)">💡 <b style="color:var(--tx)">Por qué series:</b> el formato por capítulos con <b>cliffhanger</b> engancha a volver (como ReelShort: 370M de descargas). Sube la retención y además esquiva la penalización de "contenido repetido".</div></div>'+
+  '<div class="card"><label class="lb">Elige el nicho</label><select id="serNicho">'+opts+'</select>'+
+  '<button class="btn pp" style="margin-top:12px" onclick="generarSerie()">🎬 Generar la serie</button></div>'+
+  '<div id="serRes"></div>';
+}
+function generarSerie(){
+  var n=$("serNicho").value;var s=SERIES[n]||SERIES["Tecnología / IA"];
+  var html='<div class="card"><h3>📺 Serie: “'+esc(s.tema)+'” · '+esc(n)+'</h3>';
+  s.eps.forEach(function(e,i){
+    html+='<div class="epi"><div class="en">Episodio '+(i+1)+(i===s.eps.length-1?" · final":"")+'</div><div class="et">'+esc(e.t)+'</div><div class="cliff">⏭️ '+(i===s.eps.length-1?"Remate: ":"Gancho al siguiente: ")+esc(e.c)+'</div></div>';
+  });
+  html+='<button class="btn pp" style="width:100%;margin-top:6px" onclick="programarSerie(\''+esc(s.tema).replace(/'/g,"")+'\','+s.eps.length+')">📅 Programar la serie entera</button></div>';
+  $("serRes").innerHTML=html;$("serRes").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function programarSerie(tema,n){
+  for(var i=0;i<n;i++){S.contenidoCal.push({dia:i%7,txt:tema+" · ep."+(i+1),red:"YT"});}
+  guardar();toast("Serie de "+n+" episodios programada ✓ mírala en Calendario");
+}
+
+/* --- guion viral --- */
+var PLAT={
+  TikTok:{dur:"21-45 s",opt:"que lo COMPLETEN y lo RE-VEAN",hook:"Enseña el resultado final en el primer frame"},
+  Reels:{dur:"30-90 s",opt:"que lo COMPARTAN por mensaje (DM)",hook:"Gancho visual fuerte que funcione SIN sonido"},
+  Shorts:{dur:"15-30 s",opt:"que NO deslicen y lo vean entero",hook:"El primer segundo lo decide todo: arranca en movimiento"}
+};
+function vGuion(){
+  return '<div class="hd"><h2>🎯 Generador de guion viral</h2></div>'+
+  '<div class="card"><label class="lb">¿De qué va el vídeo?</label>'+
+  '<textarea id="gTema" placeholder="Ej: 3 trucos de IA para ahorrar tiempo, el origen del café, un error típico en inglés…"></textarea>'+
+  '<div class="row" style="margin-top:10px"><div><label class="lb">Plataforma</label><select id="gPlat"><option>TikTok</option><option>Reels</option><option>Shorts</option></select></div>'+
+  '<div style="display:flex;align-items:flex-end"><button class="btn pp" style="width:100%" onclick="generarGuion()">🎯 Generar guion</button></div></div></div>'+
+  '<div id="gRes"></div>';
+}
+function generarGuion(){
+  var tema=($("gTema").value||"").trim();if(!tema){toast("Dime de qué va el vídeo");return;}
+  var pl=$("gPlat").value;var p=PLAT[pl];
+  var html='<div class="card"><h3>✅ Guion para '+esc(pl)+' · '+esc(p.dur)+'</h3>'+
+    '<div style="font-size:12.5px;color:var(--tx3);margin-bottom:12px">Optimizado para '+esc(p.opt)+' · vertical 9:16 · subtítulos siempre · sin marca de agua</div>'+
+    '<div class="gseg gancho"><div class="gl">① Gancho (0-3 s)</div><div class="gt">“'+esc(hookTxt(tema))+'”<br><span style="color:var(--tx3)">'+esc(p.hook)+'. Texto grande en pantalla desde el frame 1.</span></div></div>'+
+    '<div class="gseg des"><div class="gl">② Desarrollo (cortes cada 1,5-3 s)</div><div class="gt">Paso 1 sobre '+esc(tema)+'… <i>“pero espera, esto es lo importante”</i> → Paso 2 → <i>“y lo mejor viene ahora”</i> → Paso 3. Un micro-gancho antes de cada tercio para que no se vayan.</div></div>'+
+    '<div class="gseg rem"><div class="gl">③ Remate + loop</div><div class="gt">Cierra cumpliendo la promesa y enlaza con el principio para que el vídeo se repita (cada repetición cuenta como re-visionado).</div></div>'+
+    '<div class="gseg cta"><div class="gl">④ CTA (nunca "dale like")</div><div class="gt">'+esc(ctaTxt(pl))+'</div></div>'+
+    '<div style="font-size:12.5px;color:var(--tx2);margin-top:4px">🏷️ 1-2 hashtags específicos del nicho (no #fyp). 🔊 '+(pl==="Reels"?"audio original":"sonido en tendencia de fondo")+'.</div>'+
+    '<div class="row" style="margin-top:12px"><button class="btn pp" style="flex:none" onclick="programarGuion(\''+esc(tema.slice(0,28)).replace(/'/g,"")+'\')">📅 Programar este vídeo</button>'+
+    '<button class="btn g" style="flex:none" onclick="generarGuion()">🔄 Otra versión</button></div></div>';
+  $("gRes").innerHTML=html;$("gRes").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function hookTxt(t){var h=["Nadie te cuenta esto sobre "+t,"Lo que creías de "+t+"… en realidad es así","Para cuando pensabas que sabías todo de "+t,"El 90% hace esto mal con "+t];return h[Math.floor(Math.random()*h.length)];}
+function ctaTxt(pl){if(pl==="Reels")return "“Mándaselo a quien necesita verlo” — compartir por DM es la señal nº1 de Reels.";if(pl==="TikTok")return "Una pregunta abierta: “¿Tú cuál usas?” — sube comentarios +26% y re-visionados.";return "Pregunta que invite a comentar, o deja el final en bucle para que lo repitan.";}
+function programarGuion(t){S.contenidoCal.push({dia:Math.floor(Math.random()*7),txt:t,red:"TT"});guardar();toast("Vídeo programado ✓ en Calendario");}
+
+/* --- calendario multicanal --- */
+function vEcal(){
+  var html='<div class="hd"><h2>🗓️ Calendario multicanal</h2><button class="btn pp sm" onclick="addEcal()">+ Añadir vídeo</button></div>';
+  html+='<div class="card" style="background:rgba(96,165,250,.07);border-color:rgba(96,165,250,.28)"><div style="font-size:13px;color:var(--tx2)">📏 <b style="color:var(--tx)">Cadencia recomendada:</b> TikTok 3-5/semana · YouTube Shorts 2-4/semana · repartido, no en ráfaga. Más no es mejor: satura y baja el alcance por vídeo.</div></div>';
+  html+='<div class="card"><div class="cal">';
+  DIAS.forEach(function(d){html+='<div class="dh">'+d+'</div>';});
+  for(var i=0;i<7;i++){
+    html+='<div class="day" onclick="addEcal('+i+')"><div class="dn">'+DIAS[i]+'</div>';
+    S.contenidoCal.forEach(function(e,ix){
+      if(e.dia===i)html+='<div class="ev '+(e.red==="YT"?"amb":"")+'" onclick="event.stopPropagation();borrarEcal('+ix+')" title="Clic para borrar">'+esc(e.red)+': '+esc(e.txt)+'</div>';
+    });
+    html+='</div>';
+  }
+  html+='</div><p style="color:var(--tx3);font-size:12.5px;margin:12px 0 0">💡 Toca un día para añadir · toca un vídeo para borrarlo · TT=TikTok · IG=Instagram · YT=YouTube</p></div>';
+  return html;
+}
+function addEcal(dia){
+  var d=(typeof dia==="number")?dia:0;
+  modal('<h3>Añadir vídeo</h3><label class="lb">Día</label><select id="ecDia">'+
+    DIAS.map(function(n,i){return '<option value="'+i+'" '+(i===d?"selected":"")+'>'+n+'</option>';}).join("")+'</select>'+
+    '<label class="lb" style="margin-top:10px">Título del vídeo</label><input class="inp" id="ecTxt" placeholder="Ej: 3 trucos de IA">'+
+    '<label class="lb" style="margin-top:10px">Red</label><select id="ecRed"><option value="TT">TikTok</option><option value="IG">Instagram</option><option value="YT">YouTube</option></select>'+
+    '<button class="btn pp" style="width:100%;margin-top:14px" onclick="guardarEcal()">Añadir</button>');
+}
+function guardarEcal(){var t=($("ecTxt").value||"").trim();if(!t){toast("Escribe el título");return;}S.contenidoCal.push({dia:parseInt($("ecDia").value),txt:t.slice(0,32),red:$("ecRed").value});guardar();cerrarModal();estudio("ecal");toast("Vídeo añadido ✓");}
+function borrarEcal(ix){S.contenidoCal.splice(ix,1);guardar();estudio("ecal");toast("Vídeo borrado");}
+
+/* --- ingresos realista --- */
+function vIngresos(){
+  return '<div class="hd"><h2>💶 Cómo se gana dinero (de verdad)</h2></div>'+
+  '<div class="card"><div style="font-size:13.5px;color:var(--tx2)">Ordenado por lo que <b style="color:var(--tx)">de verdad</b> funciona para empezar a facturar. Honesto: la mayoría del dinero NO viene del "pago por vistas".</div></div>'+
+  '<div class="via"><div class="vn">1</div><div><div class="vt">UGC para marcas <span class="chip">lo más rápido</span></div><div class="vd">Grabas vídeos PARA una marca y los publica ella en sus cuentas/anuncios. NO necesitas tener seguidores.</div><div class="vp">100-500 $ por vídeo</div></div></div>'+
+  '<div class="via"><div class="vn">2</div><div><div class="vt">Afiliación + vender lo nuestro</div><div class="vd">Comisión por ventas en nichos de RPM alto (tech, software, finanzas) y promocionar Brigada, GestorOS y Chispa.</div><div class="vp">5-20% por venta</div></div></div>'+
+  '<div class="via"><div class="vn">3</div><div><div class="vt">Patrocinios de marca</div><div class="vd">Cuando el canal ya tiene audiencia, las marcas pagan por publicación.</div><div class="vp">Micro 100-500 $ · Medio 500-5.000 $</div></div></div>'+
+  '<div class="via"><div class="vn">4</div><div><div class="vt">YouTube (España SÍ puede cobrar)</div><div class="vd">Shorts pagan poco; el vídeo LARGO paga 100-400× más por vista. Combina los dos.</div><div class="vp">Shorts 30-70 $/millón · Largo 1.000-30.000 $/millón</div></div></div>'+
+  '<div class="warn">⚠️ <b>TikTok NO paga por vistas en España</b> (el Creator Rewards no está disponible aquí hoy — reverificar en la app). En TikTok se gana por marcas, TikTok Shop y directos, no por el reparto.</div>'+
+  '<div class="warn">⚠️ <b>Instagram y Facebook NO pagan por vistas en España</b> de forma fiable. Sirven de escaparate para cerrar marcas y vender, no de RPM.</div>'+
+  '<div class="warn">⚠️ <b>YouTube desmonetiza el contenido IA clónico/en masa</b> (desde julio 2025). Hay que variar guion, voz y estructura y aportar valor — el robot produce mucho pero VARIADO, no vídeos iguales.</div>'+
+  '<div class="card" style="background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.3)"><div style="font-size:13px;color:var(--tx2)">⏳ <b style="color:var(--tx)">Expectativa realista:</b> primeros ingresos serios a los 4-9 meses publicando a diario. El 80-90% de canales no explotan — por eso se juega con cartera (muchos canales, doblar en los que pegan).</div></div>';
+}
+
+/* --- reglas del robot --- */
+function vReglas(){
+  return '<div class="hd"><h2>🛡️ Reglas del robot (anti-penalización)</h2></div>'+
+  '<div class="card"><ul class="checklist">'+
+  '<li><b>Variar cada vídeo</b> (guion, voz, estructura, encuadre) — nunca plantilla calcada. Es lo que evita la desmonetización por "contenido en masa".</li>'+
+  '<li><b>Cero marcas de agua</b> de otras apps (TikTok/CapCut) — penalizan el alcance.</li>'+
+  '<li><b>Nunca resubir lo mismo</b> ni reciclar literal entre plataformas — re-editar nativo para cada una.</li>'+
+  '<li><b>Capa de calidad / criterio humano</b> en cada pieza — la IA produce, una persona revisa y aporta valor.</li>'+
+  '<li><b>Serializar</b> (miniseries con cliffhanger) — sube retención y da originalidad.</li>'+
+  '<li><b>Gancho en los primeros 3 segundos</b>, que funcione sin sonido, y subtítulos siempre.</li>'+
+  '<li><b>Apuntar a público anglosajón</b> (EE.UU./UK) cuando se pueda — pagan RPM mucho más alto.</li>'+
+  '<li><b>Nichos de RPM alto</b> (tech/IA, software, idiomas) — evitar finanzas/salud puras por riesgo de desmonetización.</li>'+
+  '<li><b>Dar 24-72 h</b> a cada vídeo antes de juzgarlo — el algoritmo tarda en arrancar.</li>'+
+  '</ul></div>'+
+  '<div class="card" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.3)"><div style="font-size:13px;color:var(--tx2)">⚡ <b style="color:var(--tx)">Nuestra ventaja real</b> no es "hacer vídeos con IA" (eso lo hace todo el mundo y está penalizado): es <b>orquestar muchos canales serializados a escala con una capa de calidad</b>. Ahí sí hay foso.</div></div>';
+}
+
+/* init */
+aplicarMarca();pintarNav();pintarENav();
+var _h=location.hash||"";
+if(_h.indexOf("estudio")>=0){vista("estudio");}
+else if(_h.indexOf("panel")>=0){vista("panel");}
+</script>
+</body>
+</html>
