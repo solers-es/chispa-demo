@@ -168,6 +168,10 @@
   .chat .ch-h .av{width:40px;height:40px;border-radius:12px;background:var(--grad);display:grid;place-items:center;font-size:22px}
   .chat .ch-h .st{font-size:11.5px;color:var(--verde)}
   .chat .ch-h .x{margin-left:auto;background:none;border:0;color:var(--tx3);font-size:22px;cursor:pointer}
+  .chat .ch-in{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--panel)}
+  .chat .ch-in input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--tx);padding:12px 14px;font-size:16px}
+  .chat .ch-in input:focus{outline:none;border-color:var(--mor)}
+  .chat .ch-in button{border:none;background:linear-gradient(135deg,var(--mor),#6d28d9);color:#fff;font-weight:800;border-radius:12px;padding:0 18px;font-size:17px;cursor:pointer}
   .stream{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
   .bub{max-width:82%;padding:10px 13px;border-radius:15px;font-size:14px;line-height:1.45}
   .bub.ia{background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:5px;align-self:flex-start}
@@ -342,6 +346,7 @@
     </div>
     <div class="stream" id="stream"></div>
     <div class="qs" id="qs"></div>
+    <div class="ch-in"><input id="chatTxt" placeholder="Escríbeme lo que quieras…" autocomplete="off"><button onclick="preguntarLibre()">➤</button></div>
   </div>
 </div>
 
@@ -421,11 +426,12 @@ var GUION={
   "Quiero probarlo":"¡Me encanta! 🎉 Te activo una cuenta de prueba y en 2 minutos tienes tu primera semana de publicaciones lista. Pulsa “Ver cómo funciona por dentro” y mira el panel con un negocio de ejemplo.",
   "¿Publicas los anuncios?":"Te dejo el anuncio montado (texto, imagen y público) listo para lanzar en Meta. En el plan Equipo puedo gestionarlos yo directamente una vez conectas tu cuenta publicitaria. 📣"
 };
-var PREGS=["¿Qué haces exactamente?","¿Cuánto cuesta?","¿Y si no sé de redes?","¿Publicas los anuncios?","Quiero probarlo"];
+var PREGS=["¿Qué haces exactamente?","¿Cuánto cuesta?","¿Y si no sé de redes?","¿Publicas en TikTok?","¿Haces vídeos?","¿En otros idiomas?","¿Publicas los anuncios?","Quiero probarlo"];
 function abrirChat(){
   $("chatOv").classList.add("on");
   $("stream").innerHTML="";
   $("qs").innerHTML="";
+  var ct=$("chatTxt");if(ct){ct.value="";ct.onkeydown=function(e){if(e.key==="Enter")preguntarLibre();};}
   iaDice(GUION.inicio,pintarPregs);
 }
 function cerrarChat(){$("chatOv").classList.remove("on");}
@@ -436,11 +442,34 @@ function pintarPregs(){
     var b=document.createElement("button");b.textContent=p;b.onclick=function(){preguntar(p);};q.appendChild(b);
   });
 }
+function cerebroChat(t){
+  t=(t||"").toLowerCase();
+  var has=function(){for(var i=0;i<arguments.length;i++){if(t.indexOf(arguments[i])>=0)return true;}return false;};
+  if(has("precio","cuesta","cuánto","cuanto","vale","plan","pagar","euros","€"))return GUION["¿Cuánto cuesta?"];
+  if(has("qué haces","que haces","qué eres","que eres","cómo funciona","como funciona","sirve","para qué","para que"))return GUION["¿Qué haces exactamente?"];
+  if(has("no sé","no se","no tengo ni idea","no entiendo"))return GUION["¿Y si no sé de redes?"];
+  if(has("anuncio","anuncios","publicidad","meta","ads"))return GUION["¿Publicas los anuncios?"];
+  if(has("probar","prueba","empezar","quiero","contratar","apuntar","alta"))return GUION["Quiero probarlo"];
+  if(has("tiktok","instagram","facebook","publicar","redes","programar","subir","youtube"))return "Publico en Instagram, Facebook, TikTok y YouTube por ti, a la hora en que más te ven. Tú solo apruebas y yo lo subo. 📲 ¿Quieres verlo en el panel de ejemplo?";
+  if(has("vídeo","video","imagen","reel","carrusel","foto","contenido"))return "Yo creo el contenido: escribo el texto, genero la imagen o el vídeo con IA, le pongo música y subtítulos, y lo dejo listo. 🎬 ¿De qué es tu negocio?";
+  if(has("restaurante","bar","comida","platos","cocina","menú","menu","paella","cafetería"))return "¡Con un restaurante hago maravillas! 😋 Fotos de los platos, vídeos con música, la oferta del día, reservas… ¿Te preparo una promoción?";
+  if(has("idioma","inglés","ingles","alemán","aleman","francés","frances","turista"))return "Sí, creo el contenido en varios idiomas (español, inglés, alemán, francés) — ideal para turistas en Mallorca. 🌍 ¿En qué idioma lo quieres?";
+  if(has("cara","avatar","mi foto","mi imagen","rostro"))return "¡Claro! Puedo ponerte TU cara: subes una foto y tu avatar habla y responde por ti. 🤳 ¿Lo probamos?";
+  if(has("hola","buenas","hey","qué tal","que tal","saludos"))return "¡Hola! 👋 Cuéntame, ¿qué tipo de negocio tienes?";
+  if(has("gracias","adiós","adios","chao","hasta luego"))return "¡Un placer! 💜 Aquí estoy cuando quieras llenar tus redes de clientes.";
+  return "Buena pregunta 🙂 Te resumo: creo tus posts, imágenes y vídeos, los programo y los publico, y respondo a tus clientes. ¿Quieres saber el precio o verlo funcionando?";
+}
+function preguntarLibre(){
+  var i=$("chatTxt");var v=(i.value||"").trim();if(!v)return;i.value="";
+  $("qs").innerHTML="";
+  var s=$("stream");var me=document.createElement("div");me.className="bub me";me.textContent=v;s.appendChild(me);s.scrollTop=s.scrollHeight;
+  iaDice(cerebroChat(v),pintarPregs);
+}
 function preguntar(p){
   $("qs").innerHTML="";
   var s=$("stream");
   var me=document.createElement("div");me.className="bub me";me.textContent=p;s.appendChild(me);s.scrollTop=s.scrollHeight;
-  iaDice(GUION[p]||"Buena pregunta 🙂 Eso te lo cuento mejor en una llamada rápida. ¿Te la agendo?",function(){
+  iaDice(GUION[p]||cerebroChat(p),function(){
     if(p==="Quiero probarlo"){
       var b=document.createElement("button");b.className="btn pp sm";b.style.margin="4px 0 0";b.textContent="Abrir el panel de ejemplo ›";b.onclick=function(){cerrarChat();vista('panel');};
       $("stream").appendChild(b);$("stream").scrollTop=$("stream").scrollHeight;
@@ -500,7 +529,28 @@ var ANGULOS=[
   {k:"📍 Enfoque local", por:"Lo local hace que la gente de la zona lo comparta con sus amigos.",
    v:["Si estás por Palma, esto es para ti: {idea} 💛\n\n{neg}, tu sitio de siempre.","Palma, atención 📣 {idea} en {neg}. Etiqueta a quien se viene."], tags:["#Palma","#Mallorca","#{tag}"]}
 ];
-window._fotos={}; window._posts=[];
+window._fotos={}; window._posts=[]; window._lang=window._lang||"es";
+// plantillas traducidas (mismo orden que ANGULOS)
+var ANGL_T={
+ en:[
+  {v:["{idea} 🔥\n\nAt {neg} we have it ready for you. Come by today.","This is {idea} 😋\n\nAt {neg} you can't miss it."],tags:["#{tag}","#Palma","#Mallorca"]},
+  {v:["This week only: {idea} 😍\n\nHurry to {neg} before it's gone. 📲","Today it's {idea}! ⏰\n\nWe'll save you a spot at {neg}, but be quick."],tags:["#offer","#{tag}","#Mallorca"]},
+  {v:["Have you tried {idea} yet? 👀\n\nTell us in the comments 👇 {neg} is waiting for you.","Hey, {idea}? 🤔 Today at {neg}. Are you in?"],tags:["#{tag}","#Palma","#foodie"]},
+  {v:["If you're in Palma, this is for you: {idea} 💛\n\n{neg}, your go-to spot.","Palma, listen up 📣 {idea} at {neg}. Tag someone who's coming."],tags:["#Palma","#Mallorca","#{tag}"]}
+ ],
+ de:[
+  {v:["{idea} 🔥\n\nBei {neg} haben wir es für dich bereit. Komm heute vorbei.","Das ist {idea} 😋\n\nBei {neg} darfst du es nicht verpassen."],tags:["#{tag}","#Palma","#Mallorca"]},
+  {v:["Nur diese Woche: {idea} 😍\n\nSchnell zu {neg}, bevor es weg ist. 📲","Heute gibt es {idea}! ⏰\n\nWir halten dir einen Platz bei {neg} frei, aber beeil dich."],tags:["#Angebot","#{tag}","#Mallorca"]},
+  {v:["Hast du {idea} schon probiert? 👀\n\nSchreib es in die Kommentare 👇 {neg} wartet auf dich.","Hey, {idea}? 🤔 Heute bei {neg}. Bist du dabei?"],tags:["#{tag}","#Palma","#foodie"]},
+  {v:["Wenn du in Palma bist, ist das für dich: {idea} 💛\n\n{neg}, dein Lieblingsort.","Palma, aufgepasst 📣 {idea} bei {neg}. Markiere jemanden, der mitkommt."],tags:["#Palma","#Mallorca","#{tag}"]}
+ ],
+ fr:[
+  {v:["{idea} 🔥\n\nChez {neg} c'est prêt pour toi. Passe aujourd'hui.","C'est {idea} 😋\n\nChez {neg}, à ne pas manquer."],tags:["#{tag}","#Palma","#Mallorca"]},
+  {v:["Cette semaine seulement : {idea} 😍\n\nFile à {neg} avant que ça parte. 📲","Aujourd'hui c'est {idea} ! ⏰\n\nOn te garde une place à {neg}, mais dépêche-toi."],tags:["#offre","#{tag}","#Mallorca"]},
+  {v:["Tu as déjà essayé {idea} ? 👀\n\nDis-le en commentaire 👇 {neg} t'attend.","Hé, {idea} ? 🤔 Aujourd'hui chez {neg}. Tu viens ?"],tags:["#{tag}","#Palma","#foodie"]},
+  {v:["Si tu es à Palma, c'est pour toi : {idea} 💛\n\n{neg}, ton adresse habituelle.","Palma, attention 📣 {idea} chez {neg}. Identifie quelqu'un qui vient."],tags:["#Palma","#Mallorca","#{tag}"]}
+ ]
+};
 function hashIdea(idea){
   var stop={de:1,la:1,el:1,los:1,las:1,un:1,una:1,del:1,en:1,con:1,para:1,que:1,una:1};
   var w=(idea||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9 ]/g,"").trim().split(/\s+/);
@@ -519,6 +569,12 @@ function vAsistente(){
   '</div>'+
   '<div class="row" style="margin-top:10px;gap:8px;align-items:center;flex-wrap:wrap"><label class="lb" style="margin:0 2px 0 0">Formato</label>'+
     FORMATOS.map(function(f){return '<button class="btn '+(window._formato===f.id?"pp":"g")+' sm fmtb" style="flex:none" data-f="'+f.id+'" onclick="setFormato(\''+f.id+'\')">'+f.ic+' '+f.nm+'</button>';}).join("")+
+  '</div>'+
+  '<div class="row" style="margin-top:10px;gap:8px;align-items:center;flex-wrap:wrap"><label class="lb" style="margin:0 4px 0 0">🌍 Idioma del contenido</label>'+
+    '<select id="contLang" onchange="window._lang=this.value" style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--tx);padding:10px 12px;font-size:15px">'+
+    ["es,🇪🇸 Español","en,🇬🇧 Inglés","de,🇩🇪 Alemán","fr,🇫🇷 Francés"].map(function(o){var p=o.split(",");return '<option value="'+p[0]+'"'+((window._lang||"es")===p[0]?" selected":"")+'>'+p[1]+'</option>';}).join("")+
+    '</select>'+
+    '<span style="font-size:11px;color:var(--tx3)">Para turistas en Mallorca. Cualquier otro idioma, con el traductor IA por uso.</span>'+
   '</div></div>'+
   '<div id="resultado"></div>';
 }
@@ -550,10 +606,13 @@ function generar(ideaOpt,auto){
   if(auto)html+='<div class="card prop"><div class="pl">⚡ Propuesta de hoy</div><div style="font-size:13.5px;color:var(--tx2);margin-top:4px">Te he preparado esto sobre <b style="color:var(--tx)">'+esc(idea)+'</b>. Cámbialo arriba o elige una de estas y publícala con un clic.</div></div>';
   html+='<div class="hd" style="margin-top:4px"><h2>'+(auto?"Elige tu publicación":"✅ Chispa te preparó varias ideas")+'</h2><button class="btn g sm" onclick="generar()">↻ Más ideas</button></div>';
   html+='<p style="color:var(--tx3);font-size:12.5px;margin:-4px 0 10px">Para <b>'+esc(donde)+'</b>'+(n.oferta?' · oferta activa: <b style="color:var(--amber)">'+esc(n.oferta)+'</b>':'')+'. Elige la que más te guste, crea la imagen con IA o sube tu foto, y publícala. <span style="color:var(--tx3)">🎨 Imagen IA: demo · en real se conecta con Flux por uso (céntimos).</span></p><div class="ideas">';
+  var LC=window._lang||"es";var VT=(LC==="es")?null:ANGL_T[LC];
   ANGULOS.forEach(function(a,i){
-    var txt=a.v[Math.floor(Math.random()*a.v.length)].replace(/{idea}/g,idea).replace(/{neg}/g,donde);
+    var vv=(VT&&VT[i]&&VT[i].v)?VT[i].v:a.v;
+    var txt=vv[Math.floor(Math.random()*vv.length)].replace(/{idea}/g,idea).replace(/{neg}/g,donde);
     if(n.oferta)txt+="\n\n🔥 "+n.oferta;
-    var tags=a.tags.map(function(t){return t.replace("{tag}",tag);}).join(" ");
+    var tt=(VT&&VT[i]&&VT[i].tags)?VT[i].tags:a.tags;
+    var tags=tt.map(function(t){return t.replace("{tag}",tag);}).join(" ");
     window._posts[i]={txt:txt,tags:tags};
     html+='<div class="card ideac"><div class="ang">'+a.k+' <span class="chip" style="margin-left:6px">'+fmtNm+'</span></div>'+
       '<div class="post">'+ofertaBadge()+'<div class="pacc"></div>'+cabeceraNegocio()+
@@ -939,18 +998,31 @@ function vSerie(){
   '<button class="btn pp" style="margin-top:12px" onclick="generarSerie()">🎬 Generar la serie</button></div>'+
   '<div id="serRes"></div>';
 }
+var _serie=null;
 function generarSerie(){
   var n=$("serNicho").value;var s=SERIES[n]||SERIES["Tecnología / IA"];
-  var html='<div class="card"><h3>📺 Serie: “'+esc(s.tema)+'” · '+esc(n)+'</h3>';
+  _serie={tema:s.tema,nicho:n,eps:s.eps.map(function(e){return {t:e.t,c:e.c};})};
+  var html='<div class="card"><h3>📺 Serie: “'+esc(s.tema)+'” · '+esc(n)+'</h3>'+
+    '<div style="font-size:12px;color:var(--tx3);margin:-2px 0 10px">Marca los capítulos que quieras, edita el título si te apetece, y pulsa <b style="color:var(--tx2)">Programar la serie</b>.</div>';
   s.eps.forEach(function(e,i){
-    html+='<div class="epi"><div class="en">Episodio '+(i+1)+(i===s.eps.length-1?" · final":"")+'</div><div class="et">'+esc(e.t)+'</div><div class="cliff">⏭️ '+(i===s.eps.length-1?"Remate: ":"Gancho al siguiente: ")+esc(e.c)+'</div></div>';
+    var fin=(i===s.eps.length-1);
+    html+='<div class="epi">'+
+      '<label style="display:flex;align-items:center;gap:9px;cursor:pointer"><input type="checkbox" class="serChk" data-i="'+i+'" checked style="width:22px;height:22px;flex:none"><span class="en">Episodio '+(i+1)+(fin?" · final":"")+'</span></label>'+
+      '<input class="serTit" data-i="'+i+'" value="'+esc(e.t)+'" style="width:100%;margin:8px 0 6px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--tx);padding:11px 12px;font-size:15px">'+
+      '<div class="cliff">⏭️ '+(fin?"Remate: ":"Gancho al siguiente: ")+esc(e.c)+'</div></div>';
   });
-  html+='<button class="btn pp" style="width:100%;margin-top:6px" onclick="programarSerie(\''+esc(s.tema).replace(/'/g,"")+'\','+s.eps.length+')">📅 Programar la serie entera</button></div>';
+  html+='<button class="btn pp" style="width:100%;margin-top:10px;padding:15px;font-size:16px" onclick="programarSerie()">📅 Programar la serie entera</button></div>';
   $("serRes").innerHTML=html;$("serRes").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
-function programarSerie(tema,n){
-  for(var i=0;i<n;i++){S.contenidoCal.push({dia:i%7,txt:tema+" · ep."+(i+1),red:"YT"});}
-  guardar();toast("Serie de "+n+" episodios programada ✓ mírala en Calendario");
+function programarSerie(){
+  var chks=document.querySelectorAll(".serChk"), tits=document.querySelectorAll(".serTit");
+  var titById={};Array.prototype.forEach.call(tits,function(t){titById[t.getAttribute("data-i")]=(t.value||"").trim();});
+  var sel=[];Array.prototype.forEach.call(chks,function(c){if(c.checked){var i=c.getAttribute("data-i");sel.push(titById[i]||(_serie?_serie.eps[i].t:"Episodio"));}});
+  if(!sel.length){toast("Marca al menos un capítulo 🙂");return;}
+  var base=_serie?_serie.tema:"Serie";
+  sel.forEach(function(t,k){S.contenidoCal.push({dia:k%7,txt:(base+" · "+t).slice(0,42),red:"YT"});});
+  guardar();toast("✅ "+sel.length+" capítulos programados en días seguidos");
+  estudio("ecal");
 }
 
 /* --- guion viral --- */

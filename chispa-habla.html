@@ -1,7 +1,7 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Habla con Chispa</title>
-<meta name="description" content="Habla con Chispa, el robot de IA que lleva el marketing de tu negocio. Toca para hablar.">
+<meta name="description" content="Habla con Chispa, el robot de IA que lleva el marketing de tu negocio. En varios idiomas, con tu cara.">
 <style>
   :root{--bg:#0b0d12;--bg2:#12151c;--panel:#161a22;--panel2:#1b212b;--line:#2a3340;--tx:#e8ecf3;--tx2:#a6b0c0;--tx3:#79839a;
     --amar:#ffcc33;--amar2:#ffb020;--mor:#8b5cf6;--mor2:#a78bfa;--verde:#34d399}
@@ -9,167 +9,252 @@
   html,body{margin:0}
   body{background:radial-gradient(1200px 700px at 50% -10%,#1a1430 0%,var(--bg) 55%);color:var(--tx);
     font:16px/1.55 -apple-system,"Segoe UI",system-ui,sans-serif;min-height:100vh;padding:0 16px}
-  .w{max-width:620px;margin:0 auto;padding:26px 0 50px;display:flex;flex-direction:column;align-items:center}
-  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;color:var(--mor2);margin-bottom:4px}
+  .w{max-width:620px;margin:0 auto;padding:20px 0 60px;display:flex;flex-direction:column;align-items:center}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;color:var(--mor2);margin-bottom:2px}
   .logo .sp{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--amar),var(--amar2));display:flex;align-items:center;justify-content:center;font-size:18px}
-  h1{font:800 26px/1.15 Georgia,serif;text-align:center;margin:10px 0 2px}
+  h1{font:800 25px/1.15 Georgia,serif;text-align:center;margin:8px 0 2px}
   h1 .g{background:linear-gradient(135deg,var(--amar),var(--mor2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .sub{color:var(--tx2);text-align:center;font-size:14px;margin:0 0 16px;max-width:440px}
-  /* robot */
-  .robot{position:relative;width:200px;height:200px;margin:6px 0 2px}
-  .halo{position:absolute;inset:-14px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.45),transparent 65%);filter:blur(6px);opacity:.5;transition:.2s}
-  .robot.speaking .halo{opacity:1;animation:pulse 1s ease-in-out infinite}
-  .robot.listening .halo{opacity:1;background:radial-gradient(circle,rgba(52,211,153,.5),transparent 65%);animation:pulse .8s ease-in-out infinite}
+  .sub{color:var(--tx2);text-align:center;font-size:13.5px;margin:0 0 10px;max-width:460px}
+  .langs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:0 0 12px}
+  .lang{border:1px solid var(--line);background:var(--panel2);color:var(--tx);font-weight:700;font-size:13px;padding:7px 12px;border-radius:20px;cursor:pointer}
+  .lang.on{background:linear-gradient(135deg,var(--mor),#6d28d9);color:#fff;border-color:transparent}
+  .avatar{position:relative;width:196px;height:196px;margin:4px 0 2px}
+  @media(max-width:420px){.avatar{width:160px;height:160px}}
+  .halo{position:absolute;inset:-14px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.45),transparent 65%);filter:blur(6px);opacity:.5;transition:.2s;pointer-events:none}
+  .avatar.speaking .halo{opacity:1;animation:pulse 1s ease-in-out infinite}
+  .avatar.listening .halo{opacity:1;background:radial-gradient(circle,rgba(52,211,153,.5),transparent 65%);animation:pulse .8s ease-in-out infinite}
   @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-  svg{position:relative;display:block;width:200px;height:200px;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
+  svg{position:relative;display:block;width:100%;height:100%;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
   .eye{fill:#8b5cf6}
-  .robot.speaking .eye,.robot.listening .eye{fill:#ffcc33}
+  .avatar.speaking .eye,.avatar.listening .eye{fill:#ffcc33}
   .mbar{fill:#8b5cf6;transform-origin:center;transform-box:fill-box}
-  .robot.speaking .mbar{animation:talk .4s ease-in-out infinite;fill:#ffcc33}
-  .robot.speaking .mbar:nth-child(2){animation-delay:.1s}
-  .robot.speaking .mbar:nth-child(3){animation-delay:.2s}
-  .robot.speaking .mbar:nth-child(4){animation-delay:.08s}
+  .avatar.speaking .mbar{animation:talk .4s ease-in-out infinite;fill:#ffcc33}
+  .avatar.speaking .mbar:nth-child(2){animation-delay:.1s}.avatar.speaking .mbar:nth-child(3){animation-delay:.2s}.avatar.speaking .mbar:nth-child(4){animation-delay:.08s}
   @keyframes talk{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
-  /* boton */
-  .mic{margin:14px 0 6px;border:none;cursor:pointer;font-weight:800;font-size:18px;color:#fff;
-    background:linear-gradient(135deg,var(--mor),#6d28d9);padding:16px 30px;border-radius:40px;
-    box-shadow:0 10px 30px rgba(139,92,246,.45);display:flex;align-items:center;gap:10px;transition:.15s}
-  .mic:hover{transform:translateY(-2px)}
+  .facewrap{position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;border:3px solid var(--mor);box-shadow:0 10px 30px rgba(139,92,246,.4)}
+  .facewrap img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:center 60%}
+  .avatar.speaking .facewrap img{animation:facetalk .28s ease-in-out infinite}
+  @keyframes facetalk{0%,100%{transform:scale(1.0)}50%{transform:scale(1.03) translateY(-1.5px)}}
+  .mouth{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);width:34px;height:5px;border-radius:6px;background:rgba(0,0,0,.45);opacity:0}
+  .avatar.speaking .mouth{opacity:1;animation:mouthmove .22s ease-in-out infinite}
+  @keyframes mouthmove{0%,100%{height:5px}50%{height:16px}}
+  .facebtns{display:flex;gap:9px;margin:10px 0 2px;flex-wrap:wrap;justify-content:center}
+  .fbtn{border:1px solid var(--line);background:var(--panel2);color:var(--tx);font-weight:700;font-size:14px;padding:10px 16px;border-radius:30px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .fbtn.alt{background:transparent}
+  .mic{margin:12px 0 6px;border:none;cursor:pointer;font-weight:800;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--mor),#6d28d9);padding:16px 30px;border-radius:40px;box-shadow:0 10px 30px rgba(139,92,246,.45);display:flex;align-items:center;gap:10px;transition:.15s}
+  .mic:active{transform:scale(.97)}
   .mic.on{background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 10px 30px rgba(239,68,68,.45)}
-  .hint{font-size:12.5px;color:var(--tx3);margin:2px 0 14px;text-align:center}
-  /* chat */
-  .chat{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;min-height:150px;max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:9px}
-  .b{max-width:82%;padding:9px 13px;border-radius:14px;font-size:14.5px;white-space:pre-wrap;animation:up .25s ease}
+  .hint{font-size:12.5px;color:var(--tx3);margin:2px 0 12px;text-align:center;max-width:470px}
+  .chat{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;min-height:130px;max-height:40vh;overflow:auto;display:flex;flex-direction:column;gap:9px}
+  .b{max-width:85%;padding:10px 14px;border-radius:14px;font-size:15px;white-space:pre-wrap;animation:up .25s ease}
   @keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .b.bot{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
   .b.me{align-self:flex-end;background:linear-gradient(135deg,var(--mor),#6d28d9);color:#fff;border-bottom-right-radius:4px}
   .row{display:flex;gap:8px;width:100%;margin-top:10px}
-  .row input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--tx);padding:12px 14px;font-size:15px}
+  .row input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--tx);padding:14px;font-size:16px}
   .row input:focus{outline:none;border-color:var(--mor)}
-  .row button{border:none;cursor:pointer;background:linear-gradient(135deg,var(--amar),var(--amar2));color:#1a1005;font-weight:800;border-radius:12px;padding:0 18px;font-size:15px}
-  .cta{margin-top:18px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--amar),var(--amar2));color:#1a1005;font-weight:800;font-size:15px;padding:13px 22px;border-radius:30px}
-  .nota{font-size:11.5px;color:var(--tx3);margin-top:14px;text-align:center;max-width:460px}
+  .row button{border:none;cursor:pointer;background:linear-gradient(135deg,var(--amar),var(--amar2));color:#1a1005;font-weight:800;border-radius:12px;padding:0 20px;font-size:16px}
+  .cta{margin-top:18px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--amar),var(--amar2));color:#1a1005;font-weight:800;font-size:15px;padding:14px 24px;border-radius:30px}
+  .nota{font-size:11.5px;color:var(--tx3);margin-top:14px;text-align:center;max-width:470px}
   #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#1f9d57;color:#fff;font-weight:700;padding:12px 20px;border-radius:30px;opacity:0;transition:.3s;z-index:60}
 </style></head><body><div class="w">
 
 <div class="logo"><span class="sp">⚡</span> Chispa</div>
 <h1>Habla con <span class="g">Chispa</span></h1>
-<p class="sub">El robot de IA que lleva el marketing de tu negocio. Pregúntale lo que quieras — <b>toca y habla</b>.</p>
+<p class="sub" id="sub">El robot de IA que lleva el marketing de tu negocio. Pregúntale lo que quieras — y <b>ponle tu cara</b>.</p>
 
-<div class="robot" id="robot">
+<div class="langs" id="langs">
+  <button class="lang on" data-l="es">🇪🇸 ES</button>
+  <button class="lang" data-l="en">🇬🇧 EN</button>
+  <button class="lang" data-l="de">🇩🇪 DE</button>
+  <button class="lang" data-l="fr">🇫🇷 FR</button>
+  <button class="lang" data-l="ca">🏝️ CAT</button>
+</div>
+
+<div class="avatar" id="avatar">
   <div class="halo"></div>
-  <svg viewBox="0 0 200 200" aria-hidden="true">
+  <svg id="robotSvg" viewBox="0 0 200 200" aria-hidden="true">
     <rect x="40" y="46" width="120" height="110" rx="26" fill="#1b212b" stroke="#2a3340" stroke-width="2"/>
     <line x1="100" y1="30" x2="100" y2="46" stroke="#8b5cf6" stroke-width="4"/>
     <circle cx="100" cy="26" r="7" fill="#ffcc33"/>
-    <circle class="eye" cx="76" cy="92" r="13"/>
-    <circle class="eye" cx="124" cy="92" r="13"/>
-    <circle cx="76" cy="92" r="5" fill="#0b0d12"/>
-    <circle cx="124" cy="92" r="5" fill="#0b0d12"/>
+    <circle class="eye" cx="76" cy="92" r="13"/><circle class="eye" cx="124" cy="92" r="13"/>
+    <circle cx="76" cy="92" r="5" fill="#0b0d12"/><circle cx="124" cy="92" r="5" fill="#0b0d12"/>
     <g>
-      <rect class="mbar" x="74"  y="120" width="9" height="20" rx="4"/>
-      <rect class="mbar" x="88"  y="120" width="9" height="20" rx="4"/>
-      <rect class="mbar" x="102" y="120" width="9" height="20" rx="4"/>
-      <rect class="mbar" x="116" y="120" width="9" height="20" rx="4"/>
+      <rect class="mbar" x="74" y="120" width="9" height="20" rx="4"/><rect class="mbar" x="88" y="120" width="9" height="20" rx="4"/>
+      <rect class="mbar" x="102" y="120" width="9" height="20" rx="4"/><rect class="mbar" x="116" y="120" width="9" height="20" rx="4"/>
     </g>
     <rect x="22" y="78" width="12" height="40" rx="6" fill="#1b212b" stroke="#2a3340" stroke-width="2"/>
     <rect x="166" y="78" width="12" height="40" rx="6" fill="#1b212b" stroke="#2a3340" stroke-width="2"/>
   </svg>
+  <div class="facewrap" id="facewrap" style="display:none"><img id="faceImg" alt="Tu cara"><div class="mouth"></div></div>
+</div>
+
+<div class="facebtns">
+  <label class="fbtn" for="facefile" id="lblFace">📷 Poner mi cara</label>
+  <input type="file" id="facefile" accept="image/*" capture="user" style="position:absolute;width:1px;height:1px;opacity:0">
+  <button class="fbtn alt" id="backRobot" style="display:none">↩</button>
 </div>
 
 <button class="mic" id="mic">🎤 TOCA PARA HABLAR</button>
-<div class="hint" id="hint">Toca el botón y habla. Chispa te escucha y te responde con voz.</div>
+<div class="hint" id="hint">Toca el botón y habla, o escríbeme abajo.</div>
 
 <div class="chat" id="chat"></div>
 
 <div class="row" id="rowText" style="display:none">
-  <input id="txt" placeholder="Escríbele a Chispa…" autocomplete="off">
-  <button id="send">Enviar</button>
+  <input id="txt" placeholder="Escríbeme lo que quieras…" autocomplete="off" autocapitalize="sentences">
+  <button id="send">➤</button>
 </div>
 
-<button class="cta" onclick="toast('Chispa está listo para tu negocio ✨ — planes desde 29 €/mes');say('Para empezar solo necesito el nombre de tu negocio y un par de fotos. En menos de un minuto te hago el primer vídeo.')">🚀 Quiero Chispa para mi negocio</button>
-
-<p class="nota">Demo con la voz del navegador (gratis). En el producto final se puede usar una voz premium tipo ElevenLabs para que suene aún más natural.</p>
+<button class="cta" id="cta">🚀 Quiero Chispa para mi negocio</button>
+<p class="nota" id="nota">Demo con la voz del navegador (gratis). La animación de la cara es demostración; el <b>lip-sync real</b> se activa con HeyGen. Más idiomas y traducción total, con el traductor IA por uso.</p>
 </div>
 
 <div id="toast"></div>
 <script>
-var chat=document.getElementById('chat'), robot=document.getElementById('robot'),
+var chat=document.getElementById('chat'), avatar=document.getElementById('avatar'),
     micBtn=document.getElementById('mic'), hint=document.getElementById('hint');
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-var rec=null, listening=false, esVoice=null;
+var rec=null, listening=false, voiceFor={}, spoke=false, greeted=false, LANG='es';
+
+// ---- textos por idioma ----
+var L={
+ es:{code:'es-ES',sub:'El robot de IA que lleva el marketing de tu negocio. Pregúntale lo que quieras — y <b>ponle tu cara</b>.',hint:'Toca el botón y habla, o escríbeme abajo.',write:'Escríbeme lo que quieras…',face:'📷 Poner mi cara',mic:'🎤 TOCA PARA HABLAR',
+   greet:'¡Hola! Soy Chispa, el robot que lleva el marketing de tu negocio. Pregúntame lo que quieras, o ponme tu cara con el botón de arriba.',
+   precio:'Tengo tres planes: Básico por 29 euros al mes, Pro por 59 y Equipo por 99. ¿Quieres una prueba?',
+   nosabe:'¡Tranquilo! Para eso estoy yo. Tú me dices qué vendes y yo me encargo de todo. ¿Qué vendes?',
+   probar:'¡Perfecto! Solo necesito el nombre de tu negocio y un par de fotos. En menos de un minuto te hago el primer vídeo.',
+   publicar:'Publico en Instagram, Facebook y TikTok por ti, a la mejor hora. Tú solo apruebas.',
+   cara:'Toca "Poner mi cara" aquí arriba y súbete una foto. En el producto final tu cara habla de verdad, con tu voz.',
+   resto:'¡Con un restaurante hago maravillas! Fotos de platos, vídeos con música, ofertas, reservas…',
+   conten:'Creo el contenido: texto, imagen o vídeo, música y subtítulos, listo para subir. ¿De qué es tu negocio?',
+   quees:'Soy Chispa, un robot de inteligencia artificial que lleva el marketing de tu negocio. Creo tus publicaciones y vídeos y te digo qué publicar. Tú solo apruebas.',
+   hola:'¡Hola! ¿Qué tipo de negocio tienes?',gracias:'¡Un placer! Aquí estoy para llenarte las redes de clientes.',
+   def:'Cuéntame más. Puedo crearte posts, imágenes y vídeos y publicarlos por ti. ¿Qué quieres hacer?'},
+ en:{code:'en-US',sub:'The AI robot that runs your business marketing. Ask it anything — and <b>put your face on it</b>.',hint:'Tap the button and speak, or write to me below.',write:'Write me anything…',face:'📷 Add my face',mic:'🎤 TAP TO SPEAK',
+   greet:'Hi! I am Chispa, the AI robot that runs your business marketing. Ask me anything, or add your face with the button above.',
+   precio:'I have three plans: Basic at 29 euros a month, Pro at 59 and Team at 99. Want a trial?',
+   nosabe:'No worries! That is exactly what I am for. Tell me what you sell and I handle everything. What do you sell?',
+   probar:'Great! I just need your business name and a couple of photos. In under a minute I make your first video.',
+   publicar:'I post on Instagram, Facebook and TikTok for you, at the best time. You just approve.',
+   cara:'Tap "Add my face" above and upload a photo. In the final product your face really talks, with your voice.',
+   resto:'With a restaurant I do wonders! Dish photos, videos with music, offers, reservations…',
+   conten:'I create the content: text, image or video, music and captions, ready to post. What is your business?',
+   quees:'I am Chispa, an AI robot that runs your business marketing. I create your posts and videos and tell you what to publish. You just approve.',
+   hola:'Hi! What kind of business do you have?',gracias:'My pleasure! I am here to fill your social media with customers.',
+   def:'Tell me more. I can create posts, images and videos and publish them for you. What would you like to do?'},
+ de:{code:'de-DE',sub:'Der KI-Roboter für das Marketing deines Geschäfts. Frag mich alles — und <b>gib mir dein Gesicht</b>.',hint:'Tippe und sprich, oder schreib mir unten.',write:'Schreib mir etwas…',face:'📷 Mein Gesicht',mic:'🎤 TIPPEN ZUM SPRECHEN',
+   greet:'Hallo! Ich bin Chispa, der KI-Roboter für dein Marketing. Frag mich alles, oder gib mir dein Gesicht mit dem Knopf oben.',
+   precio:'Ich habe drei Pakete: Basis für 29 Euro im Monat, Pro für 59 und Team für 99. Möchtest du einen Test?',
+   nosabe:'Keine Sorge! Genau dafür bin ich da. Sag mir, was du verkaufst, und ich kümmere mich um alles. Was verkaufst du?',
+   probar:'Perfekt! Ich brauche nur deinen Firmennamen und ein paar Fotos. In unter einer Minute mache ich dein erstes Video.',
+   publicar:'Ich poste für dich auf Instagram, Facebook und TikTok, zur besten Zeit. Du bestätigst nur.',
+   cara:'Tippe oben auf "Mein Gesicht" und lade ein Foto hoch. Im fertigen Produkt spricht dein Gesicht wirklich, mit deiner Stimme.',
+   resto:'Mit einem Restaurant mache ich Wunder! Fotos der Gerichte, Videos mit Musik, Angebote, Reservierungen…',
+   conten:'Ich erstelle den Inhalt: Text, Bild oder Video, Musik und Untertitel, bereit zum Posten. Was ist dein Geschäft?',
+   quees:'Ich bin Chispa, ein KI-Roboter für dein Marketing. Ich erstelle deine Beiträge und Videos und sage dir, was du posten sollst. Du bestätigst nur.',
+   hola:'Hallo! Welche Art von Geschäft hast du?',gracias:'Gern geschehen! Ich bin hier, um deine sozialen Netzwerke mit Kunden zu füllen.',
+   def:'Erzähl mir mehr. Ich kann Beiträge, Bilder und Videos erstellen und für dich posten. Was möchtest du tun?'},
+ fr:{code:'fr-FR',sub:'Le robot IA qui gère le marketing de ton entreprise. Demande-lui tout — et <b>mets ton visage</b>.',hint:'Touche et parle, ou écris-moi en bas.',write:'Écris-moi ce que tu veux…',face:'📷 Mon visage',mic:'🎤 TOUCHE POUR PARLER',
+   greet:'Bonjour ! Je suis Chispa, le robot IA qui gère ton marketing. Demande-moi tout, ou mets ton visage avec le bouton en haut.',
+   precio:'J ai trois forfaits : Basique à 29 euros par mois, Pro à 59 et Équipe à 99. Tu veux un essai ?',
+   nosabe:'Pas de souci ! C est exactement pour ça que je suis là. Dis-moi ce que tu vends et je m occupe de tout. Que vends-tu ?',
+   probar:'Parfait ! J ai juste besoin du nom de ton entreprise et de quelques photos. En moins d une minute je fais ta première vidéo.',
+   publicar:'Je publie sur Instagram, Facebook et TikTok pour toi, au meilleur moment. Tu valides, c est tout.',
+   cara:'Touche "Mon visage" en haut et ajoute une photo. Dans le produit final ton visage parle vraiment, avec ta voix.',
+   resto:'Avec un restaurant je fais des merveilles ! Photos des plats, vidéos avec musique, offres, réservations…',
+   conten:'Je crée le contenu : texte, image ou vidéo, musique et sous-titres, prêt à publier. Quelle est ton entreprise ?',
+   quees:'Je suis Chispa, un robot IA qui gère ton marketing. Je crée tes publications et vidéos et je te dis quoi publier. Tu valides, c est tout.',
+   hola:'Bonjour ! Quel type d entreprise as-tu ?',gracias:'Avec plaisir ! Je suis là pour remplir tes réseaux de clients.',
+   def:'Dis-m en plus. Je peux créer des posts, images et vidéos et les publier pour toi. Que veux-tu faire ?'},
+ ca:{code:'ca-ES',sub:'El robot d IA que porta el màrqueting del teu negoci. Pregunta-li el que vulguis — i <b>posa-li la teva cara</b>.',hint:'Toca el botó i parla, o escriu-me a sota.',write:'Escriu-me el que vulguis…',face:'📷 Posa la meva cara',mic:'🎤 TOCA PER PARLAR',
+   greet:'Hola! Soc en Chispa, el robot que porta el màrqueting del teu negoci. Pregunta-m el que vulguis, o posa-m la teva cara amb el botó de dalt.',
+   precio:'Tinc tres plans: Bàsic per 29 euros al mes, Pro per 59 i Equip per 99. Vols una prova?',
+   nosabe:'Tranquil! Per això hi soc jo. Digue-m què véns i jo m encarrego de tot. Què véns?',
+   probar:'Perfecte! Només necessito el nom del teu negoci i un parell de fotos. En menys d un minut et faig el primer vídeo.',
+   publicar:'Publico a Instagram, Facebook i TikTok per tu, a la millor hora. Tu només aproves.',
+   cara:'Toca "Posa la meva cara" aquí dalt i puja una foto. En el producte final la teva cara parla de veritat, amb la teva veu.',
+   resto:'Amb un restaurant faig meravelles! Fotos de plats, vídeos amb música, ofertes, reserves…',
+   conten:'Creo el contingut: text, imatge o vídeo, música i subtítols, a punt per publicar. De què és el teu negoci?',
+   quees:'Soc en Chispa, un robot d IA que porta el màrqueting del teu negoci. Creo les teves publicacions i vídeos i et dic què publicar. Tu només aproves.',
+   hola:'Hola! Quin tipus de negoci tens?',gracias:'Un plaer! Soc aquí per omplir-te les xarxes de clients.',
+   def:'Explica m més. Puc crear-te posts, imatges i vídeos i publicar-los per tu. Què vols fer?'}
+};
 
 function bubble(txt,who){var d=document.createElement('div');d.className='b '+who;d.textContent=txt;chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.opacity=1;t.style.transform='translateX(-50%) translateY(0)';setTimeout(function(){t.style.opacity=0;t.style.transform='translateX(-50%) translateY(20px)';},3200);}
 
-function pickVoice(){try{var vs=speechSynthesis.getVoices();esVoice=vs.find(function(v){return /es(-|_)/i.test(v.lang)})||vs.find(function(v){return /^es/i.test(v.lang)})||null;}catch(e){}}
-if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
+function pickVoices(){var vs=voices();['es','en','de','fr','ca'].forEach(function(l){voiceFor[l]=vs.find(function(v){return new RegExp('^'+l+'(-|_)','i').test(v.lang)})||vs.find(function(v){return new RegExp('^'+l,'i').test(v.lang)})||null;});}
+if('speechSynthesis' in window){pickVoices();speechSynthesis.onvoiceschanged=pickVoices;}
 
 function say(txt){
   bubble(txt,'bot');
-  if(!('speechSynthesis' in window)) return;
-  try{
-    speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(txt);
-    u.lang='es-ES'; if(esVoice) u.voice=esVoice; u.rate=1.04; u.pitch=1;
-    u.onstart=function(){robot.classList.add('speaking')};
-    u.onend=function(){robot.classList.remove('speaking')};
-    speechSynthesis.speak(u);
-  }catch(e){}
+  if(!('speechSynthesis' in window))return;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(txt);u.lang=L[LANG].code;if(voiceFor[LANG])u.voice=voiceFor[LANG];u.rate=1.04;
+    u.onstart=function(){spoke=true;avatar.classList.add('speaking')};u.onend=function(){avatar.classList.remove('speaking')};u.onerror=function(){avatar.classList.remove('speaking')};
+    speechSynthesis.speak(u);}catch(e){}
 }
+function greet(){if(greeted)return;greeted=true;say(L[LANG].greet);}
 
-// "cerebro" por palabras clave — vende Chispa
 function responder(t){
   t=(t||'').toLowerCase();
   var has=function(){for(var i=0;i<arguments.length;i++){if(t.indexOf(arguments[i])>=0)return true;}return false;};
-  if(has('precio','cuesta','cuánto','cuanto','vale','plan','pagar','euros'))
-    return 'Tengo tres planes: Básico por 29 euros al mes, Pro por 59, y Equipo por 99. Con el plan Pro ya te creo los posts, las imágenes, los vídeos y te los programo. ¿Quieres que te prepare una prueba?';
-  if(has('no sé','no se','no entiendo','no sabe','nada de marketing','no tengo ni idea','complicado'))
-    return '¡Tranquilo! Justo para eso estoy yo. Tú no tienes que saber nada de marketing: me dices qué vendes y yo me encargo de todo, de principio a fin. ¿Qué vendes?';
-  if(has('probar','prueba','empezar','quiero','contratar','apuntar','cómo empiezo','como empiezo'))
-    return '¡Perfecto! Para empezar solo necesito el nombre de tu negocio y un par de fotos. En menos de un minuto te hago el primer vídeo. ¿Cómo se llama tu negocio?';
-  if(has('publicar','redes','instagram','tiktok','facebook','subir','programar'))
-    return 'Publico en Instagram, Facebook y TikTok por ti, a la hora en que más te ven. Tú solo apruebas y yo lo subo. ¿Quieres verlo funcionando?';
-  if(has('restaurante','bar','comida','platos','cocina','menú','menu','paella'))
-    return '¡Con un restaurante hago maravillas! Fotos de los platos, vídeos con música, la oferta del día, reservas… ¿Quieres que te prepare una promoción ahora mismo?';
-  if(has('vídeo','video','imagen','foto','contenido','post'))
-    return 'Yo creo el contenido por ti: escribo el texto, genero la imagen o el vídeo, le pongo la música y los subtítulos, y lo dejo listo para subir. ¿De qué es tu negocio?';
-  if(has('qué eres','que eres','qué haces','que haces','qué es chispa','que es chispa','cómo funciona','como funciona','para qué','para que','sirve'))
-    return 'Soy Chispa, un robot de inteligencia artificial que lleva el marketing de tu negocio. Creo tus publicaciones y vídeos, te propongo qué publicar cada día, y lo dejo listo. Tú solo apruebas. ¿Qué tipo de negocio tienes?';
-  if(has('hola','buenas','hey','qué tal','que tal','saludos'))
-    return '¡Hola! Soy Chispa, el robot que lleva el marketing de tu negocio. Cuéntame, ¿qué tipo de negocio tienes?';
-  if(has('gracias','adiós','adios','chao','hasta luego','vale'))
-    return '¡Un placer! Cuando quieras, aquí estoy para llenarte las redes de clientes. 😉';
-  return 'Cuéntame un poco más. Puedo crearte posts, imágenes y vídeos para tus redes, y publicarlos por ti. ¿Qué te gustaría hacer con tu negocio?';
+  var T=L[LANG];
+  if(has('precio','cuesta','cuánto','cuanto','vale','plan','pagar','euros','price','cost','how much','preis','kostet','prix','coût','combien'))return T.precio;
+  if(has('no sé','no se','nada de marketing','no idea','do not know','dont know','keine ahnung','je ne sais','no sé res'))return T.nosabe;
+  if(has('probar','prueba','empezar','quiero','start','try','begin','anfangen','commencer','essayer','vull'))return T.probar;
+  if(has('publicar','redes','instagram','tiktok','facebook','publish','post','posten','publier','xarxes'))return T.publicar;
+  if(has('cara','foto','rostro','face','gesicht','visage','photo','imatge'))return T.cara;
+  if(has('restaurante','bar','comida','platos','menú','menu','restaurant','essen','nourriture','menjar'))return T.resto;
+  if(has('vídeo','video','imagen','image','content','contenido','bild','vidéo','contingut'))return T.conten;
+  if(has('qué eres','que eres','qué haces','que haces','what are you','what do you','was bist','was machst','qui es','que fais','què ets','què fas'))return T.quees;
+  if(has('hola','hello','hi','hallo','bonjour','salut','buenas'))return T.hola;
+  if(has('gracias','thanks','thank','danke','merci','gràcies'))return T.gracias;
+  return T.def;
 }
+function procesar(texto){if(!texto)return;bubble(texto,'me');setTimeout(function(){say(responder(texto));},250);}
 
-function procesar(texto){ if(!texto) return; bubble(texto,'me'); setTimeout(function(){ say(responder(texto)); }, 250); }
+// ---- idioma ----
+function setLang(l){
+  LANG=l; document.documentElement.lang=l;
+  Array.prototype.forEach.call(document.querySelectorAll('.lang'),function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+  document.getElementById('sub').innerHTML=L[l].sub;
+  document.getElementById('hint').textContent=L[l].hint;
+  document.getElementById('txt').placeholder=L[l].write;
+  document.getElementById('lblFace').textContent=L[l].face;
+  if(SR && micBtn) micBtn.firstChild && (micBtn.textContent=L[l].mic);
+  if(rec) try{rec.lang=L[l].code}catch(e){}
+  greeted=false; say(L[l].greet);
+}
+Array.prototype.forEach.call(document.querySelectorAll('.lang'),function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
 
-// ---- modo VOZ (si el navegador lo soporta) ----
+// ---- poner mi cara ----
+var facewrap=document.getElementById('facewrap'),robotSvg=document.getElementById('robotSvg'),faceImg=document.getElementById('faceImg'),backRobot=document.getElementById('backRobot');
+function mostrarCara(u){faceImg.src=u;facewrap.style.display='block';robotSvg.style.display='none';backRobot.style.display='inline-flex';}
+function mostrarRobot(){facewrap.style.display='none';robotSvg.style.display='block';backRobot.style.display='none';}
+document.getElementById('facefile').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){mostrarCara(r.result);try{localStorage.setItem('chispa_cara',r.result)}catch(x){}say(L[LANG].cara);};r.readAsDataURL(f);});
+backRobot.addEventListener('click',function(){mostrarRobot();try{localStorage.removeItem('chispa_cara')}catch(x){}});
+try{var sv=localStorage.getItem('chispa_cara');if(sv)mostrarCara(sv);}catch(x){}
+
+// ---- voz / texto ----
 function setupVoz(){
-  rec=new SR(); rec.lang='es-ES'; rec.interimResults=false; rec.maxAlternatives=1;
-  rec.onstart=function(){listening=true;robot.classList.add('listening');micBtn.classList.add('on');micBtn.textContent='⏹ ESCUCHANDO… (toca para parar)';hint.textContent='Habla ahora…';};
-  rec.onend=function(){listening=false;robot.classList.remove('listening');micBtn.classList.remove('on');micBtn.textContent='🎤 TOCA PARA HABLAR';hint.textContent='Toca el botón y habla.';};
-  rec.onerror=function(e){ hint.textContent = (e.error==='not-allowed'||e.error==='service-not-allowed') ? 'No me diste permiso de micrófono. Puedes escribirme abajo.' : 'No te oí bien, inténtalo otra vez o escríbeme.'; mostrarTexto(); };
-  rec.onresult=function(e){ var t=e.results[0][0].transcript; procesar(t); };
-  micBtn.addEventListener('click',function(){ if(listening){try{rec.stop()}catch(e){}} else {try{speechSynthesis.cancel();rec.start()}catch(e){mostrarTexto()}} });
+  rec=new SR();rec.lang=L[LANG].code;rec.interimResults=false;rec.maxAlternatives=1;
+  rec.onstart=function(){listening=true;avatar.classList.add('listening');micBtn.classList.add('on');micBtn.textContent='⏹ …';hint.textContent='…';};
+  rec.onend=function(){listening=false;avatar.classList.remove('listening');micBtn.classList.remove('on');micBtn.textContent=L[LANG].mic;hint.textContent=L[LANG].hint;};
+  rec.onerror=function(e){hint.textContent=L[LANG].hint;mostrarTexto();};
+  rec.onresult=function(e){procesar(e.results[0][0].transcript);};
+  micBtn.addEventListener('click',function(){greet();if(listening){try{rec.stop()}catch(e){}}else{try{speechSynthesis.cancel();rec.start()}catch(e){mostrarTexto()}}});
 }
-
-function mostrarTexto(){ document.getElementById('rowText').style.display='flex'; }
-
-// ---- modo TEXTO (siempre disponible; único si no hay voz) ----
+function mostrarTexto(){document.getElementById('rowText').style.display='flex';}
 document.getElementById('send').addEventListener('click',enviarTexto);
-document.getElementById('txt').addEventListener('keydown',function(e){ if(e.key==='Enter') enviarTexto(); });
-function enviarTexto(){ var i=document.getElementById('txt'); var v=i.value.trim(); if(!v)return; i.value=''; procesar(v); }
+document.getElementById('txt').addEventListener('keydown',function(e){if(e.key==='Enter')enviarTexto();});
+function enviarTexto(){greet();var i=document.getElementById('txt');var v=i.value.trim();if(!v)return;i.value='';procesar(v);}
+document.getElementById('cta').addEventListener('click',function(){greet();toast('✨ Chispa — 29 €/mes');say(L[LANG].probar);});
 
-// arranque
-if(SR){ setupVoz(); } else {
-  micBtn.textContent='⌨️ ESCRIBE A CHISPA';
-  hint.textContent='Tu navegador no reconoce la voz (usa Chrome para hablar). Mientras, escríbele abajo — él te responde con voz y texto.';
-  micBtn.addEventListener('click',mostrarTexto);
-  mostrarTexto();
-}
-// saludo inicial
-setTimeout(function(){ say('¡Hola! Soy Chispa, el robot que lleva el marketing de tu negocio. Toca el botón y pregúntame lo que quieras: qué hago, cuánto cuesto, o cómo lleno de clientes tu negocio.'); }, 600);
+if(SR){setupVoz();}else{micBtn.textContent='⌨️';hint.textContent='Tu móvil no deja hablar por voz en el navegador (Safari/iPhone), pero Chispa SÍ te contesta por voz. Escríbele aquí abajo 👇';micBtn.addEventListener('click',function(){greet();mostrarTexto();document.getElementById('txt').focus();});mostrarTexto();}
+
+bubble(L.es.greet,'bot');
+setTimeout(function(){try{var u=new SpeechSynthesisUtterance(L[LANG].greet);u.lang=L[LANG].code;if(voiceFor[LANG])u.voice=voiceFor[LANG];u.rate=1.04;u.onstart=function(){spoke=true;greeted=true;avatar.classList.add('speaking')};u.onend=function(){avatar.classList.remove('speaking')};speechSynthesis.speak(u);}catch(e){}},700);
+document.addEventListener('touchend',function once(){if(!spoke)greet();document.removeEventListener('touchend',once);},{passive:true});
 </script>
 </body></html>
