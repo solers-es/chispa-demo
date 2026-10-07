@@ -13,7 +13,7 @@ crons = ["*/5 * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "chispa"
-database_id = "PEGA_AQUI_EL_ID_DE_LA_BASE_D1"
+database_id = "58a28745-8473-48e5-b64d-948146b76c9e"
 
 # OPCIONAL · fotos y vídeos que las redes descargan (necesita R2 activado en la cuenta).
 # Si no lo activas, deja estas líneas comentadas: lo demás funciona igual.
@@ -24,7 +24,7 @@ database_id = "PEGA_AQUI_EL_ID_DE_LA_BASE_D1"
 [vars]
 # Dirección de este servidor (la da «wrangler deploy»). Con ella se forma la
 # dirección de vuelta que hay que registrar en Google, Meta y TikTok:  <URL_BASE>/oauth/vuelta
-URL_BASE = "https://chispa-api.PON_AQUI_TU_SUBDOMINIO.workers.dev"
+URL_BASE = "https://chispa-api.solers.workers.dev"
 # Adónde vuelve el navegador después de conectar una red
 PANEL_URL = "https://solers-es.github.io/chispa-demo/"
 # Páginas que pueden hablar con el servidor (separadas por comas)
