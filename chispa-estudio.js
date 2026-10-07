@@ -80,7 +80,30 @@ function copiarViejo(t){try{var a=document.createElement("textarea");a.value=t;a
 var KICK=[["Hoy en "+"{neg}","Recién hecho","De nuestra cocina"],["Solo este finde","Plazas limitadas","No te lo pierdas"],["¿Te apuntas?","Te preguntamos","¿Ya lo probaste?"],["Palma · Mallorca","Tu sitio en Palma","Desde 1968"]];
 function capital(s){s=(s||"").trim();return s.charAt(0).toUpperCase()+s.slice(1);}
 function tituloCorto(s){s=capital((s||"").replace(/[#@].*$/,"").replace(/[\u{1F300}-\u{1FAFF}☀-➿]/gu,"").trim());if(s.length>42){var c=s.slice(0,42);s=c.slice(0,c.lastIndexOf(" ")>18?c.lastIndexOf(" "):42)+"…";}return s||"Te esperamos";}
-function ctasPorDefecto(){return [{t:"📅 Reservar",tipo:"reserva",url:""},{t:"🌐 Ver web",tipo:"web",url:""}];}
+/* ---------- enlaces por defecto de El Paraíso (los mismos que B pone en «Mi negocio») ---------- */
+var DEF_PARAISO={reserva:"https://el-paraiso-eight.vercel.app/reservas.html",
+  web:"https://el-paraiso-eight.vercel.app/links",club:"https://el-paraiso-eight.vercel.app",
+  tiktok:"https://www.tiktok.com/@elparaisomallorca29",instagram:"https://instagram.com/elparaisobarrestaurante"};
+function esParaiso(){return /para[ií]so/i.test(N().nombre||"");}
+function enlace(tipo){var n=N(),v=n[tipo];if(v)return v;return esParaiso()?(DEF_PARAISO[tipo]||""):"";}
+function ctasPorDefecto(){var c=[{t:"📅 Reservar",tipo:"reserva",url:""},{t:"🌐 Ver web",tipo:"web",url:""}];if(esParaiso())c.push({t:"⭐ Club Paraíso",tipo:"club",url:""});return c;}
+
+/* ---------- logo y marca de agua ---------- */
+var LOGO={url:"",img:null};
+function logoUrl(){return N().logoUrl||LOGO.url||(esParaiso()?"marca/elparaiso-logo.png":"");}
+function logoListo(){cargarLogo();var im=LOGO.img;if(!im||im.complete)return Promise.resolve();return new Promise(function(ok){im.onload=ok;im.onerror=ok;setTimeout(ok,3000);});}
+function cargarLogo(){var u=logoUrl();if(!u){LOGO.img=null;return;}if(LOGO.img&&LOGO.img._u===u)return;var im=new Image();im._u=u;im.src=u;LOGO.img=im;}
+function logoHtml(){var u=logoUrl();return u?'<img class="cm-lg" src="'+esc(u.replace("elparaiso-logo.png","elparaiso-logo-160.png"))+'" alt="'+esc(N().nombre||"logo")+'">':esc(N().logo||"🍽️");}
+/* Stalin (07/10): nada de marcas de agua. El logo va solo en el avatar y en las cabeceras. */
+function marca(){return {on:false,pos:"tl",tam:18};}
+function marcaHtml(V){var m=marca();if(!m.on)return "";var u=logoUrl();
+  return u?'<img class="wm wm-'+m.pos+'" style="width:'+m.tam+'cqw" src="'+esc(u)+'" alt="">':'<div class="wm wm-'+m.pos+' wm-txt">'+esc((N().logo||"")+" "+(N().nombre||""))+'</div>';}
+/* logo propio: se guarda en el aparato (IndexedDB), sin FileReader */
+function idbLogo(modo,blob){return new Promise(function(ok){try{var r=indexedDB.open("chispa-medios",1);r.onupgradeneeded=function(){r.result.createObjectStore("m");};
+  r.onsuccess=function(){try{var db=r.result,t=db.transaction("m",modo==="get"?"readonly":"readwrite"),st=t.objectStore("m");
+    if(modo==="get"){var q=st.get("logo");q.onsuccess=function(){ok(q.result||null);};q.onerror=function(){ok(null);};}
+    else{if(blob)st.put(blob,"logo");else st.delete("logo");t.oncomplete=function(){ok(true);};t.onerror=function(){ok(false);};}}catch(e){ok(null);}};r.onerror=function(){ok(null);};}catch(e){ok(null);}});}
+setTimeout(function(){idbLogo("get").then(function(b){if(b){LOGO.url=URL.createObjectURL(b);cargarLogo();try{(window._posts||[]).forEach(function(p,i){if(i<900&&p)repintar(i);});}catch(e){}}else cargarLogo();});},0);
 function fechaBonita(f){if(!f)return "";try{var d=new Date(f);return d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}catch(e){return f;}}
 function proximo(dow,h){var d=new Date();d.setHours(h,0,0,0);var add=(dow-d.getDay()+7)%7;if(add===0&&new Date()>d)add=7;d.setDate(d.getDate()+add);var p=function(n){return (n<10?"0":"")+n;};return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(h)+":00";}
 
@@ -112,7 +135,7 @@ function nuevoPost(o){
     foto:(o.foto!=null?o.foto:0),L:(o.L!=null?o.L:0),media:null,creando:false,ctas:ctasPorDefecto(),fecha:o.fecha||"",sinTexto:false,slide:0};
   return p;
 }
-function cabecera(){var n=N();return '<div class="ph"><div class="av">'+esc(n.logo||"🍽️")+'</div><div style="min-width:0"><div style="font-weight:700;font-size:13px">'+esc(n.nombre)+'</div><div style="font-size:11px;color:var(--tx3)">'+esc(n.ciudad||"")+'</div></div></div>';}
+function cabecera(){var n=N();return '<div class="ph"><div class="av">'+logoHtml()+'</div><div style="min-width:0"><div style="font-weight:700;font-size:13px">'+esc(n.nombre)+'</div><div style="font-size:11px;color:var(--tx3)">'+esc(n.ciudad||"")+'</div></div></div>';}
 function fmtNombre(f){return {post:"🖼️ Post",carrusel:"🎠 Carrusel",historia:"📸 Historia",reel:"🎬 Reel"}[f]||"🖼️ Post";}
 
 function tarjeta(i){
@@ -121,7 +144,7 @@ function tarjeta(i){
     '<div class="cm-top"><div class="ang">'+esc(p.ang)+'</div><span class="chip">'+fmtNombre(p.formato)+'</span>'+
       (p.fecha?'<span class="cm-fecha" onclick="cmEditar('+i+',\'fecha\')" title="Cambiar fecha">🗓️ '+esc(fechaBonita(p.fecha))+'</span>':'')+'</div>'+
     '<div class="cm-post">'+(typeof ofertaBadge==="function"?ofertaBadge():"")+'<div class="pacc"></div>'+cabecera()+
-      '<div class="cm-media" id="img_'+i+'" style="aspect-ratio:'+aspecto(p)+'">'+medio(i,false)+'</div>'+
+      '<div class="cm-media" id="img_'+i+'" style="aspect-ratio:'+aspecto(p)+'" title="'+esc(creditoDe(p))+'">'+medio(i,false)+'</div>'+
       '<div class="cm-body">'+
         '<div class="cm-ed" contenteditable="true" spellcheck="false" data-i="'+i+'" data-k="txt" onblur="cmGuardarCampo(this)" aria-label="Texto de la publicación">'+esc(p.txt)+'</div>'+
         '<div class="cm-tags"><div class="cm-ed" contenteditable="true" spellcheck="false" data-i="'+i+'" data-k="tags" onblur="cmGuardarCampo(this)" aria-label="Hashtags">'+esc(p.tags)+'</div></div>'+
@@ -139,7 +162,8 @@ function tarjeta(i){
     '</div></div>';
 }
 function repintar(i){var c=$("cmCard_"+i);if(c)c.outerHTML=tarjeta(i);}
-function repintarMedio(i){var d=$("img_"+i);if(d){d.style.aspectRatio=aspecto(window._posts[i]);d.innerHTML=medio(i,false);}}
+function creditoDe(p){var m=p&&p.media;return m&&m.cred?"Foto: "+m.cred+" (Unsplash)":"";}
+function repintarMedio(i){var d=$("img_"+i);if(d){d.title=creditoDe(window._posts[i]);d.style.aspectRatio=aspecto(window._posts[i]);d.innerHTML=medio(i,false);}}
 
 /* escena: lo que se ve dentro de la imagen */
 function escena(p,opt){
@@ -153,7 +177,7 @@ function escena(p,opt){
   var kick=(p.kicker||"").replace("{neg}",n.nombre||"");
   return '<div class="cm-scene L'+(p.L||0)+(V?" V":"")+(p.sinTexto?" sinTexto":"")+'">'+media+
     '<div class="sh"></div><div class="gl"></div>'+(m.esVideo?'':'<div class="sw"></div>')+
-    '<div class="br"><i>'+esc(n.logo||"🍽️")+'</i>'+esc(n.nombre||"")+'</div>'+
+    marcaHtml(V)+
     (n.oferta?'<div class="of">🔥 '+esc(n.oferta)+'</div>':'')+
     '<div class="tx">'+(kick?'<div class="kk">'+esc(kick)+'</div>':'')+'<div class="tt">'+words+'</div>'+
       '<div class="ct">'+esc(p.ctas&&p.ctas[0]?p.ctas[0].t.replace(/^\S+\s/,"")+" →":"Reserva tu mesa →")+'</div></div>'+
@@ -177,7 +201,7 @@ function medio(i,mini){
     (m.tipo!=="propia"?'<button title="Otra versión" onclick="crearImagenIA('+i+')">↻</button>':'<button title="Cambiar" onclick="cmElegirArchivo('+i+')">📷</button>')+
     '<button title="Descargar imagen o vídeo" onclick="cmExportar('+i+')">⬇</button>'+
     '<button title="Quitar imagen" onclick="cmQuitar('+i+')">✕</button></div>';
-  return h+nav+(m.slides?"":badge)+cred+tool;
+  return h+nav+tool;
 }
 
 /* =====================================================================
@@ -255,8 +279,9 @@ window.subirFoto=function(i,inp){
    ===================================================================== */
 window.cmGuardarCampo=function(el){var i=+el.getAttribute("data-i"),k=el.getAttribute("data-k");var p=window._posts[i];if(!p)return;var v=(el.innerText||"").replace(/\n{3,}/g,"\n\n").trim();if(v!==p[k]){p[k]=v;toast("Guardado ✓");}};
 window.cmCta=function(i,k){var c=window._posts[i].ctas[k];if(!c)return;
-  if(c.url){window.open(/^https?:|^tel:|^mailto:/.test(c.url)?c.url:"https://"+c.url,"_blank","noopener");return;}
-  if(typeof abrirCta==="function"&&(c.tipo==="reserva"||c.tipo==="web"||c.tipo==="tel"))abrirCta(c.tipo);else cmEditar(i,"ctas");};
+  var u=c.url||enlace(c.tipo);
+  if(u){window.open(/^https?:|^tel:|^mailto:/.test(u)?u:"https://"+u,"_blank","noopener");return;}
+  toast("Pon el enlace de este botón");cmEditar(i,"ctas");};
 window.cmEditar=function(i,foco){
   var p=window._posts[i];
   var c0=p.ctas[0]||{t:"",url:""},c1=p.ctas[1]||{t:"",url:""};
@@ -301,7 +326,8 @@ window.programarGen=function(i){
    ===================================================================== */
 function pintar(lista,cabeceraHtml){
   window._posts=lista;window._fotos={};window._fotosArr={};window._cIdx={};
-  var html=cabeceraHtml+'<div class="ideas cm-wrap">'+lista.map(function(p,i){return tarjeta(i);}).join("")+'</div>'+(typeof avisoConectar==="function"?avisoConectar():"");
+  var barra='<div class="cm-agbar"><span>📅 ¿Cuándo salen?</span><button class="btn pp sm" onclick="window.CHISPA_AGENDA&&CHISPA_AGENDA.planificarSemana(true)">⚡ Planificar mi semana</button><button class="btn g sm" onclick="window.CHISPA_AGENDA&&CHISPA_AGENDA.todoAlCalendario()">Todo al calendario</button><span class="cm-agsp"></span><button class="btn g sm" onclick="cmDemo()">▶ Ver demo de publicación</button><button class="btn g sm" onclick="cmMarca()">🏷️ Logo</button></div>';
+  var html=cabeceraHtml+barra+'<div class="ideas cm-wrap">'+lista.map(function(p,i){return tarjeta(i);}).join("")+'</div>'+(typeof avisoConectar==="function"?avisoConectar():"");
   $("resultado").innerHTML=html;
 }
 function tiraEjemplos(){
@@ -371,12 +397,13 @@ function dibujar(x,W,H,p,fuente,t,dur){
   if(Lw===3){x.strokeStyle="rgba(255,255,255,.7)";x.lineWidth=Math.max(2,u*.25);if(V)rr(x,3.6*u,14*u,W-7.2*u,H-44*u,2*u);else rr(x,3.6*u,3.6*u,W-7.2*u,H-7.2*u,2*u);x.stroke();}
   // marca
   var aB=ease(t/0.6);x.globalAlpha=aB;
-  x.font="700 "+(3.6*u)+"px Inter, sans-serif";x.textBaseline="middle";
-  var bx=5.5*u,by=(V?21:9)*u,lbl=n.nombre||"";
-  if(Lw===3){var bw=8*u+2*u+x.measureText(lbl).width;bx=(W-bw)/2;by=(V?23:11.5)*u;}
-  x.fillStyle="rgba(255,255,255,.92)";x.beginPath();x.arc(bx+4*u,by,4*u,0,7);x.fill();
-  x.font=(4.4*u)+"px sans-serif";x.textAlign="center";x.fillStyle="#111";x.fillText(n.logo||"🍽️",bx+4*u,by+.2*u);
-  x.textAlign="left";x.font="700 "+(3.6*u)+"px Inter, sans-serif";x.fillStyle="#fff";x.fillText(lbl,bx+10*u,by);
+  var MA=marca();
+  if(MA.on){var lg=LOGO.img&&LOGO.img.complete&&LOGO.img.naturalWidth?LOGO.img:null;
+    var sz=W*MA.tam/100,mx=4.5*u,myT=(V?17:4.5)*u,myB=(V?30:4.5)*u;
+    var lx=(MA.pos==="tr"||MA.pos==="br")?W-mx-sz:mx,ly=(MA.pos==="bl"||MA.pos==="br")?H-myB-sz:myT;
+    if(lg){x.save();x.shadowColor="rgba(0,0,0,.35)";x.shadowBlur=u*2;x.drawImage(lg,lx,ly,sz,sz);x.restore();}
+    else{x.font="700 "+(3.6*u)+"px Inter, sans-serif";x.textBaseline="middle";x.fillStyle="#fff";var der=(MA.pos==="tr"||MA.pos==="br");x.textAlign=der?"right":"left";
+      x.fillText(((n.logo||"")+" "+(n.nombre||"")).trim(),der?W-mx:mx,ly+sz/2);x.textAlign="left";}}
   x.globalAlpha=1;
   if(p.sinTexto)return;
   // oferta
@@ -418,14 +445,14 @@ function fuenteDe(p){
 }
 function medidas(p){return vertical(p)?[1080,1920]:(p.formato==="carrusel"?[1080,1350]:[1080,1080]);}
 function hacerImagen(p){
-  return Promise.all([fuentesListas(),fuenteDe(p)]).then(function(r){var src=r[1],wh=medidas(p),c=document.createElement("canvas");c.width=wh[0];c.height=wh[1];
+  return Promise.all([fuentesListas(),fuenteDe(p),logoListo()]).then(function(r){var src=r[1],wh=medidas(p),c=document.createElement("canvas");c.width=wh[0];c.height=wh[1];
     var x=c.getContext("2d");dibujar(x,wh[0],wh[1],p,src,4,6);
     return new Promise(function(ok,ko){try{c.toBlob(function(b){b?ok(b):ko(new Error("vacío"));},"image/jpeg",.92);}catch(e){ko(e);}});});
 }
 function tipoVideo(){var t=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"];if(!window.MediaRecorder)return "";for(var k=0;k<t.length;k++){try{if(MediaRecorder.isTypeSupported(t[k]))return t[k];}catch(e){}}return "";}
 function hacerVideo(p,progreso,dur){
   dur=dur||6;var mt=tipoVideo();if(!mt)return Promise.reject(new Error("Este navegador no graba vídeo"));
-  return Promise.all([fuentesListas(),fuenteDe(p)]).then(function(r){
+  return Promise.all([fuentesListas(),fuenteDe(p),logoListo()]).then(function(r){
     var src=r[1],wh=[1080,1920];
     if(!vertical(p)&&p.formato!=="carrusel")wh=[1080,1080];
     if(p.formato==="carrusel")wh=[1080,1350];
@@ -452,7 +479,7 @@ function compartirArchivo(b,nombre,texto){
 
 /* ---------- ventana para descargar ---------- */
 function ov(){var o=$("cmOv");if(!o){o=document.createElement("div");o.id="cmOv";o.className="cm-ov";o.innerHTML='<div class="cm-box" id="cmBox" role="dialog" aria-modal="true"></div>';document.body.appendChild(o);o.addEventListener("click",function(e){if(e.target===o)cmCerrar();});}return o;}
-window.cmCerrar=function(){var o=$("cmOv");if(o)o.classList.remove("on");document.body.style.overflow="";};
+window.cmCerrar=function(){if(PUB.demo){PUB.demo=0;DEMO.t.forEach(clearTimeout);DEMO.t=[];}var o=$("cmOv");if(o)o.classList.remove("on");document.body.style.overflow="";};
 function abrirOv(html){var o=ov();$("cmBox").innerHTML=html;o.classList.add("on");document.body.style.overflow="hidden";$("cmBox").scrollTop=0;}
 window.cmExportar=function(i){
   var p=window._posts[i];if(!p.media){toast("Primero crea o sube una imagen 🙂");return;}
@@ -482,7 +509,8 @@ var REDES=[
  {id:"tt",nm:"TikTok",sub:"Vídeo vertical",cls:"tt",ic:"♪",vert:true,subir:"https://www.tiktok.com/upload"},
  {id:"fb",nm:"Facebook",sub:"Publicación en tu página",cls:"fb",ic:"f",vert:false,subir:"https://www.facebook.com/"},
  {id:"wa",nm:"WhatsApp Estado",sub:"Lo ven tus contactos",cls:"wa",ic:"✆",vert:true,subir:""},
- {id:"yt",nm:"YouTube Shorts",sub:"Vídeo corto vertical",cls:"yt",ic:"▶",vert:true,subir:"https://www.youtube.com/upload"}
+ {id:"yt",nm:"YouTube Shorts",sub:"Vídeo corto vertical",cls:"yt",ic:"▶",vert:true,subir:"https://www.youtube.com/upload"},
+ {id:"gbp",nm:"Google (tu ficha)",sub:"Novedad en Google Maps y Búsqueda",cls:"gg",ic:"G",vert:false,subir:"https://business.google.com/"}
 ];
 var PUB={i:0,sel:{igf:1,igs:1,fb:1,wa:1},tab:"igf",paso:1,hecho:{}};
 function red(id){for(var k=0;k<REDES.length;k++)if(REDES[k].id===id)return REDES[k];return REDES[0];}
@@ -494,30 +522,37 @@ function miniEscena(p,vert,h){
 }
 function telefono(contenido,oscuro){return '<div class="cm-phone"><div class="isl"></div><div class="scr'+(oscuro?" dark":"")+'">'+contenido+'</div></div>';}
 function sb(osc){return '<div class="pv-sb" style="'+(osc?"color:#fff":"")+'"><span>'+new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})+'</span><span>●●● 5G ▮</span></div>';}
-function usuario(){var n=N();return (n.instagram||"").replace(/^.*instagram\.com\//,"").replace(/^@/,"").replace(/\/.*$/,"")||sinTildes(n.nombre||"tunegocio").replace(/[^a-z0-9]+/g,"")+"palma";}
+function usuarioTT(){var t=enlace("tiktok");return (t||"").replace(/^.*tiktok\.com\/@?/,"").replace(/^@/,"").replace(/[\/?].*$/,"")||usuario();}
+function usuario(){var n=N();return (enlace("instagram")||"").replace(/^.*instagram\.com\//,"").replace(/^@/,"").replace(/\/.*$/,"")||sinTildes(n.nombre||"tunegocio").replace(/[^a-z0-9]+/g,"")+"palma";}
 function vista(p,id,pub){
   var n=N(),u=usuario(),cap=esc(textoCompleto(p)),ctaT=esc(p.ctas&&p.ctas[0]?p.ctas[0].t:"📅 Reservar");
   var likes=pub?'<span class="n" data-cuenta="'+(180+Math.floor(Math.random()*240))+'">0</span>':(120+((p.titulo||"").length*7)%300);
   var marca=pub?'<div class="pv-pub"><div>✓ Publicado</div></div>':'';
   if(id==="igf")return telefono(sb()+'<div class="pv-bar" style="font-size:18px;font-weight:800;font-family:Georgia,serif">Instagram<span style="margin-left:auto;font-size:18px">♡ ✉</span></div>'+
-    '<div class="pv-bar"><div class="pv-av"><i>'+esc(n.logo||"🍽️")+'</i></div><div><div style="font-size:12.5px">'+esc(u)+'</div><div style="font-size:10.5px;color:#777;font-weight:400">'+esc(n.ciudad||"")+'</div></div><span style="margin-left:auto">⋯</span></div>'+
+    '<div class="pv-bar"><div class="pv-av"><i>'+logoHtml()+'</i></div><div><div style="font-size:12.5px">'+esc(u)+'</div><div style="font-size:10.5px;color:#777;font-weight:400">'+esc(n.ciudad||"")+'</div></div><span style="margin-left:auto">⋯</span></div>'+
     '<div class="pv-m">'+miniEscena(p,false,280)+'</div><div class="pv-ic"><span>♡</span><span>💬</span><span>➤</span><span style="margin-left:auto">🔖</span></div>'+
     '<div class="pv-likes">Le gusta a <span>'+likes+'</span> personas</div><div class="pv-cap"><b>'+esc(u)+'</b>'+cap.slice(0,160)+(cap.length>160?'… <span style="color:#888">más</span>':'')+'</div>'+marca);
-  if(id==="igs")return telefono('<div class="pv-full">'+miniEscena(p,true,560)+'</div><div class="pv-prog"><i></i></div><div class="pv-bar" style="position:absolute;top:18px;left:0;right:0;color:#fff;z-index:6"><div class="pv-av"><i>'+esc(n.logo||"🍽️")+'</i></div><span style="font-size:12px">'+esc(u)+' <span style="opacity:.7;font-weight:400">2 min</span></span></div>'+
+  if(id==="igs")return telefono('<div class="pv-full">'+miniEscena(p,true,560)+'</div><div class="pv-prog"><i></i></div><div class="pv-bar" style="position:absolute;top:18px;left:0;right:0;color:#fff;z-index:6"><div class="pv-av"><i>'+logoHtml()+'</i></div><span style="font-size:12px">'+esc(u)+' <span style="opacity:.7;font-weight:400">2 min</span></span></div>'+
     '<div class="pv-stick">🔗 '+ctaT.replace(/^\S+\s/,"")+'</div><div class="pv-bar" style="position:absolute;bottom:14px;left:0;right:0;z-index:6;color:#fff"><div style="flex:1;border:1px solid rgba(255,255,255,.6);border-radius:30px;padding:8px 12px;font-weight:400;font-size:12px">Enviar mensaje</div><span>♡</span><span>➤</span></div>'+marca,true);
   if(id==="tt")return telefono('<div class="pv-full">'+miniEscena(p,true,560)+'</div><div class="pv-bar" style="position:absolute;top:26px;left:0;right:0;justify-content:center;color:#fff;z-index:6;gap:16px;font-size:13px"><span style="opacity:.7">Siguiendo</span><span style="border-bottom:2px solid #fff">Para ti</span></div>'+
-    '<div class="pv-side"><div class="pv-av" style="width:40px;height:40px"><i>'+esc(n.logo||"🍽️")+'</i></div><div><span>♥</span>'+(pub?likes:"2,4 mil")+'</div><div><span>💬</span>86</div><div><span>🔖</span>210</div><div><span>↪</span>47</div></div>'+
-    '<div class="pv-btm"><b>@'+esc(u)+'</b>'+cap.slice(0,110)+(cap.length>110?'…':'')+'<div style="margin-top:6px">♫ sonido original · '+esc(n.nombre||"")+'</div></div>'+marca,true);
+    '<div class="pv-side"><div class="pv-av" style="width:40px;height:40px"><i>'+logoHtml()+'</i></div><div><span>♥</span>'+(pub?likes:"2,4 mil")+'</div><div><span>💬</span>86</div><div><span>🔖</span>210</div><div><span>↪</span>47</div></div>'+
+    '<div class="pv-btm"><b>@'+esc(usuarioTT())+'</b>'+cap.slice(0,110)+(cap.length>110?'…':'')+'<div style="margin-top:6px">♫ sonido original · '+esc(n.nombre||"")+'</div></div>'+marca,true);
   if(id==="fb")return telefono('<div class="pv-fb" style="display:flex;flex-direction:column;height:100%">'+sb()+'<div class="pv-bar" style="color:#1877F2;font-size:22px;font-weight:800">facebook</div>'+
-    '<div class="pv-bar"><div class="pv-av"><i>'+esc(n.logo||"🍽️")+'</i></div><div><div style="font-size:12.5px">'+esc(n.nombre||"")+'</div><div style="font-size:10.5px;color:#65676b;font-weight:400">Ahora · 🌍</div></div></div>'+
+    '<div class="pv-bar"><div class="pv-av"><i>'+logoHtml()+'</i></div><div><div style="font-size:12.5px">'+esc(n.nombre||"")+'</div><div style="font-size:10.5px;color:#65676b;font-weight:400">Ahora · 🌍</div></div></div>'+
     '<div class="pv-cap" style="max-height:72px">'+cap.slice(0,150)+(cap.length>150?'… Ver más':'')+'</div><div class="pv-m">'+miniEscena(p,false,250)+'</div>'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f0f2f5;font-size:12px"><div><div style="color:#65676b;font-size:10.5px">'+esc((n.web||"el-paraiso-eight.vercel.app").replace(/^https?:\/\//,"").toUpperCase().slice(0,28))+'</div><b>'+esc(n.nombre||"")+'</b></div><span style="background:#e4e6eb;border-radius:6px;padding:6px 10px;font-weight:700">'+ctaT.replace(/^\S+\s/,"")+'</span></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f0f2f5;font-size:12px"><div><div style="color:#65676b;font-size:10.5px">'+esc((enlace("web")||"tu web").replace(/^https?:\/\//,"").toUpperCase().slice(0,28))+'</div><b>'+esc(n.nombre||"")+'</b></div><span style="background:#e4e6eb;border-radius:6px;padding:6px 10px;font-weight:700">'+ctaT.replace(/^\S+\s/,"")+'</span></div>'+
     '<div class="pv-fbr"><span>👍 Me gusta</span><span>💬 Comentar</span><span>↪ Compartir</span></div></div>'+marca);
-  if(id==="wa")return telefono('<div class="pv-full pv-wa">'+miniEscena(p,true,560)+'</div><div class="pv-prog"><i></i></div><div class="pv-bar" style="position:absolute;top:18px;left:0;right:0;color:#fff;z-index:6"><span>←</span><div class="pv-av" style="background:#25D366"><i>'+esc(n.logo||"🍽️")+'</i></div><div style="font-size:12px">'+esc(n.nombre||"")+'<div style="font-weight:400;opacity:.8;font-size:10.5px">hace un momento</div></div></div>'+
+  if(id==="wa")return telefono('<div class="pv-full pv-wa">'+miniEscena(p,true,560)+'</div><div class="pv-prog"><i></i></div><div class="pv-bar" style="position:absolute;top:18px;left:0;right:0;color:#fff;z-index:6"><span>←</span><div class="pv-av" style="background:#25D366"><i>'+logoHtml()+'</i></div><div style="font-size:12px">'+esc(n.nombre||"")+'<div style="font-weight:400;opacity:.8;font-size:10.5px">hace un momento</div></div></div>'+
     '<div class="pv-btm" style="right:12px;text-align:center;bottom:16px"><div style="background:rgba(0,0,0,.45);border-radius:10px;padding:8px">'+esc((p.titulo||"")+" · "+(p.ctas&&p.ctas[0]?p.ctas[0].t:""))+'</div><div style="margin-top:8px;opacity:.85">⌃ Responder</div></div>'+marca,true);
   if(id==="yt")return telefono('<div class="pv-full">'+miniEscena(p,true,560)+'</div><div class="pv-bar" style="position:absolute;top:26px;left:0;right:0;color:#fff;z-index:6"><b style="font-size:15px">Shorts</b><span style="margin-left:auto">🔍 ⋮</span></div>'+
     '<div class="pv-side"><div><span>👍</span>'+(pub?likes:"1,1 mil")+'</div><div><span>👎</span>No</div><div><span>💬</span>54</div><div><span>↪</span>Compartir</div></div>'+
-    '<div class="pv-btm"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div class="pv-av" style="background:#f00;width:26px;height:26px"><i>'+esc(n.logo||"🍽️")+'</i></div><b style="display:inline;margin:0">@'+esc(u)+'</b><span style="background:#fff;color:#000;border-radius:20px;padding:3px 9px;font-weight:700;font-size:11px">Suscribirse</span></div>'+esc(p.titulo||"")+'</div>'+marca,true);
+    '<div class="pv-btm"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div class="pv-av" style="background:#f00;width:26px;height:26px"><i>'+logoHtml()+'</i></div><b style="display:inline;margin:0">@'+esc(u)+'</b><span style="background:#fff;color:#000;border-radius:20px;padding:3px 9px;font-weight:700;font-size:11px">Suscribirse</span></div>'+esc(p.titulo||"")+'</div>'+marca,true);
+  if(id==="gbp")return telefono(sb()+'<div class="pv-gg"><div class="pv-ggs"><span>☰</span><span class="q">'+esc(n.nombre||"")+' '+esc((n.ciudad||"").split(",")[0])+'</span><span>🎤</span></div>'+
+    '<div class="pv-ggf"><div class="pv-ggl">'+logoHtml()+'</div><div><b>'+esc(n.nombre||"")+(esParaiso()?' Bar Restaurante':'')+'</b><div class="pv-ggm">Restaurante · '+esc((n.ciudad||"").split(",")[0])+'</div><div class="pv-ggo">Abierto</div></div></div>'+
+    '<div class="pv-ggt"><span>Resumen</span><span class="on">Novedades</span><span>Reseñas</span><span>Fotos</span></div>'+
+    '<div class="pv-ggp"><div class="pv-ggph">'+logoHtml()+'<div><b>'+esc(n.nombre||"")+'</b><div class="pv-ggm">'+(pub?"Hace un momento":"Novedad")+'</div></div></div>'+
+      '<div class="pv-m">'+miniEscena(p,false,200)+'</div><div class="pv-cap" style="max-height:58px;padding-top:8px">'+cap.slice(0,120)+(cap.length>120?'…':'')+'</div>'+
+      '<div class="pv-ggb">'+ctaT.replace(/^\S+\s/,"")+'</div></div></div>'+marca);
   return "";
 }
 window.publicarGen=function(i){
@@ -531,7 +566,7 @@ function pintarPub(){
   var p=window._posts[PUB.i],sel=seleccion();
   if(!PUB.sel[PUB.tab]&&sel.length)PUB.tab=sel[0].id;
   var pasos='<div class="cm-steps"><span'+(PUB.paso===1?'':' style="opacity:.6"')+'>'+(PUB.paso===1?'<b>1 · Redes y vista previa</b>':'1 · Redes')+'</span><span>›</span><span>'+(PUB.paso===2?'<b>2 · Enviar</b>':'2 · Enviar')+'</span><span>›</span><span>'+(PUB.paso===3?'<b>3 · Publicado</b>':'3 · Publicado')+'</span></div>';
-  var h='<div class="cm-bh"><div><h3>🚀 Publicar</h3>'+pasos+'</div><button class="x" onclick="cmCerrar()" aria-label="Cerrar">×</button></div><div class="cm-bb">';
+  var h='<div class="cm-bh"><div><h3>🚀 Publicar</h3>'+pasos+'</div><button class="x" onclick="cmCerrar()" aria-label="Cerrar">×</button></div>'+(PUB.demo?'<div class="cm-demo"><b>▶ DEMOSTRACIÓN</b> Así se publica con Chispa. No se sube nada de verdad. <button onclick="cmDemoParar()">Parar</button></div>':'')+'<div class="cm-bb">';
   if(PUB.paso===1){
     h+='<div class="cm-grid"><div><div class="cm-lbl">¿Dónde lo publicamos?</div><div class="cm-redes">'+REDES.map(function(r){return '<button class="cm-red'+(PUB.sel[r.id]?" on":"")+'" onclick="cmRed(\''+r.id+'\')"><span class="ri '+r.cls+'">'+r.ic+'</span><span><div class="rn">'+r.nm+'</div><div class="rd">'+r.sub+'</div></span><span class="ck"></span></button>';}).join("")+'</div>'+
       (p.media?'':'<div class="cm-note" style="border-color:rgba(255,204,51,.5);color:var(--amber)">⚠️ Esta publicación no tiene imagen. <a href="javascript:void 0" onclick="cmCerrar();crearImagenIA('+PUB.i+')">Crear una con IA</a> o <a href="javascript:void 0" onclick="cmCerrar();cmElegirArchivo('+PUB.i+')">subir tu foto</a>.</div>')+
@@ -559,7 +594,10 @@ function pintarPub(){
 function contarLikes(){var els=document.querySelectorAll("[data-cuenta]");Array.prototype.forEach.call(els,function(e){var fin=+e.getAttribute("data-cuenta"),t0=performance.now();(function f(){var k=Math.min(1,(performance.now()-t0)/2200);e.textContent=Math.round(fin*ease(k));if(k<1)requestAnimationFrame(f);})();});}
 window.cmRed=function(id){if(PUB.sel[id])delete PUB.sel[id];else{PUB.sel[id]=1;PUB.tab=id;}pintarPub();};
 window.cmTab=function(id){PUB.tab=id;pintarPub();};
-window.cmPaso=function(n){PUB.paso=n;if(n===3){S.historial=S.historial||[];S.historial.push({cuando:Date.now(),redes:Object.keys(PUB.sel),titulo:window._posts[PUB.i].titulo});guardar();}pintarPub();};
+window.cmPaso=function(n){PUB.paso=n;if(n===3&&!PUB.demo){S.historial=S.historial||[];S.historial.push({cuando:Date.now(),redes:Object.keys(PUB.sel),titulo:window._posts[PUB.i].titulo});guardar();
+    var pp=window._posts[PUB.i],hechas=Object.keys(PUB.hecho);
+    if(pp&&pp._agendaId&&window.CHISPA_AGENDA){if(hechas.length)CHISPA_AGENDA.marcar(pp._agendaId,"publicada",hechas);else toast("Cuando la subas, márcala como publicada en el calendario");}}
+  pintarPub();};
 window.cmCopiarTexto=function(){copiar(textoCompleto(window._posts[PUB.i])).then(function(){toast("📋 Texto copiado");});};
 var cacheArch={};
 function prepararArchivo(p,vert){
@@ -580,8 +618,8 @@ window.cmEnviar=function(id){
     set("Publicando directamente en "+r.nm+"…");
     prepararArchivo(p,r.vert).then(function(b){var fd=new FormData();fd.append("red",id);fd.append("texto",texto);fd.append("fecha",p.fecha||"");fd.append("archivo",b,nombreArchivo(p,ext(b)));
       return fetch(PD.url,{method:"POST",body:fd,credentials:"include"});})
-    .then(function(res){if(!res.ok)throw new Error("respuesta "+res.status);PUB.hecho[id]="Publicado directamente";set("✓ Publicado directamente en "+r.nm,true);})
-    .catch(function(e){set("La publicación directa falló ("+(e&&e.message||"error")+"). Pulsa otra vez para hacerlo a mano.");PD._fallo=PD._fallo||{};PD._fallo[id]=1;});
+    .then(function(res){if(!res.ok)throw new Error("respuesta "+res.status);PUB.hecho[id]="Publicado directamente";set("✓ Publicado directamente en "+r.nm,true);if(p._agendaId&&window.CHISPA_AGENDA)CHISPA_AGENDA.marcar(p._agendaId,"publicada",[id]);})
+    .catch(function(e){set("La publicación directa falló ("+(e&&e.message||"error")+"). Pulsa otra vez para hacerlo a mano.");PD._fallo=PD._fallo||{};PD._fallo[id]=1;if(p._agendaId&&window.CHISPA_AGENDA)CHISPA_AGENDA.marcar(p._agendaId,"fallo",[id],e&&e.message);});
     return;
   }
   // 2) Sin permiso todavía: se abre la red con el contenido listo
@@ -608,9 +646,76 @@ window.cmEnviar=function(id){
 };
 
 /* =====================================================================
+   DEMO DE PUBLICACIÓN (para enseñar): recorre los pasos sola
+   ===================================================================== */
+var DEMO={t:[]};
+function dPaso(ms,fn){DEMO.t.push(setTimeout(function(){if(PUB.demo)fn();},ms));}
+function tocar(sel){var e=document.querySelector(sel);if(e){e.classList.add("cm-tap");e.scrollIntoView({block:"nearest",behavior:"smooth"});}}
+window.cmDemo=function(i){
+  var P=window._posts||[];if(i==null){i=0;for(var k=0;k<P.length&&k<900;k++)if(P[k]&&P[k].media){i=k;break;}}
+  var p=P[i];if(!p){toast("Primero crea una publicación");return;}
+  if(!p.media){crearImagenIA(i);setTimeout(function(){cmDemo(i);},1800);return;}
+  DEMO.t.forEach(clearTimeout);DEMO.t=[];
+  PUB.i=i;PUB.paso=1;PUB.hecho={};PUB.sel={};PUB.tab="igf";PUB.demo=1;pintarPub();
+  var t=700,redes=["igf","tt","fb","gbp"];
+  redes.forEach(function(r){dPaso(t,function(){PUB.sel[r]=1;PUB.tab=r;pintarPub();tocar('.cm-red[onclick*="\''+r+'\'"]');});t+=1900;});
+  dPaso(t,function(){tocar(".cm-big");});t+=700;
+  dPaso(t,function(){PUB.paso=2;pintarPub();});t+=900;
+  redes.forEach(function(r){dPaso(t,function(){var st=$("cmSt_"+r);if(st){st.textContent="Publicando…";st.className="st";}tocar("#cmSt_"+r);});t+=700;
+    dPaso(t,function(){PUB.hecho[r]="Publicado (demostración)";pintarPub();});t+=500;});
+  dPaso(t+300,function(){PUB.paso=3;PUB.tab="igf";pintarPub();contarLikes();});t+=300;
+  ["tt","fb","gbp","igf"].forEach(function(r){t+=3000;dPaso(t,function(){PUB.tab=r;pintarPub();contarLikes();});});
+  dPaso(t+2600,function(){PUB.demo=0;pintarPub();toast("Fin de la demostración");});
+};
+window.cmDemoParar=function(){PUB.demo=0;DEMO.t.forEach(clearTimeout);DEMO.t=[];pintarPub();toast("Demostración parada");};
+
+/* =====================================================================
+   LOGO Y MARCA DE AGUA (lo puede abrir también «Mi negocio»)
+   ===================================================================== */
+window.cmMarca=function(){
+  var m=marca(),u=logoUrl();
+  modal('<h3>🏷️ Tu logo</h3>'+
+    '<div class="cm-mk"><div class="cm-mkl">'+(u?'<img src="'+esc(u)+'" alt="Logo">':'<span>'+esc(N().logo||"🍽️")+'</span>')+'</div><div>'+
+      '<input type="file" accept="image/*" id="cmLogoIn" style="display:none" onchange="cmLogoSubir(this)">'+
+      '<button class="btn pp sm" onclick="document.getElementById(\'cmLogoIn\').click()">📷 Cambiar logo</button> '+
+      ((N().logoUrl||LOGO.url)?'<button class="btn g sm" onclick="cmLogoQuitar()">↺ Quitar el mío</button>':'')+
+      '<p style="font-size:12px;color:var(--tx3);margin:8px 0 0">Mejor en PNG con fondo transparente. Sale como foto de perfil en cada publicación y en las vistas previas de cada red (nunca encima de la imagen).</p></div></div>'+
+    '<button class="btn pp" style="width:100%;margin-top:14px" onclick="cerrarModal()">Listo</button>');
+};
+window.cmMkPos=function(b){Array.prototype.forEach.call(b.parentNode.children,function(x){x.className="btn g sm";});b.className="btn pp sm";};
+window.cmMarcaGuardar=function(){var on=$("cmMkOn").checked,pb=document.querySelector(".cm-mkpos .pp"),t=+$("cmMkT").value;
+  S.negocio.marcaAgua={on:on,pos:pb?pb.getAttribute("data-pos"):"tl",tam:t};guardar();cerrarModal();
+  (window._posts||[]).forEach(function(p,i){if(i<900&&p)repintar(i);});toast("Marca de agua guardada ✓");};
+window.cmLogoSubir=function(inp){var f=inp.files&&inp.files[0];if(!f)return;if(!/^image\//.test(f.type)){toast("Elige una imagen");return;}
+  if(LOGO.url)try{URL.revokeObjectURL(LOGO.url);}catch(e){}LOGO.url=URL.createObjectURL(f);delete S.negocio.logoUrl;cargarLogo();idbLogo("put",f);
+  cerrarModal();(window._posts||[]).forEach(function(p,i){if(i<900&&p)repintar(i);});toast("Logo cambiado ✓");cmMarca();};
+window.cmLogoQuitar=function(){if(LOGO.url)try{URL.revokeObjectURL(LOGO.url);}catch(e){}LOGO.url="";delete S.negocio.logoUrl;guardar();cargarLogo();idbLogo("del",null);
+  cerrarModal();(window._posts||[]).forEach(function(p,i){if(i<900&&p)repintar(i);});toast("Vuelve el logo de siempre");};
+
+/* «Conectar Instagram / Facebook / TikTok»: si nadie lo ha montado todavía, que haga algo útil */
+function conectarAqui(){
+  var R=[["igf","Instagram","ig","◎",enlace("instagram"),"https://business.facebook.com/latest/settings/instagram_account","Une tu Instagram profesional a la página de Facebook (lo pide Meta para publicar)"],
+    ["fb","Facebook","fb","f",enlace("facebook"),"https://business.facebook.com/latest/settings/pages","Tu página de Facebook en Meta Business"],
+    ["tt","TikTok","tt","♪",enlace("tiktok"),"https://www.tiktok.com/business/","Cuenta de empresa de TikTok"],
+    ["yt","YouTube","yt","▶",enlace("youtube"),"https://studio.youtube.com/","Tu canal en YouTube Studio"],
+    ["gbp","Google","gg","G",enlace("google"),"https://business.google.com/","Tu ficha de Google (Maps y Búsqueda)"]];
+  modal('<h3>🔗 Conectar tus redes</h3><p style="color:var(--tx2);font-size:13px;margin:0 0 10px">Abre cada red y deja la sesión iniciada. Mientras Meta, TikTok y Google aprueban a Chispa, publicas con un toque desde «Publicar».</p>'+
+    R.map(function(r){return '<div class="cm-row" style="margin-bottom:8px"><span class="ri '+r[2]+'" style="width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:800">'+r[3]+'</span><div class="rn">'+r[1]+'<div class="st">'+esc(r[6])+'</div></div>'+
+      (r[4]?'<a class="btn g sm" style="flex:none;text-decoration:none" href="'+esc(r[4])+'" target="_blank" rel="noopener">Mi perfil</a>':'')+
+      '<a class="btn pp sm" style="flex:none;text-decoration:none" href="'+r[5]+'" target="_blank" rel="noopener">Conectar</a></div>';}).join("")+
+    '<button class="btn g" style="width:100%;margin-top:6px" onclick="cerrarModal();typeof panel===\'function\'&&panel(\'ajustes\')">Poner mis enlaces en «Mi negocio»</button>');
+}
+try{if(typeof window.conectarCuentas!=="function"||/pr[oó]ximamente/.test(String(window.conectarCuentas)))window.conectarCuentas=conectarAqui;}catch(e){}
+
+/* =====================================================================
    ARRANQUE: si el panel ya está pintado, volver a pintarlo con lo nuevo
    ===================================================================== */
 document.addEventListener("keydown",function(e){if(e.key==="Escape")cmCerrar();});
 try{if($("app")&&$("app").classList.contains("on")&&typeof panel==="function"&&typeof TAB!=="undefined"&&TAB==="asistente")panel("asistente");}catch(e){}
-window.CHISPA_ESTUDIO={version:"2026-10-07",catDe:catDe,fotos:F,hacerImagen:hacerImagen,hacerVideo:hacerVideo};
+window.CHISPA_ESTUDIO={version:"2026-10-07",marca:function(){cmMarca();},demo:function(i){cmDemo(i);},logoUrl:logoUrl,enlace:enlace,catDe:catDe,fotos:F,hacerImagen:hacerImagen,hacerVideo:hacerVideo,
+  nuevoPost:nuevoPost,ejemplos:ejemplos,escena:escena,tituloCorto:tituloCorto,fechaBonita:fechaBonita,vertical:vertical,aspecto:aspecto,
+  fotoPara:function(cat,n,w,h){var f=fotoDe(cat,n);return {url:fotoUrl(f[0],w||1080,h||1080),cred:f[1]};},
+  // abre la ventana Publicar con una publicación que no está en las tarjetas (p. ej. desde el calendario)
+  publicar:function(p,redes){window._posts=window._posts||[];var i=900;window._posts[i]=p;publicarGen(i);
+    if(redes&&redes.length){PUB.sel={};redes.forEach(function(r){PUB.sel[r]=1;});PUB.tab=redes[0];pintarPub();}}};
 })();
