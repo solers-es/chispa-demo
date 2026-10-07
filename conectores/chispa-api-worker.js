@@ -70,6 +70,8 @@
 import { publicarEn, estadisticas } from "./redes.js";
 import * as IA from "./ia.js";
 import { crearApiPublica } from "./api-publica.js";
+// Bandeja, estadísticas, anuncios y automatizaciones (trabajador J): todo en panel-real.js
+import { ESQUEMA_PANEL, rutasPanel, rutasAdminPanel, cronPanel } from "./panel-real.js";
 // Alta sola, prueba, planes, límites y pago (trabajador H): todo en su módulo
 import { rutasPublicas, rutasConSesion, antesDeRuta, asegurarTablasSuscripciones, puedePublicar } from "./suscripciones.js";
 
@@ -99,8 +101,8 @@ const GRAPH = "https://graph.facebook.com/v21.0";
 const ALCANCES = {
   google: "openid email https://www.googleapis.com/auth/business.manage",
   youtube: "openid email https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/yt-analytics.readonly",
-  meta: "pages_show_list,pages_read_engagement,pages_manage_posts,pages_manage_engagement,instagram_basic,instagram_content_publish,instagram_manage_comments,instagram_manage_insights,business_management",
-  tiktok: "user.info.basic,video.publish,video.upload",
+  meta: "pages_show_list,pages_read_engagement,pages_manage_posts,pages_manage_engagement,pages_messaging,read_insights,instagram_basic,instagram_content_publish,instagram_manage_comments,instagram_manage_insights,instagram_manage_messages,business_management,ads_management,ads_read",
+  tiktok: "user.info.basic,user.info.stats,video.list,video.publish,video.upload",
 };
 
 /* ---------------- tablas (se crean solas) ---------------- */
@@ -115,6 +117,7 @@ const ESQUEMA = [
   "CREATE INDEX IF NOT EXISTS agenda_pendiente ON agenda (estado, cuando)",
   "CREATE TABLE IF NOT EXISTS api_claves (id TEXT PRIMARY KEY, huella TEXT NOT NULL UNIQUE, negocio TEXT NOT NULL, nombre TEXT, prefijo TEXT NOT NULL, creado INTEGER NOT NULL, usado INTEGER, revocada INTEGER NOT NULL DEFAULT 0)",
   ...IA.ESQUEMA_IA,
+  ...ESQUEMA_PANEL,
 ];
 let tablasListas = false;
 async function asegurarTablas(env) {
@@ -170,7 +173,7 @@ function cabecerasCors(req, env) {
   const o = req.headers.get("Origin") || "", ok = origenes(env);
   return {
     "Access-Control-Allow-Origin": ok.includes(o) ? o : ok[0],
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Chispa-Clave, X-Chispa-Admin, Stripe-Signature",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
@@ -561,6 +564,8 @@ async function atender(req, env) {
       await env.DB.prepare("INSERT INTO negocios (id, nombre, creado) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET nombre = excluded.nombre").bind(id, String(c.nombre || id), ahora()).run();
       return { negocio: id, codigo: await guardarCodigo(env, id, c.rol === "equipo" ? "equipo" : "dueno", { nota: "alta" }) };
     }
+    const ap = await rutasAdminPanel(req, env, m, ruta);
+    if (ap !== undefined) return ap;
     throw new Fallo("No existe", 404);
   }
 
@@ -640,6 +645,8 @@ async function atender(req, env) {
     return { ok: true, id };
   }
   if (m === "GET" && ruta === "/estadisticas") return estadisticasNegocio(env, s.negocio);
+  const pr = await rutasPanel(req, env, { Fallo, leerJson, tokensDe, credPara }, s, m, ruta, partes, url);
+  if (pr !== undefined) return pr;
   throw new Fallo("No existe", 404);
 }
 
@@ -669,6 +676,8 @@ export default {
       if (!(await puedePublicar(env, f.negocio))) continue; // prueba terminada, cancelada o impago
       await publicarItem(env, f.negocio, it, (caches[f.negocio] = caches[f.negocio] || {}));
     }
+    // bandeja, estadísticas, anuncios y reglas (panel-real.js): si algo falla ahí, lo de publicar ya está hecho
+    try { await asegurarTablasSuscripciones(env); await cronPanel(env, { Fallo, leerJson, tokensDe, credPara }); } catch (e) { console.log("cronPanel: " + (e && e.message)); }
   },
 };
 

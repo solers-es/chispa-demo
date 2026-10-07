@@ -155,13 +155,13 @@ async function arrancar(opciones = {}) {
   const alta = await worker.fetch(new Request(env.URL_BASE + '/admin/negocios', { method: 'POST', headers: { 'X-Chispa-Admin': env.ADMIN_CLAVE, 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'el-paraiso', nombre: 'El Paraíso' }) }), env);
   const { codigo } = await alta.json();
   return {
-    env, worker, db, registro, estado, codigo, medios, llamadasIA,
+    env, worker, db, registro, estado, codigo, medios, llamadasIA, respuestas, // respuestas: otras pruebas añaden redes imitadas con respuestas.unshift([re, fn])
     base: env.URL_BASE, web: 'http://localhost:' + PUERTO_WEB,
     cron: () => worker.scheduled({}, env),
     cerrar: () => { api.close(); web.close(); },
   };
 }
-module.exports = { arrancar };
+module.exports = { arrancar, respuestas };
 
 if (require.main === module) {
   arrancar().then((s) => {
