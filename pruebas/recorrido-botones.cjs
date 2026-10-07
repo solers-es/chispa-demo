@@ -41,7 +41,8 @@ const { arrancar } = require('./servidor-simulador.cjs');
     const m = document.getElementById(document.getElementById('app').classList.contains('on') ? 'main' : document.getElementById('estudioApp').classList.contains('on') ? 'estudioApp' : 'landing');
     const mo = document.getElementById('modalOv'), t = document.getElementById('toast');
     const ovs = [...document.querySelectorAll('[class*="ov"].on, [class*="modal"].on, [class*="Ov"].on, dialog[open], [role="dialog"]')].length;
-    return { html: (m ? m.innerHTML.length + ':' + m.innerText.length : '') + ':' + document.body.innerHTML.length, modal: !!(mo && mo.classList.contains('on')), toast: t ? t.textContent + (t.classList.contains('on') ? '1' : '0') : '', url: location.href, ovs, scroll: Math.round(window.scrollY) };
+    const h = (x) => { let n = 7; for (let i = 0; i < x.length; i++) n = (n * 31 + x.charCodeAt(i)) | 0; return n; };
+    return { html: (m ? h(m.innerHTML) : '') + ':' + h(document.body.innerHTML), modal: !!(mo && mo.classList.contains('on')), toast: t ? t.textContent + (t.classList.contains('on') ? '1' : '0') : '', url: location.href, ovs, scroll: Math.round(window.scrollY) };
   });
   for (const [v, t] of pantallas) {
     await abrirPantalla(v, t); await pg.waitForTimeout(400);
@@ -51,10 +52,18 @@ const { arrancar } = require('./servidor-simulador.cjs');
       await abrirPantalla(v, t); await pg.waitForTimeout(150);
       const bs = pg.locator(raiz + ' button:visible, ' + raiz + ' a.btn:visible');
       if (i >= (await bs.count())) break;
-      const bt = bs.nth(i);
+      let bt = bs.nth(i);
+      // si algo lo tapa (una ventana que no se cierra con cerrarModal, p. ej. el alta), se recarga la página
+      const tapado = async (x) => x.evaluate((el) => { el.scrollIntoView({ block: 'center' }); const q = el.getBoundingClientRect(); const y = document.elementFromPoint(q.x + q.width / 2, q.y + q.height / 2); return !(y && (y === el || el.contains(y))); }).catch(() => true);
+      if (await tapado(bt)) {
+        await pg.goto(PAGINA, { waitUntil: 'load' }); await pg.waitForTimeout(900); await abrirPantalla(v, t); await pg.waitForTimeout(200);
+        bt = pg.locator(raiz + ' button:visible, ' + raiz + ' a.btn:visible').nth(i);
+        if (await tapado(bt)) { fallosClic.push((t || v) + ' › botón ' + i + ': tapado por otra cosa'); continue; }
+      }
       const nombre = ((await bt.innerText().catch(() => '')) || (await bt.getAttribute('aria-label').catch(() => '')) || '').replace(/\s+/g, ' ').trim().slice(0, 50);
+      await pg.evaluate(() => { const t = document.getElementById('toast'); if (t) t.textContent = ''; });
       const antes = await firma(), pop = popups, des = descargas;
-      try { await bt.click({ timeout: 1500 }); } catch (e) { fallosClic.push((t || v) + ' › «' + nombre + '»: ' + String(e.message).split('\n')[0].slice(0, 120)); continue; }
+      try { await bt.click({ timeout: 1500, force: true }); } catch (e) { fallosClic.push((t || v) + ' › «' + nombre + '»: ' + String(e.message).split('\n')[0].slice(0, 120)); continue; }
       await pg.waitForTimeout(450);
       const desp = await firma().catch(() => antes);
       pulsados++;

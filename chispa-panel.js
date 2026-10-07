@@ -546,5 +546,18 @@ import { resumen, serieEjemplo, REDES_M, NOMBRE_CAMPO } from "./conectores/conse
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status)))).then((j) => j.texto).catch(() => (typeof cerebroChat === "function" ? cerebroChat(v) : "Ahora mismo no puedo contestar, prueba en un momento 🙏"))
       .then((txt) => { try { st.removeChild(esc2); } catch (e) {} historial.push({ yo: false, texto: txt }); const b = document.createElement("div"); b.className = "bub ia"; b.textContent = txt; st.appendChild(b); st.scrollTop = st.scrollHeight; try { pintarPregs(); } catch (e) {} });
   };
+  /* ---------------- 🤖 Piloto automático (Mi negocio) ----------------
+     Encendido: Chispa planifica la semana en el calendario (CHISPA_AGENDA.planificarSemana) y, cada vez que
+     se abre la app sin nada programado para los próximos 7 días, planifica la siguiente. Con el servidor y
+     las redes conectadas, lo programado se publica solo (cron). */
+  function semanaVacia() { const a = Date.now(), b = a + 7 * 864e5; return !((window.S && S.agenda) || []).some((x) => x && x.estado === "programada" && x.cuando && Date.parse(x.cuando) > a && Date.parse(x.cuando) < b); }
+  function planificar() { try { return window.CHISPA_AGENDA && CHISPA_AGENDA.planificarSemana(false); } catch (e) { return null; } }
+  window.togglePiloto = function () {
+    S.negocio.piloto = !S.negocio.piloto; guardar();
+    if (S.negocio.piloto) { const r = semanaVacia() ? planificar() : null; aviso("🤖 Piloto automático activado" + (r ? ": " + r.n + " publicaciones programadas esta semana" : ": tu semana ya tiene publicaciones") + ". Cuando se acabe, te preparo la siguiente."); }
+    else aviso("Piloto automático desactivado");
+    window.panel("ajustes");
+  };
+  if (window.S && S.negocio && S.negocio.piloto && semanaVacia()) { const r = planificar(); if (r && r.n) aviso("🤖 Piloto automático: he programado tu semana (" + r.n + " publicaciones). Míralas en el Calendario."); }
   window.ChispaPanel = { enServidor, recargar: () => { BAND = MET = ANU = REG = AVI = null; if (MIAS.includes(TAB)) pintar(TAB); }, _demo: demo };
 })();
