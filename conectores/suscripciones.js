@@ -14,6 +14,7 @@
      GET  /cuenta                   → plan, estado, fin de la prueba, límites y uso
      POST /pago/checkout {plan}     (dueño) → {url} de Stripe Checkout · 503 si el pago está apagado
      POST /pago/portal              (dueño) → {url} del portal de cliente de Stripe (cambiar plan, baja, facturas)
+     POST /cuenta/baja {confirmar:"BORRAR"} (dueño) → cancela en Stripe y borra el negocio y todo lo suyo
    Administración (cabecera X-Chispa-Admin):
      GET    /admin/clientes         → todos los negocios con plan, estado de pago y uso
      POST   /admin/clientes/:id {plan?, estado?, pruebaHasta?, dias?}  (p. ej. cobro por transferencia)
@@ -338,6 +339,17 @@ async function webhook(req, env, h) {
   return { recibido: true };
 }
 
+/* Baja del propio cliente: cancela la suscripción en Stripe (si la hay) y borra el negocio entero */
+async function baja(env, h, s, cuerpo) {
+  const { Fallo } = h;
+  if (!s.esAdministrador) throw new Fallo("Solo el dueño puede dar de baja el negocio", 403);
+  if (cuerpo.confirmar !== "BORRAR") throw new Fallo("Escribe BORRAR para confirmar");
+  const c = await env.DB.prepare("SELECT stripe_suscripcion FROM cuentas WHERE negocio = ?").bind(s.negocio).first();
+  if (!c) throw new Fallo("Este negocio lo lleva Solers: para darlo de baja escribe a admin@solers.es", 403);
+  if (c.stripe_suscripcion && env.STRIPE_SECRET_KEY) await stripe(env, "DELETE", "/subscriptions/" + encodeURIComponent(c.stripe_suscripcion));
+  return borrarNegocio(env, h, s.negocio);
+}
+
 /* ---------------- administración ---------------- */
 async function listarClientes(env) {
   const { results } = await env.DB.prepare("SELECT n.id, n.nombre, n.creado FROM negocios n ORDER BY n.creado DESC").all();
@@ -401,7 +413,7 @@ export async function rutasPublicas(req, env, h, m, ruta) {
 }
 /* Rutas con sesión. Devuelve undefined si no es suya. */
 export async function rutasConSesion(req, env, h, s, m, ruta) {
-  if (!["/cuenta", "/pago/checkout", "/pago/portal"].includes(ruta)) return undefined;
+  if (!["/cuenta", "/cuenta/baja", "/pago/checkout", "/pago/portal"].includes(ruta)) return undefined;
   await asegurarTablasSuscripciones(env);
   if (m === "GET" && ruta === "/cuenta") {
     const c = await cuentaDe(env, s.negocio);
@@ -409,6 +421,7 @@ export async function rutasConSesion(req, env, h, s, m, ruta) {
   }
   if (m === "POST" && ruta === "/pago/checkout") return checkout(env, h, s, await h.leerJson(req).catch(() => ({})));
   if (m === "POST" && ruta === "/pago/portal") return portal(env, h, s);
+  if (m === "POST" && ruta === "/cuenta/baja") return baja(env, h, s, await h.leerJson(req).catch(() => ({})));
   return undefined;
 }
 /* Para el cron: ¿puede este negocio publicar ahora? (prueba terminada, cancelada o impago → no) */

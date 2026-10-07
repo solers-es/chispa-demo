@@ -17,6 +17,7 @@ globalThis.fetch = async function (entrada, o = {}) {
     if (cab.Authorization !== 'Bearer sk_test_FALSA_de_prueba') return j(401, { error: { message: 'Invalid API Key' } });
     if (url.pathname === '/v1/checkout/sessions') { const id = 'cs_test_' + STRIPE.sesiones.length; STRIPE.sesiones.push({ id, campos }); return j(200, { id, url: 'https://checkout.stripe.com/c/pay/' + id }); }
     if (url.pathname === '/v1/billing_portal/sessions') { STRIPE.portales.push(campos); return j(200, { url: 'https://billing.stripe.com/p/session/test_1' }); }
+    if (/^\/v1\/subscriptions\//.test(url.pathname) && o.method === 'DELETE') { STRIPE.cancelas = (STRIPE.cancelas || []).concat(url.pathname.split('/').pop()); return j(200, { id: url.pathname.split('/').pop(), status: 'canceled' }); }
     return j(404, { error: { message: 'no simulado' } });
   }
   if (url.hostname === 'challenges.cloudflare.com') {
@@ -212,6 +213,17 @@ function resolver(reto, dif) {
   r = await pedir('DELETE', '/admin/negocios/' + B2.negocio, undefined, null, { 'X-Chispa-Admin': s.env.ADMIN_CLAVE }); assert.equal(r.j.ok, true);
   r = await pedir('GET', '/cuenta', undefined, B2.sesion); assert.equal(r.st, 401);
   paso('borrar un negocio de prueba lo quita todo (y El Paraíso no se deja borrar)');
+
+  // --- baja del propio cliente ---
+  ipFalsa = '10.0.0.5';
+  const C = (await altaBuena({ correo: 'c@ejemplo.com' })).j;
+  s.db.run("UPDATE cuentas SET stripe_suscripcion = 'sub_9', stripe_cliente = 'cus_9' WHERE negocio = ?", [C.negocio]);
+  r = await pedir('POST', '/cuenta/baja', { confirmar: 'no' }, C.sesion); assert.equal(r.st, 400);
+  r = await pedir('POST', '/cuenta/baja', { confirmar: 'BORRAR' }, C.sesion); assert.equal(r.j.ok, true);
+  assert.deepEqual(STRIPE.cancelas, ['sub_9']);
+  r = await pedir('GET', '/cuenta', undefined, C.sesion); assert.equal(r.st, 401);
+  r = await pedir('POST', '/cuenta/baja', { confirmar: 'BORRAR' }, par); assert.equal(r.st, 403);
+  paso('baja del cliente: cancela su suscripción en Stripe y borra todo; El Paraíso no se da de baja así');
 
   Date.now = realNow;
   console.log('\n' + ok + ' comprobaciones en verde');

@@ -286,26 +286,12 @@
 
   <section><div class="wrap">
     <h2>Un precio para cada negocio</h2>
-    <p class="lead">Sin permanencia. Pruebas, y si no te llena las redes, lo dejas.</p>
+    <p class="lead" data-precios-lead>Prueba 14 días gratis, sin tarjeta. Sin permanencia: te das de baja cuando quieras. Precios sin IVA.</p>
+    <!-- Los precios salen de precios.js (la única tabla). Esto es solo lo que se ve si no carga. -->
     <div class="planes">
-      <div class="plan">
-        <h3>Básico</h3><div class="price">29 €<small>/mes</small></div>
-        <span class="chip amb">Para empezar</span>
-        <ul><li>Posts escritos por IA</li><li>Programación automática</li><li>1 red social</li><li>Calendario de contenido</li></ul>
-        <button class="btn g" onclick="elegir('Básico')">Empezar</button>
-      </div>
-      <div class="plan best">
-        <h3>Pro</h3><div class="price">59 €<small>/mes</small></div>
-        <span class="chip">Lo más completo</span>
-        <ul><li>Todo lo de Básico +</li><li>Imágenes creadas por IA</li><li>Instagram + Facebook</li><li>Anuncios preparados</li><li>Avatar que atiende a tus clientes</li></ul>
-        <button class="btn pp" onclick="elegir('Pro')">Quiero Pro</button>
-      </div>
-      <div class="plan">
-        <h3>Equipo</h3><div class="price">99 €<small>/mes</small></div>
-        <span class="chip amb">Negocios con volumen</span>
-        <ul><li>Todo lo de Pro +</li><li>Gestión de anuncios en Meta</li><li>Respuestas automáticas 24/7</li><li>Varios usuarios</li><li>Soporte prioritario</li></ul>
-        <button class="btn g" onclick="elegir('Equipo')">Hablar con ventas</button>
-      </div>
+      <div class="plan"><h3>Básico</h3><div class="price">39 €<small>/mes + IVA</small></div><button class="btn g" onclick="elegir('basico')">Probar 14 días gratis</button></div>
+      <div class="plan best"><h3>Pro</h3><div class="price">79 €<small>/mes + IVA</small></div><button class="btn pp" onclick="elegir('pro')">Probar 14 días gratis</button></div>
+      <div class="plan"><h3>Agencia</h3><div class="price">149 €<small>/mes + IVA</small></div><button class="btn g" onclick="elegir('agencia')">Probar 14 días gratis</button></div>
     </div>
   </div></section>
 
@@ -323,7 +309,7 @@
     </div>
   </div></section>
 
-  <footer>Prototipo · la IA está simulada con ejemplos · sin base de datos · © Solers</footer>
+  <footer id="pieLanding">© 2026 Solers · <a href="legal/aviso-legal.html">Aviso legal</a> · <a href="legal/privacidad.html">Privacidad</a> · <a href="legal/terminos.html">Términos</a> · <a href="legal/cookies.html">Cookies</a> · <a href="legal/encargo-tratamiento.html">Encargo del tratamiento</a> · <a href="#alta" onclick="ChispaAlta&&ChispaAlta.abrir()">Darme de alta</a></footer>
 </div>
 
 <!-- ===================== PANEL ===================== -->
@@ -423,7 +409,7 @@ function vista(v){
 var GUION={
   inicio:"¡Hola! Soy Chispa ⚡ Me encargo del marketing de tu negocio para que tú no tengas que pensar en redes. ¿Qué te gustaría saber?",
   "¿Qué haces exactamente?":"Escribo tus publicaciones, te creo las imágenes, las programo y las publico en Instagram y Facebook. Y cuando alguien comenta o te escribe, le preparo la respuesta para que tú solo la apruebes. Todo con el estilo de tu negocio. 🙌",
-  "¿Cuánto cuesta?":"Desde 29 €/mes el plan Básico. El que más eligen es el Pro, 59 €/mes, que ya incluye imágenes, Instagram + Facebook y anuncios preparados. Sin permanencia: si no te llena las redes, lo dejas. 💜",
+  "¿Cuánto cuesta?":"Desde 39 €/mes + IVA el plan Básico. El que más eligen es el Pro, 79 €/mes + IVA. Pruebas 14 días gratis y sin permanencia. 💜",
   "¿Y si no sé de redes?":"¡Perfecto, para eso estoy yo! Tú me dices una idea en una frase (o ni eso) y yo hago el resto. No necesitas saber diseñar, ni escribir, ni a qué hora publicar. Yo aprendo qué funciona en tu negocio.",
   "Quiero probarlo":"¡Me encanta! 🎉 Te activo una cuenta de prueba y en 2 minutos tienes tu primera semana de publicaciones lista. Pulsa “Ver cómo funciona por dentro” y mira el panel con un negocio de ejemplo.",
   "¿Publicas los anuncios?":"Te dejo el anuncio montado (texto, imagen y público) listo para lanzar en Meta. En el plan Equipo puedo gestionarlos yo directamente una vez conectas tu cuenta publicitaria. 📣"
@@ -1139,6 +1125,9 @@ else if(_h.indexOf("panel")>=0){vista("panel");}
 <!-- Tipo de negocio (perfiles de sector) y cuentas: modo Solers / modo cliente (trabajador E) -->
 <script src="sectores.js"></script>
 <script src="chispa-cuentas.js"></script>
+<!-- Precios (una sola tabla), alta sola, prueba, pago y legal (trabajador H) -->
+<script src="precios.js"></script>
+<script src="alta.js"></script>
 <!-- Sincronización con el servidor de Chispa (trabajador F): mismo estado en todas las páginas y en el móvil.
      Vacío = modo demostración (todo en este navegador). Al desplegar: la dirección de conectores/chispa-api-worker.js
      (ver docs/SERVIDOR-CHISPA.md). No es secreta. -->
