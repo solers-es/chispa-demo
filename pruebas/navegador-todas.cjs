@@ -3,7 +3,7 @@
    Puertos: PUERTO_API / PUERTO_WEB (por defecto 8848 / 8845, para no chocar con otro simulador abierto). */
 const { spawnSync } = require('child_process');
 const path = require('path');
-const PRUEBAS = ['servidor-navegador.cjs', 'panel-navegador.cjs', 'alta-navegador.cjs', 'ia-navegador.cjs', 'clips-navegador.cjs', 'creadores-navegador.cjs'];
+const PRUEBAS = ['servidor-navegador.cjs', 'panel-navegador.cjs', 'alta-navegador.cjs', 'ia-navegador.cjs', 'clips-navegador.cjs', 'creadores-navegador.cjs', 'ofertas-navegador.cjs'];
 const env = { ...process.env, PUERTO_API: process.env.PUERTO_API || '8848', PUERTO_WEB: process.env.PUERTO_WEB || '8845' };
 let mal = 0;
 for (const p of PRUEBAS) {

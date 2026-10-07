@@ -1,4 +1,4 @@
-# Estado de Chispa · 07/10/2026 (mañana, revisado por el trabajador K)
+# Estado de Chispa · 07/10/2026 (revisado por el trabajador K; + Plan de ofertas del trabajador L)
 
 > **Para Stalin, en una línea:** lo que es **programar** está hecho y probado: **≈ 99 % del código**.
 > Lo único de código que queda es el **vídeo 100 % generado por IA** (≈ 1 h), y no se puede escribir
@@ -36,6 +36,7 @@ la primera respuesta real de cada red (riesgo, no tarea pendiente).
 | Automatizaciones | 90 % | **100 %** | No (T5) | El correo sale solo al poner el proveedor (trámite T7) |
 | Chat y «Habla con Chispa» | 95 % | **100 %** | Sí | Alemán y catalán con la voz del navegador: no hay voz gratuita en el servidor (si se quiere, es una voz de pago = decisión) |
 | **Estudio para creadores** (antes «Estudio de contenido») | 30 % | **100 %** | Sí (IA real, probado 1 vez) | Nada. Ver sección 1 bis |
+| **📅 Plan de ofertas** (nuevo, L) | — | **100 %** | Tiempo y festivos sí (APIs gratis); IA real, 1 vez | Nada de código. La carta de El Paraíso no tiene bebidas: añadirlas con precio. Ver sección 1 ter |
 | Cuentas, varios negocios, sectores, modo Solers | 85 % | **100 %** | — | **Verificación del correo hecha** (K): se enciende sola con el proveedor (T7) |
 | Cobro, seguridad y RGPD | 80 % | **100 %** | Stripe no (T4) | **Copia de la base fuera de Cloudflare hecha** (K). **La baja ya borra TODO** (K). Encender Stripe: trámite T4 |
 | **Chispa entera (media de las 14 áreas)** | ≈ 85 % | **≈ 99 %** | | Solo el vídeo IA (decisión D1) |
@@ -80,6 +81,46 @@ la primera respuesta real de cada red (riesgo, no tarea pendiente).
    en la base la bandeja (comentarios y mensajes de los clientes del negocio), estadísticas, anuncios,
    reglas, avisos, claves de API e imágenes. Ahora borra **las 19**, comprobado tabla por tabla.
 5. En el móvil, el botón flotante «Ver cómo funciona» tapaba el último botón de la pantalla: hueco abajo.
+
+### 1 ter · 📅 Tu plan de ofertas (trabajador L, 07/10/2026 tarde)
+
+Encargo de Stalin: «que me salga la maqueta de cada día de lo que puedo poner de oferta, según el
+tiempo, el algoritmo y el día». Sección nueva del panel **«Plan de ofertas»** (`#ofertas`) y tarjeta
+arriba del **Asistente** con la propuesta de hoy/mañana.
+
+- **Una maqueta por día** (7 días, o 14): plato (o servicio / contenido según el sector), bebida (o
+  extra / gancho), oferta, franja horaria, red y formato con su hora, texto listo, imagen propuesta
+  (foto libre; «🎨 Imagen con IA» solo al pulsar, para cuidar el cupo) y el **«por qué» en una línea**.
+- **Señales reales y gratis** (nada inventado):
+  - Tiempo de la ciudad de «Mi negocio»: **Open-Meteo** (sin clave): máxima, lluvia, viento → calor =
+    cóctel frío y terraza; lluvia = cuchara, para llevar y publicar antes; viento = vender el interior.
+  - Festivos: **Nager.Date** (España + la comunidad: Baleares para Palma). Si no responde, la lista 2026
+    copiada de Nager.Date (nacionales + Baleares) y Sant Sebastià (fiesta local de Palma).
+  - Fechas calculadas: puentes, vísperas, principio de mes (nóminas), fin de mes, San Valentín, Día de
+    la Madre, Halloween… **Partidos y eventos NO**: no hay fuente gratuita fiable, no se inventan.
+  - El día: **cerrado** (horario de Mi negocio; El Paraíso, miércoles) y **horas flojas** de la «Promo
+    para llenar» del calendario. Reglas de las redes de `docs/CRECIMIENTO-ALGORITMOS.md` (formato y hora
+    por día). Temporada turística (Baleares). Estadísticas **reales** del negocio si hay ≥ 3 medidas.
+- **La carta**: «📖 Importar tu carta» lee el enlace (El Paraíso: la carta pública
+  `carta-paraiso.html`, 46 platos con precio; el enlace de Mi negocio, `carta.html`, es el **editor** y
+  Chispa lo dice), webs con schema.org o texto con precios; o se pega / edita a mano. **Nunca se inventa
+  un precio**: sin precio sale el hueco «… €». La carta de El Paraíso **no tiene bebidas**: las bebidas
+  salen como sugerencia «no está en tu carta: pon el precio tú» hasta que se añadan.
+- **Botones**: «Usar esta propuesta» (la publicación a su hora + la franja de promo con historias y
+  estado de WhatsApp, en el calendario REAL como **borrador**, y «Abrir en Publicar»), «Otra idea»,
+  «Cambiar plato/bebida», «👎 No me gusta» (aprende: no vuelve a salir; se guarda en `S.ofertasDia`, que
+  el servidor sincroniza por negocio) y «⚡ Planificar la semana entera» de un toque.
+- **Sectores e idioma**: peluquería → servicio del día + extra; creador → contenido + gancho + llamada a
+  la acción; precios de ejemplo de los sectores cambiados por «… €». Texto en el idioma del negocio.
+- **IA del servidor**: `POST /ofertas/textos` escribe los textos de todos los días en **una sola
+  llamada** (Llama 3.3), en el idioma del negocio; cualquier precio que no venga de la carta se cambia por
+  «… €». Sin servidor: plantillas en es, en, de y fr.
+- **Plan**: Básico 3 días, Pro y Agencia 14 (`precios.js` → `limites.diasOfertas`), y el servidor lo
+  aplica también (`GET /ofertas/plan`; días de más, fuera).
+- Ficheros: `ofertas-dia.js` + `ofertas-dia.css` (página), `ofertas-carta.js` (leer cartas, vale en la
+  página y en el servidor), `conectores/ofertas.js` (rutas `/ofertas/…`), y una línea en
+  `chispa-api-worker.js` e `ia.js` (exporta `llm`). Pruebas: `ofertas-api.cjs` (15) y
+  `ofertas-navegador.cjs` (17).
 
 ---
 
@@ -205,6 +246,11 @@ node pruebas/recorrido-botones.cjs     # TODAS las pantallas y botones: errores,
 node pruebas/alta-navegador.cjs        # alta sola (H)
 ```
 (Los puertos se cambian con `PUERTO_API` y `PUERTO_WEB` si hay otro simulador abierto.)
+
+Resultado con el Plan de ofertas (07/10/2026, trabajador L): servidor **162** (147 + 15 de
+`ofertas-api.cjs`), navegador **83** (66 + 17 de `ofertas-navegador.cjs`: ordenador sin servidor con
+tiempo/festivos/carta imitados, iPhone 390 px con servidor e IA, plan Básico), recorrido de botones
+18 pantallas: **328** en ordenador y **410** en iPhone con servidor, **0 errores, 0 avisos que prometen**.
 
 Resultado (07/10/2026, repaso de K):
 - Servidor: **22 + 35 + 35 + 39 + 10 + 6 = 147 comprobaciones en verde** (`servidor-todas.cjs`; nuevas:

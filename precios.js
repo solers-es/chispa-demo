@@ -25,23 +25,23 @@
       {
         id: 'basico', nombre: 'Básico', precio: 39, etiqueta: 'Para empezar',
         en: { nombre: 'Basic', etiqueta: 'To get started' },
-        incluye: ['Publicaciones escritas por IA', 'Programación automática', 'Calendario de contenido', '2 redes conectadas', '30 publicaciones al mes', '5 imágenes IA al día'],
-        incluyeEn: ['AI-written posts', 'Automatic scheduling', 'Content calendar', '2 connected networks', '30 posts a month', '5 AI images a day'],
-        limites: { publicacionesMes: 30, redes: 2, imagenesDia: 5, usuarios: 1 }
+        incluye: ['Publicaciones escritas por IA', 'Programación automática', 'Calendario de contenido', '2 redes conectadas', '30 publicaciones al mes', '5 imágenes IA al día', 'Plan de ofertas: los próximos 3 días'],
+        incluyeEn: ['AI-written posts', 'Automatic scheduling', 'Content calendar', '2 connected networks', '30 posts a month', '5 AI images a day', 'Offer plan: the next 3 days'],
+        limites: { publicacionesMes: 30, redes: 2, imagenesDia: 5, usuarios: 1, diasOfertas: 3 }
       },
       {
         id: 'pro', nombre: 'Pro', precio: 79, etiqueta: 'Lo más completo', destacado: true,
         en: { nombre: 'Pro', etiqueta: 'Most complete' },
-        incluye: ['Todo lo de Básico +', 'Todas las redes (Instagram, Facebook, TikTok, YouTube, Google)', '90 publicaciones al mes', '20 imágenes IA al día', 'Anuncios preparados', 'Respuestas a comentarios y reseñas', 'Estudio para creadores: miniseries y guiones con IA', 'Hasta 3 usuarios'],
-        incluyeEn: ['Everything in Basic +', 'All networks (Instagram, Facebook, TikTok, YouTube, Google)', '90 posts a month', '20 AI images a day', 'Ready-made ads', 'Replies to comments and reviews', 'Creator studio: AI mini-series and scripts', 'Up to 3 users'],
-        limites: { publicacionesMes: 90, redes: 4, imagenesDia: 20, usuarios: 3 }
+        incluye: ['Todo lo de Básico +', 'Todas las redes (Instagram, Facebook, TikTok, YouTube, Google)', '90 publicaciones al mes', '20 imágenes IA al día', 'Anuncios preparados', 'Respuestas a comentarios y reseñas', 'Estudio para creadores: miniseries y guiones con IA', 'Plan de ofertas de 14 días (tiempo, festivos y tu carta)', 'Hasta 3 usuarios'],
+        incluyeEn: ['Everything in Basic +', 'All networks (Instagram, Facebook, TikTok, YouTube, Google)', '90 posts a month', '20 AI images a day', 'Ready-made ads', 'Replies to comments and reviews', 'Creator studio: AI mini-series and scripts', '14-day offer plan (weather, holidays and your menu)', 'Up to 3 users'],
+        limites: { publicacionesMes: 90, redes: 4, imagenesDia: 20, usuarios: 3, diasOfertas: 14 }
       },
       {
         id: 'agencia', nombre: 'Agencia', precio: 149, etiqueta: 'Volumen y equipos',
         en: { nombre: 'Agency', etiqueta: 'Volume and teams' },
         incluye: ['Todo lo de Pro +', '300 publicaciones al mes', '60 imágenes IA al día', 'Hasta 10 usuarios', 'Soporte prioritario'],
         incluyeEn: ['Everything in Pro +', '300 posts a month', '60 AI images a day', 'Up to 10 users', 'Priority support'],
-        limites: { publicacionesMes: 300, redes: 4, imagenesDia: 60, usuarios: 10 }
+        limites: { publicacionesMes: 300, redes: 4, imagenesDia: 60, usuarios: 10, diasOfertas: 14 }
       }
     ]
   };

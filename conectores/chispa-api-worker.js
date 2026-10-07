@@ -75,6 +75,8 @@ import { ESQUEMA_PANEL, rutasPanel, rutasAdminPanel, cronPanel, exigirFuncion } 
 import { rutaChat } from "./chat.js"; // chat de la portada con IA (público y con topes)
 // Alta sola, prueba, planes, límites y pago (trabajador H): todo en su módulo
 import { rutasPublicas, rutasConSesion, antesDeRuta, asegurarTablasSuscripciones, puedePublicar } from "./suscripciones.js";
+// «Tu plan de ofertas» (trabajador L): textos con IA por día, días por plan y leer la carta
+import { rutasOfertas } from "./ofertas.js";
 
 const VERSION = "2";
 const MAX_ESTADO = 1_500_000; // D1 admite filas de hasta 2 MB
@@ -578,6 +580,7 @@ async function atender(req, env) {
   if (ruta === "/mcp") return API_PUBLICA.mcp(req, env, s);
   if (partes[0] === "v1") return API_PUBLICA.v1(req, env, s, ruta, partes, url);
   if (s.api) throw new Fallo("Una clave de API solo vale para /v1/… y /mcp", 403);
+  if (partes[0] === "ofertas") return rutasOfertas(req, env, { Fallo, leerJson }, s, m, ruta); // «Tu plan de ofertas» (ofertas.js)
   if (partes[0] === "ia") {
     if (m === "GET" && ruta === "/ia/uso") return IA.usoHoy(env, s.negocio);
     if (m === "POST" && ruta === "/ia/imagen") return IA.generarImagen(env, s.negocio, await leerJson(req), urlBase(env, req));

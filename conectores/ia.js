@@ -187,7 +187,7 @@ export function alinear(texto, oidas, duracion) {
 }
 
 /* ---------------- TEXTO (reaprovechar, escribir, traducir) ---------------- */
-async function llm(env, negocio, sistema, usuario, maxTokens = 1400) {
+export async function llm(env, negocio, sistema, usuario, maxTokens = 1400) { // también lo usa ofertas.js (plan de ofertas)
   sinIA(env);
   await comprobarCupo(env, negocio, "texto");
   const r = await correr(env, MODELOS.texto, { messages: [{ role: "system", content: sistema }, { role: "user", content: usuario }], max_tokens: maxTokens, temperature: 0.6 });
