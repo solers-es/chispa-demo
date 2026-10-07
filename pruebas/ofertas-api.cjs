@@ -66,7 +66,7 @@ const SCHEMA = '<html><script type="application/ld+json">{"@context":"https://sc
   assert.equal(r.st, 200, r.txt); assert.equal(r.j.textos.length, 14); assert.equal(r.j.idioma, 'en');
   const llam = s.llamadasIA.filter((c) => /daily offer posts/.test(c.e.messages[0].content));
   assert.equal(llam.length, 1, 'una sola llamada a la IA para todos los días');
-  assert.match(llam[0].e.messages[0].content, /English/); assert.match(llam[0].e.messages[0].content, /NEVER invent prices/);
+  assert.match(llam[0].e.messages[0].content, /English/); assert.match(llam[0].e.messages[0].content, /NEVER invent prices/); assert.match(llam[0].e.messages[0].content, /INTERNAL notes.*NEVER say the business is quiet/);
   const t0 = r.j.textos[0].texto;
   assert.match(t0, /46 €/, 'el precio de la carta se respeta'); assert.doesNotMatch(t0, /9,90 €/); assert.match(t0, /… €/);
   paso('14 textos en UNA llamada, en inglés, con la regla de no inventar precios; «9,90 €» inventado → «… €», «46 €» de la carta se queda');

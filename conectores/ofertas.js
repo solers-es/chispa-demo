@@ -62,6 +62,7 @@ export async function textos(env, Fallo, negocio, q) {
   const sis = "You write the daily offer posts for " + (quien || "a small local business") + ". Tone: " + (corto(q.tono, 60) || "close, warm, with a spark") + ". " +
     "Each day already has its dish/service, drink/extra, offer, time window, network and format chosen by the owner's planner: use them EXACTLY as given (same names), do not add other products. " +
     "NEVER invent prices, discounts, dates, events or facts that are not given. If the offer has '… €' keep '… €' literally (the owner will write the price). " +
+    "The fields 'motivo' and 'tiempo' are INTERNAL notes for the owner: use them only to pick the angle (e.g. heat → cold drink, rain → comfort food); NEVER say the business is quiet, slow, empty or that it needs customers. Speak to the customer with appetite and enthusiasm. " +
     "Write EVERYTHING in " + lengua + " (" + lc + "), natural and idiomatic. Answer ONLY with valid JSON, no markdown.";
   const lineas = dias.map((d) => ({
     clave: corto(d.clave || d.fecha, 60), fecha: d.fecha, dia: corto(d.dia, 20), plato: corto(d.plato, 80), precioPlato: corto(d.precioPlato, 40),
@@ -77,7 +78,7 @@ export async function textos(env, Fallo, negocio, q) {
     const x = porClave[d.clave];
     if (!x) return null;
     const permitidos = [d.precioPlato, d.precioBebida, d.oferta];
-    return { clave: d.clave, titulo: quitarPreciosInventados(corto(x.titulo, 60), permitidos), texto: quitarPreciosInventados(String(x.texto).slice(0, 900), permitidos),
+    return { clave: d.clave, titulo: quitarPreciosInventados(corto(x.titulo, 60), permitidos), texto: quitarPreciosInventados(String(x.texto).replace(/[ \t]+\n/g, "\n").replace(/\n[ \t]+/g, "\n").trim().slice(0, 900), permitidos),
       hashtags: Array.isArray(x.hashtags) ? x.hashtags.slice(0, 6).map((h) => corto(h, 40)) : [] };
   }).filter(Boolean);
   if (!salida.length) throw new Fallo("La IA no devolvió los textos; prueba otra vez", 502);
