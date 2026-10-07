@@ -31,7 +31,7 @@ fs.mkdirSync(OUT, { recursive: true });
   for (const [nombre, opciones] of [['ordenador', { viewport: { width: 1366, height: 900 } }], ['iphone', { ...devices['iPhone 13'] }]]) {
     // ---------------- A) demostración ----------------
     const c = await b.newContext(opciones);
-    const p = await abrir(c, s.web + '/index.html#bandeja');
+    const p = await abrir(c, s.web + '/index.html?servidor=no#bandeja');
     let txt = await p.locator('#main').innerText();
     assert.match(txt, /Datos de EJEMPLO/); assert.match(txt, /Marta|marta/); assert.ok(!/promo_followers/.test(txt), 'el spam no sale en «sin responder»');
     const n0 = await p.locator('.cp-it').count();

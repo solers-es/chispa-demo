@@ -623,7 +623,7 @@ function vMes(){
 }
 function vLista(){
   var A=datos().slice().sort(function(a,b){return (a.cuando?fecha(a.cuando):new Date(8e15))-(b.cuando?fecha(b.cuando):new Date(8e15));});
-  var desde=sumaDias(new Date(),-7);desde.setHours(0,0,0,0);
+  var desde=sumaDias(REF||new Date(),-7);desde.setHours(0,0,0,0); /* las flechas ‹ › también mueven la lista (J) */
   var grupos={},orden=[];
   A.forEach(function(a){var k=a.cuando?a.cuando.slice(0,10):"sin";if(a.cuando&&fecha(a.cuando)<desde)return;if(!grupos[k]){grupos[k]=[];orden.push(k);}grupos[k].push(a);});
   if(!orden.length)return '<div class="card empty">No hay publicaciones. Pulsa «Planificar mi semana» y Chispa te la llena.</div>';

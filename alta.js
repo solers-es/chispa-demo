@@ -41,7 +41,8 @@
   /* ---------- servidor ---------- */
   var ALTA = lsJson(LS_ALTA);
   (function () { try { var p = new URLSearchParams(location.search).get('servidor'); if (p && p !== 'no' && (/^https:\/\//.test(p) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/.test(p))) ls('chispa_servidor', p.replace(/\/$/, '')); } catch (e) {} })();
-  function servidor() { return String(window.CHISPA_SERVIDOR || ls('chispa_servidor') || (ALTA && ALTA.servidor) || POR_DEFECTO).replace(/\/$/, ''); }
+  // como chispa-sync.js: ?servidor=<dirección> guardado en el navegador manda sobre index.html («no» = el de index.html; el alta siempre necesita servidor)
+  function servidor() { var l = ls('chispa_servidor'); if (l === 'no') l = ''; return String(l || window.CHISPA_SERVIDOR || (ALTA && ALTA.servidor) || POR_DEFECTO).replace(/\/$/, ''); }
   function sesion() { var s = lsJson('chispa_sesion'); return s && s.sesion ? s : null; }
   function llamar(metodo, ruta, cuerpo, cab) {
     var h = { 'Content-Type': 'application/json' };

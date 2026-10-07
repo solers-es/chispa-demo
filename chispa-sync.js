@@ -73,11 +73,13 @@
   (function leerParametro() {
     try {
       var p = new URLSearchParams(location.search).get('servidor');
-      if (p === 'no') { lsDel(LS_SERVIDOR); return; }
+      if (p === 'no') { lsSet(LS_SERVIDOR, 'no'); return; } // ?servidor=no → solo demostración en este navegador (pruebas)
+      if (p === 'si') { lsDel(LS_SERVIDOR); return; }        // ?servidor=si → vuelve al servidor de index.html
       if (p && (/^https:\/\//.test(p) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/.test(p))) lsSet(LS_SERVIDOR, p.replace(/\/$/, ''));
     } catch (e) {}
   })();
-  function servidor() { return String(window.CHISPA_SERVIDOR || lsGet(LS_SERVIDOR) || '').replace(/\/$/, ''); }
+  // ?servidor=<dirección> (guardado en este navegador) manda sobre el de index.html; «no» = solo demostración
+  function servidor() { var l = lsGet(LS_SERVIDOR); if (l === 'no') return ''; return String(l || window.CHISPA_SERVIDOR || '').replace(/\/$/, ''); }
   var SES = lsJson(LS_SESION);
   if (SES && SES.servidor !== servidor()) SES = null; // la sesión es de otro servidor
   function guardarSesion(s) { SES = s; if (s) lsSet(LS_SESION, JSON.stringify(s)); else lsDel(LS_SESION); }

@@ -26,7 +26,7 @@ const { arrancar } = require('./servidor-simulador.cjs');
   let popups = 0; ctx.on('page', (p) => { if (p !== pg) { popups++; p.close().catch(() => {}); } });
   let descargas = 0; pg.on('download', () => descargas++);
   // con «servidor» como 2.º argumento: como un visitante SIN código con el servidor encendido (CHISPA_SERVIDOR)
-  const PAGINA = s.web + '/index.html' + (process.argv[3] === 'servidor' ? '?servidor=' + encodeURIComponent(s.base) : '');
+  const PAGINA = s.web + '/index.html' + (process.argv[3] === 'servidor' ? '?servidor=' + encodeURIComponent(s.base) : '?servidor=no');
   await pg.goto(PAGINA, { waitUntil: 'load' });
   await pg.waitForTimeout(1500);
   await pg.evaluate(() => { try { localStorage.setItem('chispa_tour_visto', '1'); } catch (e) {} });

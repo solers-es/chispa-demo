@@ -91,7 +91,7 @@ fs.mkdirSync(OUT, { recursive: true });
   assert.equal(r, 200); paso('con el código entra desde otro aparato');
 
   // 4) modo Solers: altas y pagos
-  await p3.goto(s.web + '/index.html?admin', { waitUntil: 'domcontentloaded' }); await p3.waitForTimeout(1500);
+  await p3.goto(s.web + '/index.html?admin&servidor=' + encodeURIComponent(s.base), { waitUntil: 'domcontentloaded' }); await p3.waitForTimeout(1500);
   await p3.fill('#ccClave', 'clave-solers'); await p3.fill('#ccClave2', 'clave-solers'); await p3.evaluate(() => ccClaveOk()); await p3.waitForTimeout(800);
   assert.ok(await p3.locator('#alAdm').count());
   await p3.locator('#alAdm button', { hasText: 'Ver todos' }).click();

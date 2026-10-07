@@ -22,7 +22,7 @@ fs.mkdirSync(OUT, { recursive: true });
 
   // 0) sin servidor: modo demostración
   const c0 = await b.newContext({ viewport: { width: 1366, height: 900 } });
-  const p0 = await abrir(c0, s.web + '/index.html#conectar');
+  const p0 = await abrir(c0, s.web + '/index.html?servidor=no#conectar');
   assert.match(await p0.locator('#chispaSyncCard').innerText(), /Modo demostración/);
   assert.equal(await p0.evaluate(() => ChispaSync.estado().modo), 'demostracion');
   await p0.locator('#chispaSyncCard').screenshot({ path: path.join(OUT, 'demostracion.png') });

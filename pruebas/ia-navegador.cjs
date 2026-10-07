@@ -20,7 +20,7 @@ fs.mkdirSync(OUT, { recursive: true });
 
   // 0) sin servidor: «Crear imagen con IA» pone una foto libre y lo dice
   const c0 = await b.newContext({ viewport: { width: 1366, height: 900 } });
-  const p0 = await abrir(c0, s.web + '/index.html');
+  const p0 = await abrir(c0, s.web + '/index.html?servidor=no'); // sin servidor (index.html lo trae encendido)
   await p0.evaluate(() => { vista('panel'); panel('asistente'); document.getElementById('idea').value = 'Paella del domingo en la terraza'; generar(); });
   await p0.waitForFunction(() => window._posts && window._posts[0] && window._posts[0].media && !window._posts[0].creando, null, { timeout: 45000 });
   await p0.evaluate(() => crearImagenIA(0, 1));
