@@ -1139,5 +1139,10 @@ else if(_h.indexOf("panel")>=0){vista("panel");}
 <!-- Tipo de negocio (perfiles de sector) y cuentas: modo Solers / modo cliente (trabajador E) -->
 <script src="sectores.js"></script>
 <script src="chispa-cuentas.js"></script>
+<!-- Sincronización con el servidor de Chispa (trabajador F): mismo estado en todas las páginas y en el móvil.
+     Vacío = modo demostración (todo en este navegador). Al desplegar: la dirección de conectores/chispa-api-worker.js
+     (ver docs/SERVIDOR-CHISPA.md). No es secreta. -->
+<script>window.CHISPA_SERVIDOR=window.CHISPA_SERVIDOR||"";window.CHISPA_NEGOCIO=window.CHISPA_NEGOCIO||"el-paraiso";</script>
+<script src="chispa-sync.js"></script>
 </body>
 </html>

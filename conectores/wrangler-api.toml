@@ -1,0 +1,36 @@
+# Chispa · servidor de datos y conexiones (ver chispa-api-worker.js y docs/SERVIDOR-CHISPA.md)
+# Aquí NO van secretos: van con  npx wrangler secret put <NOMBRE> -c conectores/wrangler-api.toml
+name = "chispa-api"
+main = "chispa-api-worker.js"
+compatibility_date = "2026-10-01"
+
+# Cada 5 minutos publica lo que ya toca (de todos los negocios)
+[triggers]
+crons = ["*/5 * * * *"]
+
+# Base de datos: npx wrangler d1 create chispa   → copia aquí el database_id que te da
+# (las tablas las crea el propio servidor la primera vez)
+[[d1_databases]]
+binding = "DB"
+database_name = "chispa"
+database_id = "PEGA_AQUI_EL_ID_DE_LA_BASE_D1"
+
+# OPCIONAL · fotos y vídeos que las redes descargan (necesita R2 activado en la cuenta).
+# Si no lo activas, deja estas líneas comentadas: lo demás funciona igual.
+# [[r2_buckets]]
+# binding = "MEDIOS"
+# bucket_name = "chispa-medios"
+
+[vars]
+# Dirección de este servidor (la da «wrangler deploy»). Con ella se forma la
+# dirección de vuelta que hay que registrar en Google, Meta y TikTok:  <URL_BASE>/oauth/vuelta
+URL_BASE = "https://chispa-api.PON_AQUI_TU_SUBDOMINIO.workers.dev"
+# Adónde vuelve el navegador después de conectar una red
+PANEL_URL = "https://solers-es.github.io/chispa-demo/"
+# Páginas que pueden hablar con el servidor (separadas por comas)
+ORIGENES = "https://solers-es.github.io"
+RESERVAS_URL = "https://el-paraiso-eight.vercel.app/reservas.html"
+# Hasta que TikTok audite la app solo deja publicar en privado
+TIKTOK_PRIVACIDAD = "SELF_ONLY"
+# Si activas R2: la URL pública del bucket (r2.dev o dominio propio)
+# MEDIA_PUBLICA = "https://pub-XXXX.r2.dev"
