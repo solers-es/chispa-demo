@@ -515,7 +515,7 @@ function ordenFranja(texto,t,o){
   var que=o.promo?"He montado la promoción para llenar":modoDe(it)==="dia"?"He programado el día entero":"He programado la franja";
   return {texto:nota+"Hecho ✓ "+que+":\n\n"+resumenLista([it])+movida+(it.por?"\n\nPor qué: "+it.por:"")+
     (it.promo?"\n\nLa publicación y el estado de WhatsApp salen al empezar; las historias, repartidas hasta el final, todas con el botón «Reservar».":"")+
-    "\n\nPara cambiarla, tócala en el calendario o estira el bloque.",accion:"dia"};
+    "\n\nPara cambiarla, tócala en el calendario o estira el bloque.",accion:"dia",ref:iso(iniDe(it)),id:it.id};
 }
 function orden(texto){
   var t=sinTildes(texto).replace(/[¿?¡!.,]/g," ").replace(/\s+/g," ").trim();
@@ -868,7 +868,7 @@ window.agOrden=function(txt){
   var r=orden(v);
   if(!r){ULTIMO="No te he entendido del todo 🙂 Prueba con: «programa la semana», «publica todo esto el lunes», «publica el viernes a las 20:00» o «¿qué tengo programado?».";}
   else ULTIMO=r.texto;
-  if(r&&(r.accion==="dia"||r.accion==="semana")){var pr=S.agenda.filter(function(a){return a.estado==="programada"&&a.cuando;}).sort(function(a,b){return fecha(b.cuando)-fecha(a.cuando);});if(r.accion==="dia"&&pr.length)REF=fecha(pr[0].cuando);}
+  if(r&&r.ref){REF=fecha(r.ref);}else if(r&&(r.accion==="dia"||r.accion==="semana")){var pr=S.agenda.filter(function(a){return a.estado==="programada"&&a.cuando;}).sort(function(a,b){return fecha(b.cuando)-fecha(a.cuando);});if(r.accion==="dia"&&pr.length)REF=fecha(pr[0].cuando);}
   refrescar();
 };
 window.agAvisos=function(){
