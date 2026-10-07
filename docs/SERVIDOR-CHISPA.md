@@ -13,6 +13,9 @@ Stalin delante, siguiendo la guía de abajo. Hasta entonces Chispa sigue en **mo
 |---|---|
 | `conectores/chispa-api-worker.js` | El servidor (Cloudflare Worker): estado por negocio, conexiones OAuth, publicación y cron |
 | `conectores/wrangler-api.toml` | Su configuración. **Sin ids reales ni secretos**: lleva marcadores `PEGA_AQUI…` / `PON_AQUI…` |
+| `conectores/ia.js` | **IA gratis (Workers AI):** imagen FLUX, voz MeloTTS + subtítulos Whisper, textos/reaprovechar/traducir con Llama 3.3, cupo diario (trabajador G) |
+| `conectores/api-publica.js` | **API pública `/v1/…` con claves por negocio y servidor MCP `/mcp`** (ver [`API-CHISPA.md`](API-CHISPA.md)) |
+| `chispa-ia.js` | En la página: «Crear imagen con IA» de verdad, vídeo con voz y subtítulos, otros idiomas, reaprovechar, claves de API |
 | `conectores/redes.js` | Llamadas a Instagram, Facebook, TikTok, YouTube y Google. Compartidas con `publicador-worker.js` |
 | `chispa-sync.js` | En la página (cargado al final de `index.html`): baja, sube y junta los cambios |
 | `pruebas/servidor-simulador.cjs` | Simulador local: el Worker de verdad en Node, con D1 imitada (SQLite) y redes falsas |
@@ -104,6 +107,37 @@ R2: Cloudflare puede pedir una tarjeta para activarlo aunque no cobre dentro del
 **opcional** y se puede dejar para después.
 
 ---
+
+## 3 bis · IA en el servidor, API pública y MCP (07/10/2026, trabajador G)
+
+**Desplegado** en `chispa-api.solers.workers.dev` (versión `2`, `/salud` → `"ia": true`) y comprobado
+**una vez con IA real**: imagen generada en producción (`capturas/ia/servidor-real-paella.jpg`, 1024×1024,
+servida en `/medio/…` con CORS). Enlace `[ai] binding = "AI"` en `wrangler-api.toml`; **sin claves nuevas**
+(Workers AI va con la cuenta).
+
+| Ruta | Qué hace | Modelo |
+|---|---|---|
+| `POST /ia/imagen` | Imagen acorde al texto y al sector → URL pública `/medio/ID.jpg` (30 días; las redes la descargan) | `@cf/black-forest-labs/flux-1-schnell` |
+| `POST /ia/voz` | Voz + tiempos palabra a palabra para subtítulos (es, en, fr, zh, ja, ko) | `@cf/myshell-ai/melotts` + `@cf/openai/whisper-large-v3-turbo` |
+| `POST /ia/texto` | `accion`: `escribir`, `reaprovechar` (texto largo → piezas) o `traducir` | `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (reserva: `@cf/meta/m2m100-1.2b`) |
+| `GET /ia/uso` | Lo gastado hoy y los límites | — |
+| `POST /ia/video` | **Hueco**: 501 hasta elegir proveedor de pago ([`VIDEO-IA.md`](VIDEO-IA.md)) | — |
+| `/claves` | (dueño) crear, listar y revocar claves de API; se guarda solo la huella | — |
+| `/v1/…` · `POST /mcp` | API pública y MCP: [`API-CHISPA.md`](API-CHISPA.md) | — |
+
+**Cupo gratis:** 10.000 neuronas/día por cuenta. El servidor apunta lo gastado en `uso_ia` y corta a
+9.000 (Cloudflare daría error, no cobra). Por negocio y día: 20 imágenes, 40 voces, 25 textos.
+Medido: **una imagen ≈ 173 neuronas** (≈ 52 al día en toda la cuenta), voz ≈ 20-25, texto ≈ 30-260.
+De pago (Workers Paid 5 $/mes): 0,011 $ por 1.000 neuronas → imagen ≈ 0,0019 $.
+
+**En la página (`chispa-ia.js`):** las propuestas automáticas del Estudio siguen con **fotos libres**
+(no gastan cupo); la IA solo se usa al pulsar **«✨ Crear imagen con IA» / «↻ Otra versión»**. Sin
+servidor o sin sesión, sale una foto libre y lo dice. Tablas nuevas (se crean solas): `uso_ia`,
+`medios_ia`, `api_claves`.
+
+**Idiomas de verdad:** ver la tabla de [`API-CHISPA.md` §7](API-CHISPA.md). Resumen: textos en
+cualquier idioma (8 garantizados, el resto con aviso), voz solo en 6, y m2m100 solo de reserva porque
+se equivoca.
 
 ## 4 · Guía de despliegue, paso a paso (con Stalin en pantalla)
 
@@ -305,6 +339,8 @@ mkdir -p ~/Proyectos/chispa-f-pruebas && cd ~/Proyectos/chispa-f-pruebas && npm 
 cd <chispa-demo>
 NODE_PATH=~/Proyectos/chispa-f-pruebas/node_modules node pruebas/servidor-api.cjs         # 22 comprobaciones
 NODE_PATH=~/Proyectos/chispa-f-pruebas/node_modules node pruebas/servidor-navegador.cjs   # 11, portátil + iPhone
+NODE_PATH=~/Proyectos/chispa-f-pruebas/node_modules node pruebas/servidor-ia-api.cjs      # 35: IA imitada, cupo, claves, /v1, MCP
+CHISPA_FOTO_IA=<una foto.jpg> NODE_PATH=~/Proyectos/chispa-f-pruebas/node_modules node pruebas/ia-navegador.cjs  # 10, escritorio + iPhone
 NODE_PATH=~/Proyectos/chispa-f-pruebas/node_modules node pruebas/servidor-simulador.cjs   # para mirarlo a mano
 ```
 El simulador ejecuta el Worker de verdad (`chispa-api-worker.js`) con D1 imitada por SQLite y

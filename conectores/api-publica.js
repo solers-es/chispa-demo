@@ -18,6 +18,7 @@
      DELETE /v1/publicaciones/:id          cancelar (si no está publicada)
      POST   /v1/imagen                     imagen con IA (URL pública)
      POST   /v1/voz                        voz + subtítulos (audio en base64)
+     POST   /v1/video                      HUECO: 501 hasta elegir proveedor (docs/VIDEO-IA.md)
      POST   /v1/texto                      escribir una publicación desde una idea
      POST   /v1/reaprovechar               texto largo → varias piezas
      POST   /v1/traducir                   texto → varios idiomas
@@ -132,6 +133,7 @@ export function crearApiPublica(ctx) {
     }
     if (m === "POST" && ruta === "/v1/imagen") { const q = await leerJson(req); return IA.generarImagen(env, s.negocio, q, ctx.urlBase(env, req)); }
     if (m === "POST" && ruta === "/v1/voz") return { __crudo: await IA.generarVoz(env, s.negocio, await leerJson(req)) };
+    if (m === "POST" && ruta === "/v1/video") return IA.generarVideo(env, s.negocio, await leerJson(req).catch(() => ({})));
     if (m === "POST" && ruta === "/v1/texto") return IA.escribir(env, s.negocio, { ...(await leerJson(req)), negocio: s.nombre });
     if (m === "POST" && ruta === "/v1/reaprovechar") return IA.reaprovechar(env, s.negocio, { ...(await leerJson(req)), negocio: s.nombre });
     if (m === "POST" && ruta === "/v1/traducir") return IA.traducir(env, s.negocio, await leerJson(req));

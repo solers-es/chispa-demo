@@ -44,15 +44,15 @@ const { arrancar } = require('./servidor-simulador.cjs');
   assert.equal(r.st, 404); paso('un medio que no existe da 404');
 
   // --- CUPO ---
-  s.db.run("UPDATE uso_ia SET veces = 25 WHERE tipo = 'imagen'");
+  s.db.run("UPDATE uso_ia SET veces = 20 WHERE tipo = 'imagen'");
   r = await pedir('POST', '/ia/imagen', { texto: 'otra' }, equipo);
   assert.equal(r.st, 429); assert.match(r.j.error, /límite de hoy/); paso('límite diario por negocio: 429 con mensaje claro');
   s.db.run("UPDATE uso_ia SET veces = 0, neuronas = 8990 WHERE tipo = 'imagen'");
   r = await pedir('POST', '/ia/imagen', { texto: 'otra' }, equipo);
   assert.equal(r.st, 429); assert.match(r.j.error, /cupo gratuito/); paso('tope de la cuenta (9.000 neuronas): corta antes de que Cloudflare dé error');
-  s.db.run("UPDATE uso_ia SET neuronas = 58 WHERE tipo = 'imagen'");
+  s.db.run("UPDATE uso_ia SET neuronas = 173 WHERE tipo = 'imagen'");
   r = await pedir('GET', '/ia/uso', undefined, equipo);
-  assert.equal(r.j.limites.imagen, 25); assert.ok(r.j.neuronasCuenta >= 58); paso('/ia/uso enseña lo gastado hoy');
+  assert.equal(r.j.limites.imagen, 20); assert.ok(r.j.neuronasCuenta >= 173); paso('/ia/uso enseña lo gastado hoy');
 
   // --- VOZ + SUBTÍTULOS ---
   r = await pedir('POST', '/ia/voz', { texto: 'Hola mundo. #Palma 🔥', idioma: 'es' }, equipo);
@@ -64,6 +64,9 @@ const { arrancar } = require('./servidor-simulador.cjs');
   assert.equal(r.st, 200); assert.equal(s.llamadasIA.filter((c) => /melotts/.test(c.modelo)).pop().e.lang, 'jp'); paso('japonés: se pide a MeloTTS como «jp» (su código)');
   r = await pedir('POST', '/ia/voz', { texto: 'Guten Abend', idioma: 'de' }, equipo);
   assert.equal(r.st, 422); assert.equal(r.j.alternativa, 'navegador'); assert.match(r.j.error, /alemán/); paso('alemán: el servidor no tiene voz y lo dice (alternativa: voz del navegador)');
+
+  r = await pedir('POST', '/ia/video', { texto: 'x' }, equipo);
+  assert.equal(r.st, 501); assert.match(r.j.error, /VIDEO-IA/); paso('vídeo con IA: hueco preparado que dice claro que falta elegir proveedor (501)');
 
   // --- TEXTO ---
   r = await pedir('POST', '/ia/texto', { accion: 'reaprovechar', texto: 'Este fin de semana celebramos 56 años con paella y música en directo en la terraza. '.repeat(2), idioma: 'de', piezas: ['posts', 'hilo', 'carrusel'] }, equipo);

@@ -19,7 +19,7 @@
      · tope global de la cuenta:  9.000 neuronas/día (margen de 1.000)
      · tope por negocio y día:    LIMITES (abajo)
    Neuronas aproximadas por uso (precios oficiales, ver docs/SERVIDOR-CHISPA.md):
-     imagen 1024² con 4 pasos = 4 teselas × 4,8 + 4 pasos × 9,6 ≈ 58
+     imagen 1024² con 4 pasos ≈ 173 (MEDIDO en la cuenta: 4 teselas × 4,8 + 4 pasos × 4 teselas × 9,6)
      voz de 20 s ≈ 6 (MeloTTS) + 16 (Whisper) ≈ 22
      texto (≈1.000 tokens de entrada + 1.000 de salida con Llama 3.3 70B) ≈ 230
    ===================================================================== */
@@ -42,9 +42,9 @@ export const NOMBRES_IDIOMA = {
 };
 const NOMBRE_EN = { es: "Spanish", en: "English", de: "German", fr: "French", it: "Italian", pt: "Portuguese", nl: "Dutch", ca: "Catalan", gl: "Galician", eu: "Basque", zh: "Simplified Chinese", ja: "Japanese", ko: "Korean", ar: "Arabic", ru: "Russian", pl: "Polish", sv: "Swedish", da: "Danish", no: "Norwegian", fi: "Finnish", tr: "Turkish", hi: "Hindi", th: "Thai", ro: "Romanian", uk: "Ukrainian", el: "Greek" };
 
-export const LIMITES = { imagen: 25, voz: 40, texto: 25 };      // por negocio y día
+export const LIMITES = { imagen: 20, voz: 40, texto: 25 };      // por negocio y día
 export const CUPO_GLOBAL = 9000;                               // neuronas por día para TODA la cuenta
-const ESTIMADO = { imagen: 58, voz: 25, texto: 260 };
+const ESTIMADO = { imagen: 175, voz: 25, texto: 260 };
 
 export const ESQUEMA_IA = [
   "CREATE TABLE IF NOT EXISTS uso_ia (dia TEXT NOT NULL, negocio TEXT NOT NULL, tipo TEXT NOT NULL, veces INTEGER NOT NULL, neuronas REAL NOT NULL, PRIMARY KEY (dia, negocio, tipo))",
@@ -288,4 +288,14 @@ export function juntarIdiomas(base, lcBase, trad) {
   const partes = [(BANDERA[lcBase] || lcBase.toUpperCase()) + " " + base.trim()];
   for (const c of Object.keys(trad)) partes.push((BANDERA[c] || c.toUpperCase()) + " " + String(trad[c]).trim());
   return partes.join("\n\n");
+}
+
+/* ---------------- VÍDEO CON IA: hueco preparado (sin contratar nada) ----------------
+   Workers AI no genera vídeo. Opciones con precio y recomendación: docs/VIDEO-IA.md.
+   Cuando se elija proveedor: poner su clave con «wrangler secret put» (FAL_KEY o GEMINI_API_KEY)
+   y rellenar aquí la llamada. Hasta entonces el Estudio monta el vídeo con las fotos (Ken Burns,
+   texto, voz y subtítulos), que es gratis. */
+export async function generarVideo(env, negocio, q) {
+  throw new FalloIA("El vídeo generado por IA todavía no está activado (hace falta elegir proveedor de pago: ver docs/VIDEO-IA.md). " +
+    "Mientras tanto, el Estudio monta el vídeo con tus fotos, voz y subtítulos, gratis.", 501, { pendiente: "video-ia", opciones: ["veo-3.1-lite", "ltx-2-fast", "wan-2.2"] });
 }

@@ -59,6 +59,7 @@
      POST   /ia/imagen {texto,titulo,sector,prompt?,cantidad?}  → {urls:[…/medio/ID.jpg]}
      POST   /ia/voz {texto, idioma}        → {audio (data:), palabras:[{t,i,f}], duracion}
      POST   /ia/texto {accion: escribir|reaprovechar|traducir, …}
+     POST   /ia/video                      HUECO: 501 hasta elegir proveedor (docs/VIDEO-IA.md)
      GET    /ia/uso                        lo gastado hoy y los límites
      GET    /medio/:id.jpg                 público: imagen generada (las redes la descargan)
      --- API pública y MCP (ver conectores/api-publica.js y docs/API-CHISPA.md) ---
@@ -574,6 +575,7 @@ async function atender(req, env) {
     if (m === "GET" && ruta === "/ia/uso") return IA.usoHoy(env, s.negocio);
     if (m === "POST" && ruta === "/ia/imagen") return IA.generarImagen(env, s.negocio, await leerJson(req), urlBase(env, req));
     if (m === "POST" && ruta === "/ia/voz") return { __crudo: await IA.generarVoz(env, s.negocio, await leerJson(req)) };
+    if (m === "POST" && ruta === "/ia/video") return IA.generarVideo(env, s.negocio, await leerJson(req).catch(() => ({})));
     if (m === "POST" && ruta === "/ia/texto") {
       const c = await leerJson(req), q = { ...c, negocio: c.negocio || s.nombre };
       if (c.accion === "reaprovechar") return IA.reaprovechar(env, s.negocio, q);
