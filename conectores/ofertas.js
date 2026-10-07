@@ -17,7 +17,7 @@
    ===================================================================== */
 import "../precios.js";
 import "../ofertas-carta.js";
-import { llm, sacarJson, NOMBRES_IDIOMA, TEXTO_IDIOMAS_OFICIALES } from "./ia.js";
+import { llm, llmJson, sacarJson, NOMBRES_IDIOMA, TEXTO_IDIOMAS_OFICIALES } from "./ia.js";
 import { cuentaDe, comprobarLimite } from "./suscripciones.js";
 
 const PRECIOS = globalThis.ChispaPrecios;
@@ -71,7 +71,7 @@ export async function textos(env, Fallo, negocio, q) {
   }));
   const usr = "Days (JSON):\n" + JSON.stringify(lineas) +
     '\n\nFor EACH day return one post. JSON: {"dias":[{"clave":"same clave","titulo":"max 6 words for the image","texto":"35-90 words: hook in the first line, the dish/drink/offer, the time window, 1-3 emojis and a call to action' + (q.cta ? " (" + corto(q.cta, 40) + ")" : "") + '","hashtags":["#x"]}]}. Use \\n for line breaks inside strings.';
-  const j = sacarJson(await llm(env, negocio, sis, usr, Math.min(2600, 350 + 175 * dias.length)));
+  const j = await llmJson(env, negocio, sis, usr, Math.min(2600, 350 + 175 * dias.length));
   const porClave = {};
   (Array.isArray(j.dias) ? j.dias : []).forEach((x) => { if (x && x.clave && x.texto) porClave[String(x.clave)] = x; });
   const salida = lineas.map((d) => {

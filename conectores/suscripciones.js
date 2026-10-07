@@ -432,7 +432,7 @@ async function borrarNegocio(env, h, id) {
   // TODO lo del negocio (RGPD: la baja borra de verdad). Antes se quedaban bandeja (comentarios y
   // mensajes de sus clientes), estadísticas, anuncios, reglas, avisos, claves de API e imágenes.
   const TABLAS = ["codigos", "sesiones", "estado", "conexiones", "oauth_estados", "agenda", "uso", "bandeja", "metricas_dia", "anuncios", "reglas",
-    "avisos", "auto_registro", "ajustes_j", "api_claves", "uso_ia", "medios_ia", "correo_tokens", "cuentas"];
+    "avisos", "auto_registro", "ajustes_j", "api_claves", "uso_ia", "medios_ia", "video_ia", "correo_tokens", "cuentas"];
   for (const tabla of TABLAS) {
     try { await env.DB.prepare("DELETE FROM " + tabla + " WHERE negocio = ?").bind(id).run(); }
     catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; } // tabla que aún no se ha creado en esta base

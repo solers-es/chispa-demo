@@ -1215,7 +1215,11 @@ window.abrirChat=function(){
   var vis=function(){b.style.display=($("app")&&$("app").classList.contains("on"))?"":"none";};vis();
   var va=window.vista;window.vista=function(v){va.apply(this,arguments);vis();};})();
 
-window.CHISPA_AGENDA={planificarSemana:planificarSemana,todoAlCalendario:todoAlCalendario,programarTodoEn:programarTodoEn,orden:orden,marcar:marcar,publicarAhora:publicarAhora,
+/* vídeo hecho en el aparato (p. ej. «Crear vídeo con IA»): se guarda aquí (IndexedDB) y, si queda programado,
+   al sincronizar se sube al servidor como cualquier vídeo propio (prepararMedios) */
+function conVideo(o,blob){var it=item(Object.assign({},o,{mediaLocal:true,media:null}));if(o.origen)it.origen=o.origen;S.agenda=S.agenda||[];S.agenda.push(it);
+  return guardarLocal(it.id,blob).catch(function(){}).then(function(){urlLocal[it.id]={url:URL.createObjectURL(blob),esVideo:true,blob:blob};guardarTodo();try{sincronizar(it);}catch(e){}return it;});}
+window.CHISPA_AGENDA={conVideo:conVideo,planificarSemana:planificarSemana,todoAlCalendario:todoAlCalendario,programarTodoEn:programarTodoEn,orden:orden,marcar:marcar,publicarAhora:publicarAhora,
   redes:REDES,estados:ESTADOS,mejoresHoras:POR,datos:datos,_avisar:avisar,
   // franjas y día entero
   crearPromo:crearPromo,crearBloque:crearBloque,repartir:repartir,choques:choques,proponer:proponer,rango:rango,linea:linea,horasValle:VALLE,promo:function(){window.agPromo();}};

@@ -59,7 +59,9 @@
      POST   /ia/imagen {texto,titulo,sector,prompt?,cantidad?}  → {urls:[…/medio/ID.jpg]}
      POST   /ia/voz {texto, idioma}        → {audio (data:), palabras:[{t,i,f}], duracion}
      POST   /ia/texto {accion: escribir|reaprovechar|traducir|serie|guion, …}  (serie y guion: Estudio para creadores, Pro y Agencia)
-     POST   /ia/video                      HUECO: 501 hasta elegir proveedor (docs/VIDEO-IA.md)
+     POST   /ia/texto {accion:"video", tema, escenas, idioma}  → guion por escenas para el vídeo IA gratis
+     GET    /ia/video/estado · POST /ia/video · GET /ia/video/:id   vídeo realista (de pago): 501 hasta poner proveedor (video-ia.js)
+     GET    /video-ia/:id.mp4              público: el clip realista ya generado
      GET    /ia/uso                        lo gastado hoy y los límites
      GET    /medio/:id.jpg                 público: imagen generada (las redes la descargan)
      --- API pública y MCP (ver conectores/api-publica.js y docs/API-CHISPA.md) ---
@@ -69,6 +71,7 @@
    ===================================================================== */
 import { publicarEn, estadisticas } from "./redes.js";
 import * as IA from "./ia.js";
+import * as VIDEO from "./video-ia.js";
 import { crearApiPublica } from "./api-publica.js";
 // Bandeja, estadísticas, anuncios y automatizaciones (trabajador J): todo en panel-real.js
 import { ESQUEMA_PANEL, rutasPanel, rutasAdminPanel, cronPanel, exigirFuncion } from "./panel-real.js";
@@ -120,6 +123,7 @@ const ESQUEMA = [
   "CREATE INDEX IF NOT EXISTS agenda_pendiente ON agenda (estado, cuando)",
   "CREATE TABLE IF NOT EXISTS api_claves (id TEXT PRIMARY KEY, huella TEXT NOT NULL UNIQUE, negocio TEXT NOT NULL, nombre TEXT, prefijo TEXT NOT NULL, creado INTEGER NOT NULL, usado INTEGER, revocada INTEGER NOT NULL DEFAULT 0)",
   ...IA.ESQUEMA_IA,
+  ...VIDEO.ESQUEMA_VIDEO_IA,
   ...ESQUEMA_PANEL,
 ];
 let tablasListas = false;
@@ -558,6 +562,7 @@ async function atender(req, env) {
   if (m === "POST" && ruta === "/sesion") return entrar(env, await leerJson(req));
   if (m === "POST" && ruta === "/chat") return rutaChat(req, env, { Fallo, huella, leerJson });
   if (m === "GET" && partes[0] === "medio" && partes.length === 2) return IA.servirMedio(env, partes[1]);
+  if (m === "GET" && partes[0] === "video-ia" && partes.length === 2) return VIDEO.servirVideo(env, partes[1]);
 
   if (partes[0] === "admin") {
     soloAdmin(req, env);
@@ -585,17 +590,21 @@ async function atender(req, env) {
     if (m === "GET" && ruta === "/ia/uso") return IA.usoHoy(env, s.negocio);
     if (m === "POST" && ruta === "/ia/imagen") return IA.generarImagen(env, s.negocio, await leerJson(req), urlBase(env, req));
     if (m === "POST" && ruta === "/ia/voz") return { __crudo: await IA.generarVoz(env, s.negocio, await leerJson(req)) };
-    if (m === "POST" && ruta === "/ia/video") return IA.generarVideo(env, s.negocio, await leerJson(req).catch(() => ({})));
+    // vídeo realista con IA (de pago, APAGADO hasta poner proveedor y clave): video-ia.js
+    if (m === "GET" && ruta === "/ia/video/estado") return VIDEO.estadoVideo(env, s.negocio);
+    if (m === "POST" && ruta === "/ia/video") return VIDEO.pedirVideo(env, s.negocio, await leerJson(req).catch(() => ({})), urlBase(env, req));
+    if (m === "GET" && partes[1] === "video" && partes.length === 3) return VIDEO.consultarVideo(env, s.negocio, partes[2], urlBase(env, req));
     if (m === "POST" && ruta === "/ia/texto") {
       const c = await leerJson(req), q = { ...c, negocio: c.negocio || s.nombre };
       if (c.accion === "reaprovechar") return IA.reaprovechar(env, s.negocio, q);
       if (c.accion === "traducir") return IA.traducir(env, s.negocio, q);
       if (c.accion === "escribir") return IA.escribir(env, s.negocio, q);
+      if (c.accion === "video") return IA.escenasVideo(env, s.negocio, q); // vídeo con IA gratis: guion por escenas (todos los planes)
       if (c.accion === "serie" || c.accion === "guion") {
         await exigirFuncion(env, Fallo, s.negocio, "estudio"); // Estudio para creadores: Pro y Agencia (precios.js)
         return c.accion === "serie" ? IA.serie(env, s.negocio, q) : IA.guion(env, s.negocio, q);
       }
-      throw new Fallo("accion: escribir | reaprovechar | traducir | serie | guion");
+      throw new Fallo("accion: escribir | reaprovechar | traducir | serie | guion | video");
     }
     throw new Fallo("No existe", 404);
   }

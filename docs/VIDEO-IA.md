@@ -3,7 +3,25 @@
 > Encargo de Stalin: lo que Blotato tiene y Chispa no, **sin contratar nada todavía y sin meter
 > tarjeta**. Este documento es para decidir. Precios consultados el **07/10/2026**.
 
-## Qué hay hoy en Chispa (gratis)
+## 08/10/2026 · Lo que ya está hecho
+
+- **Vídeo con IA GRATIS, funcionando**: Estudio → «🎞️ Crear vídeo con IA» (`chispa-video-ia.js`): guion por
+  escenas con IA, una imagen IA por escena (FLUX), voz IA por escena, subtítulos palabra a palabra, sello,
+  música suave generada en el navegador, MP4/WebM y «📅 Programar». Ejemplo real:
+  `capturas/video-ia/ejemplo-recetas-caribenas-08-10-2026.mp4`.
+- **Vídeo realista (de pago) PROGRAMADO y APAGADO**: `conectores/video-ia.js` (Veo 3.1 Lite o fal.ai LTX-2 Fast).
+  Para encenderlo, cuando Stalin decida y meta tarjeta en el proveedor:
+  ```bash
+  cd conectores
+  npx wrangler secret put VIDEO_IA_PROVEEDOR -c wrangler-api.toml   # escribe: veo   (o: fal)
+  npx wrangler secret put GEMINI_API_KEY     -c wrangler-api.toml   # (o FAL_KEY si es fal)
+  # opcionales: VIDEO_IA_MODELO (nombre exacto del modelo), VIDEO_IA_TOPE_USD_MES (20 por defecto)
+  ```
+  Límite: Básico 0, Pro 8, Agencia 30 clips al mes (`precios.js` → `videoIAMes`), coste apuntado por clip.
+  **Sin probar contra el proveedor** (no hay clave): el primer día, una prueba y mirar la respuesta. Comprobar
+  también el nombre exacto del modelo Lite en la documentación de Google ese día.
+
+## Qué había antes (07/10/2026)
 
 - **Cloudflare Workers AI no genera vídeo** (solo imagen, voz, texto, transcripción): no hay opción
   gratuita en nuestro propio servidor.

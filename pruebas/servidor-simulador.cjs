@@ -103,6 +103,10 @@ const aiFalsa = {
       } else if (/showrunner/.test(e.messages[0].content)) {
         const n = +(u.match(/Episodes: (\d+)/) || [0, 5])[1];
         r = { titulo: 'Serie imitada', premisa: 'Premisa', episodios: Array.from({ length: n }, (_, k) => ({ titulo: 'Episodio ' + (k + 1) + ' de la IA', gancho: 'Gancho ' + (k + 1), guion: 'línea 1\nlínea 2', cliffhanger: 'Sigue en el ' + (k + 2), texto_pantalla: 'EP ' + (k + 1) })), hashtags: ['#serie'] };
+      } else if (/director of short vertical videos/.test(e.messages[0].content)) {
+        const n = +(u.match(/Scenes: exactly (\d+)/) || [0, 5])[1];
+        const tema = (u.match(/Video topic: (.*)/) || [0, 'el tema'])[1];
+        r = { titulo: 'Vídeo imitado: ' + tema.slice(0, 30), escenas: Array.from({ length: n }, (_, k) => ({ dice: 'Escena ' + (k + 1) + ' sobre ' + tema + ', contada en pocas palabras.', texto_pantalla: 'Paso ' + (k + 1), imagen: 'A realistic photo of Caribbean food, scene ' + (k + 1) })), descripcion: 'Descripción imitada', hashtags: ['#caribe'] };
       } else if (/short vertical video scripts/.test(e.messages[0].content)) {
         r = { titulo: 'Guion imitado', gancho: 'Nadie te cuenta esto', texto_pantalla: 'OJO', escenas: [{ dice: 'uno', se_ve: 'plano' }, { dice: 'dos', se_ve: 'detalle' }], remate: 'Remate', cta: '¿Tú qué opinas?', descripcion: 'Desc', hashtags: ['#tip'], duracion: '30 s' };
       } else if (/Source content/.test(u)) r = { piezas: [{ tipo: 'posts', titulo: 'P1', texto: 'Post uno' }, { tipo: 'hilo', titulo: 'Hilo', texto: '1/ a\n\n2/ b' }, { tipo: 'carrusel', titulo: 'C', texto: 'Pie', diapositivas: [{ titulo: 'a', texto: 'b' }] }] };

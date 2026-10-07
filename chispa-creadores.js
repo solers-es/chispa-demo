@@ -36,6 +36,9 @@
   function aviso(m) { try { toast(m); } catch (e) {} }
   function sync() { return window.ChispaSync; }
   function conServidor() { var s = sync(); if (!s || !s.estado || !s.pedir) return false; var e = s.estado(); return e.modo === 'servidor' && !e.pausado; }
+  // hay servidor (?servidor=…) pero nadie ha entrado con su código: se dice claro en vez de fallar
+  function sinSesion() { var s = sync(); if (!s || !s.estado) return false; var e = s.estado(); return e.modo === 'sin-sesion'; }
+  var AVISO_SESION = '🔑 La IA necesita que entres con tu código de negocio (Conexiones → «Entrar»). Sin entrar te enseño una plantilla de EJEMPLO con tu tema.';
   function info() { try { if (window.ChispaSector && ChispaSector.paraIA) return ChispaSector.paraIA(); } catch (e) {} var n = S.negocio || {}; return { sector: '', negocio: n.nombre, ciudad: n.ciudad, idioma: { base: 'es' } }; }
   function idiomaNegocio() { var i = info().idioma; return ((i && (i.base || i.codigo)) || 'es').slice(0, 2).toLowerCase(); }
   function nombreSector() { try { return ChispaSector.actual().nombre; } catch (e) { return ''; } }
@@ -79,11 +82,13 @@
   function errorIA(e) {
     var m = (e && e.message) || 'no disponible';
     if (/Pro y Agencia/.test(m)) return '🔒 ' + m;
-    return '⚠️ La IA no ha podido: ' + m + '. Te dejo una plantilla de ejemplo.';
+    if (e && e.status === 401) return AVISO_SESION;
+    return '⚠️ La IA no ha podido: ' + m + '. Te dejo una plantilla de EJEMPLO con tu tema (no la ha escrito la IA).';
   }
 
   /* ---------------- piezas comunes ---------------- */
   function cabeceraModo() {
+    if (sinSesion()) return '<div class="card" style="background:rgba(255,204,51,.06);border-color:rgba(255,204,51,.25)"><div style="font-size:13px;color:var(--tx2)">🔑 <b style="color:var(--tx)">Falta entrar:</b> el servidor de Chispa está conectado, pero la IA solo escribe para un negocio que ha entrado con su código. Entra en <a href="javascript:void 0" onclick="vista(\'panel\');panel(\'conectar\')">Conexiones</a>. Mientras tanto verás plantillas de EJEMPLO con tu tema.</div></div>';
     if (conServidor()) return '<div class="card" style="background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.3)"><div style="font-size:13px;color:var(--tx2)">✅ <b style="color:var(--tx)">IA activada</b> · escribe para cualquier tema, en tu idioma y con el tono de tu negocio. Incluido en los planes <b>Pro y Agencia</b>.</div></div>';
     return '<div class="card" style="background:rgba(255,204,51,.06);border-color:rgba(255,204,51,.25)"><div style="font-size:13px;color:var(--tx2)">🧪 <b style="color:var(--tx)">Modo demostración:</b> verás plantillas de EJEMPLO. Con tu cuenta (entra con tu código en <a href="javascript:void 0" onclick="vista(\'panel\');panel(\'conectar\')">Conexiones</a>) la IA lo escribe para cualquier tema e idioma. Planes Pro y Agencia.</div></div>';
   }
@@ -143,7 +148,7 @@
         '<a class="btn pp" href="' + u + '" download="portada-' + esc(String(titulo).toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)) + '.jpg">⬇️ Descargar</a>';
     }, function () { var box = $('kPort'); if (box) box.innerHTML = 'No se pudo crear la portada. Prueba otra vez.'; });
   }
-  window.ChispaCreadores = { portada: portada, alCalendario: alCalendario, delEstudio: delEstudio, conServidor: conServidor };
+  window.ChispaCreadores = { portada: portada, alCalendario: alCalendario, delEstudio: delEstudio, conServidor: conServidor, sinSesion: sinSesion, plantillaSerie: function (t, n) { return plantillaSerie(t, n || 5); } };
 
   /* =====================================================================
      PESTAÑAS
@@ -152,6 +157,7 @@
     { id: 'cartera', ic: '📺', nm: 'Mis canales' },
     { id: 'serie', ic: '🎬', nm: 'Miniserie con IA' },
     { id: 'guion', ic: '🎯', nm: 'Guion con IA' },
+    { id: 'video', ic: '🎞️', nm: 'Crear vídeo con IA' },
     { id: 'ecal', ic: '🗓️', nm: 'En el calendario' },
     { id: 'ingresos', ic: '💶', nm: 'Monetizar' },
     { id: 'reglas', ic: '🛡️', nm: 'Buenas prácticas' }
@@ -199,6 +205,20 @@
     'Mi negocio por dentro': { titulo: 'Un día en ' + ((S.negocio && S.negocio.nombre) || 'mi negocio'), eps: [['A las 7 de la mañana, antes de abrir', 'Lo que pasa antes de que llegues…'], ['El error que casi nos cuesta caro', 'Cómo lo arreglamos, mañana.'], ['La receta (o el truco) de la casa', 'Lo que nadie ve, en el próximo.'], ['Conoce al equipo', 'Y quién manda de verdad…'], ['Lo que nos dicen los clientes', 'Fin de la serie: gracias por verla.']] }
   };
   var SERIE = null;
+  /* Plantilla de EJEMPLO hecha con el tema que se ha pedido (sin IA): estructura de miniserie con gancho y cliffhanger */
+  function seriePorTema(tema) {
+    var t = String(tema || 'tu tema').trim().replace(/\s+/g, ' ').slice(0, 60), c = t.charAt(0).toUpperCase() + t.slice(1);
+    return { titulo: c.slice(0, 48), eps: [
+      ['Lo que nadie te cuenta de ' + t, 'Y el primer paso es más fácil de lo que crees…'],
+      [c + ': el error más típico', 'Cómo evitarlo, en el próximo.'],
+      [c + ': el truco que lo cambia todo', 'Pero falta lo más importante…'],
+      [c + ' paso a paso', 'Mañana, el resultado final.'],
+      [c + ': el resultado', 'Fin de la serie. ¿Cuál quieres que haga ahora?'],
+      [c + ': preguntas de la gente', 'Respondo la más votada en el siguiente.'],
+      [c + ': versión rápida', 'Y la versión difícil, en el próximo…'],
+      [c + ': lo que aprendí', 'Fin. Guárdala para tenerla a mano.']
+    ] };
+  }
   window.vSerie = function () {
     datos();
     var d = SERIE || (S.estudioK && S.estudioK.ultimaSerie);
@@ -209,8 +229,8 @@
       '<button class="btn pp" style="margin-top:12px" onclick="generarSerie()">🎬 Escribir la serie</button></div><div id="serRes">' + (SERIE ? pintarSerie(SERIE) : '') + '</div>';
   };
   function plantillaSerie(tema, n) {
-    var k = Object.keys(EJEMPLOS_SERIE).filter(function (x) { return x.toLowerCase() === String(tema).toLowerCase(); })[0] || 'Mi negocio por dentro';
-    var e = EJEMPLOS_SERIE[k];
+    var k = Object.keys(EJEMPLOS_SERIE).filter(function (x) { return x.toLowerCase() === String(tema).toLowerCase(); })[0];
+    var e = k ? EJEMPLOS_SERIE[k] : seriePorTema(tema);
     return { titulo: e.titulo, premisa: '', ejemplo: true, plataforma: 'tiktok', idioma: 'es', hashtags: [],
       episodios: e.eps.slice(0, n).map(function (x) { return { titulo: x[0], gancho: '', guion: '', cliffhanger: x[1], texto_pantalla: '' }; }) };
   }
@@ -218,13 +238,13 @@
     var tema = ($('serTema').value || '').trim(); if (!tema) { aviso('Dime el tema de la serie'); return; }
     var pl = $('serPlat').value, n = parseInt($('serN').value, 10) || 5, lc = $('serIdi').value, canal = $('serCanal').value;
     var res = $('serRes');
-    if (!conServidor()) { SERIE = plantillaSerie(tema, n); SERIE.plataforma = pl; SERIE.canal = canal; res.innerHTML = pintarSerie(SERIE); return; }
+    if (!conServidor()) { SERIE = plantillaSerie(tema, n); SERIE.plataforma = pl; SERIE.canal = canal; SERIE.temaPedido = tema; res.innerHTML = (sinSesion() ? '<div class="warn">' + esc(AVISO_SESION) + '</div>' : '') + pintarSerie(SERIE); return; }
     res.innerHTML = '<div class="card" style="color:var(--tx3)">✍️ Escribiendo la serie con IA…</div>';
     pedirIA({ accion: 'serie', tema: tema, plataforma: pl, episodios: n, idioma: lc }).then(function (j) {
       SERIE = j; SERIE.canal = canal; S.estudioK.ultimaSerie = SERIE; try { guardar(); } catch (e) {}
       res.innerHTML = pintarSerie(SERIE);
     }, function (e) {
-      SERIE = plantillaSerie(tema, n); SERIE.plataforma = pl; SERIE.canal = canal;
+      SERIE = plantillaSerie(tema, n); SERIE.plataforma = pl; SERIE.canal = canal; SERIE.temaPedido = tema;
       res.innerHTML = '<div class="warn">' + esc(errorIA(e)) + '</div>' + pintarSerie(SERIE);
     });
   };
@@ -291,7 +311,7 @@
   window.generarGuion = function (variante) {
     var tema = ($('gTema').value || '').trim() || (GUION && GUION.temaPedido) || ''; if (!tema) { aviso('Dime de qué va el vídeo'); return; }
     var pl = $('gPlat').value, lc = $('gIdi').value, canal = $('gCanal').value, res = $('gRes');
-    if (!conServidor()) { GUION = plantillaGuion(tema, pl); GUION.canal = canal; GUION.temaPedido = tema; res.innerHTML = pintarGuion(GUION); return; }
+    if (!conServidor()) { GUION = plantillaGuion(tema, pl); GUION.canal = canal; GUION.temaPedido = tema; res.innerHTML = (sinSesion() ? '<div class="warn">' + esc(AVISO_SESION) + '</div>' : '') + pintarGuion(GUION); return; }
     res.innerHTML = '<div class="card" style="color:var(--tx3)">✍️ Escribiendo el guion con IA…</div>';
     pedirIA({ accion: 'guion', tema: tema, plataforma: pl, idioma: lc, variante: variante || 0 }).then(function (j) {
       GUION = j; GUION.canal = canal; GUION.temaPedido = tema; GUION.variante = variante || 1; S.estudioK.ultimoGuion = GUION; try { guardar(); } catch (e) {}

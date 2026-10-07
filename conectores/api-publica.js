@@ -26,6 +26,7 @@
      POST   /mcp                           Model Context Protocol (HTTP «streamable», sin estado)
    ===================================================================== */
 import * as IA from "./ia.js";
+import * as VIDEO from "./video-ia.js";
 
 export const ALIAS_RED = {
   igf: "igf", igs: "igs", fb: "fb", tt: "tt", yt: "yt", gbp: "gbp",
@@ -133,7 +134,7 @@ export function crearApiPublica(ctx) {
     }
     if (m === "POST" && ruta === "/v1/imagen") { const q = await leerJson(req); return IA.generarImagen(env, s.negocio, q, ctx.urlBase(env, req)); }
     if (m === "POST" && ruta === "/v1/voz") return { __crudo: await IA.generarVoz(env, s.negocio, await leerJson(req)) };
-    if (m === "POST" && ruta === "/v1/video") return IA.generarVideo(env, s.negocio, await leerJson(req).catch(() => ({})));
+    if (m === "POST" && ruta === "/v1/video") return VIDEO.pedirVideo(env, s.negocio, await leerJson(req).catch(() => ({})), ctx.urlBase(env, req));
     if (m === "POST" && ruta === "/v1/texto") return IA.escribir(env, s.negocio, { ...(await leerJson(req)), negocio: s.nombre });
     if (m === "POST" && ruta === "/v1/reaprovechar") return IA.reaprovechar(env, s.negocio, { ...(await leerJson(req)), negocio: s.nombre });
     if (m === "POST" && ruta === "/v1/traducir") return IA.traducir(env, s.negocio, await leerJson(req));

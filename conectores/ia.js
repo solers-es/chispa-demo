@@ -189,22 +189,82 @@ export function alinear(texto, oidas, duracion) {
 }
 
 /* ---------------- TEXTO (reaprovechar, escribir, traducir) ---------------- */
-export async function llm(env, negocio, sistema, usuario, maxTokens = 1400) { // también lo usa ofertas.js (plan de ofertas)
+export async function llm(env, negocio, sistema, usuario, maxTokens = 1400, op = {}) { // también lo usa ofertas.js (plan de ofertas)
   sinIA(env);
   await comprobarCupo(env, negocio, "texto");
-  const r = await correr(env, MODELOS.texto, { messages: [{ role: "system", content: sistema }, { role: "user", content: usuario }], max_tokens: maxTokens, temperature: 0.6 });
+  const entrada = { messages: [{ role: "system", content: sistema }, { role: "user", content: usuario }], max_tokens: maxTokens, temperature: op.temperatura != null ? op.temperatura : 0.6 };
+  // «JSON mode» de Workers AI: el modelo SOLO puede devolver un objeto JSON válido (medido el 07/10/2026:
+  // sin esto, 2 de cada 6 miniseries salían con una «}» de más al final y no se podían leer; con esto, 6 de 6)
+  if (op.json) entrada.response_format = { type: "json_object" };
+  const r = await correr(env, MODELOS.texto, entrada);
   await apuntar(env, negocio, "texto", neuronasDe(r, ESTIMADO.texto));
   const txt = (r && r.choices && r.choices[0] && r.choices[0].message && r.choices[0].message.content) || (r && r.response) || "";
   return typeof txt === "string" ? txt : JSON.stringify(txt);
 }
+/* Pide JSON a la IA y lo lee con tolerancia; si sale mal (o le falta algo: «valido»), lo pide OTRA vez,
+   más estricto. Solo si fallan los dos intentos da error (y la página pone su plantilla con el tema pedido). */
+export async function llmJson(env, negocio, sistema, usuario, maxTokens = 1400, valido = null) {
+  let ultimo = null;
+  for (let intento = 0; intento < 2; intento++) {
+    const usr = intento === 0 ? usuario : usuario + "\n\nIMPORTANT: your previous answer could not be parsed. Return ONE single valid JSON object, exactly with the keys asked, no text before or after, no markdown, no trailing commas, balanced braces.";
+    let txt;
+    try { txt = await llm(env, negocio, sistema, usr, maxTokens, { json: true, temperatura: intento ? 0.3 : 0.6 }); }
+    catch (e) { if (e instanceof FalloIA && (e.status === 429 || e.status === 501 || e.status === 400)) throw e; ultimo = e; continue; }
+    try {
+      const j = sacarJson(txt);
+      if (valido && !valido(j)) { ultimo = new FalloIA("La IA no devolvió todo lo que hacía falta; prueba otra vez", 502); continue; }
+      return j;
+    } catch (e) { ultimo = e; }
+  }
+  throw ultimo instanceof FalloIA ? ultimo : new FalloIA("La IA no ha podido hacerlo ahora mismo; prueba otra vez en un minuto", 502);
+}
+/* Lee el JSON de lo que diga el modelo, con tolerancia: quita ```, se queda con el PRIMER objeto
+   completo (llaves equilibradas, fuera de las comillas), arregla saltos de línea dentro de los textos,
+   comas finales y, si se cortó, cierra lo que quedó abierto. */
 export function sacarJson(t) {
   if (t && typeof t === "object") return t;
-  const s = String(t || "").replace(/```(json)?/gi, "");
-  const a = s.indexOf("{"), b = s.lastIndexOf("}");
-  if (a < 0 || b <= a) throw new FalloIA("La IA no respondió en el formato esperado; prueba otra vez", 502);
-  const trozo = s.slice(a, b + 1);
-  try { return JSON.parse(trozo); } catch (e) {}
-  try { return JSON.parse(escaparSaltos(trozo)); } catch (e) { throw new FalloIA("La IA respondió algo que no se pudo leer; prueba otra vez", 502); }
+  const s = String(t || "").replace(/```(json)?/gi, "").replace(/^﻿/, "");
+  const a = s.indexOf("{");
+  if (a < 0) throw new FalloIA("La IA no respondió en el formato esperado; prueba otra vez", 502);
+  const trozo = primerObjeto(s.slice(a)), e = escaparSaltos(trozo), c = sinComasFinales(e);
+  for (const x of [trozo, e, c, cerrarAbierto(c)]) { try { const j = JSON.parse(x); if (j && typeof j === "object") return j; } catch (er) {} }
+  throw new FalloIA("La IA respondió algo que no se pudo leer; prueba otra vez", 502);
+}
+/* Desde la primera «{» hasta la «}» que la cierra (lo que venga después, p. ej. una «}» de más, se ignora) */
+export function primerObjeto(s) {
+  let prof = 0, dentro = false, esc = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (dentro) { if (esc) esc = false; else if (ch === "\\") esc = true; else if (ch === '"') dentro = false; continue; }
+    if (ch === '"') dentro = true;
+    else if (ch === "{" || ch === "[") prof++;
+    else if (ch === "}" || ch === "]") { prof--; if (prof === 0) return s.slice(0, i + 1); }
+  }
+  return s; // cortado: lo arregla cerrarAbierto
+}
+export function sinComasFinales(s) {
+  let o = "", dentro = false, esc = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (dentro) { o += ch; if (esc) esc = false; else if (ch === "\\") esc = true; else if (ch === '"') dentro = false; continue; }
+    if (ch === '"') { dentro = true; o += ch; continue; }
+    if (ch === ",") { let k = i + 1; while (k < s.length && /\s/.test(s[k])) k++; if (s[k] === "}" || s[k] === "]") continue; }
+    o += ch;
+  }
+  return o;
+}
+/* Si la respuesta se cortó (max_tokens): cierra la cadena, quita el último trozo a medias y cierra llaves */
+export function cerrarAbierto(s) {
+  const pila = []; let dentro = false, esc = false;
+  for (const ch of s) {
+    if (dentro) { if (esc) esc = false; else if (ch === "\\") esc = true; else if (ch === '"') dentro = false; continue; }
+    if (ch === '"') dentro = true; else if (ch === "{" || ch === "[") pila.push(ch); else if (ch === "}" || ch === "]") pila.pop();
+  }
+  if (!pila.length && !dentro) return s;
+  let o = s + (dentro ? '"' : "");
+  o = o.replace(/,\s*"[^"]*"\s*:\s*"[^"]*"\s*$/, "").replace(/,\s*"[^"]*"\s*:?\s*$/, "").replace(/,\s*$/, "").replace(/:\s*$/, ': ""');
+  for (let k = pila.length - 1; k >= 0; k--) o += pila[k] === "{" ? "}" : "]";
+  return o;
 }
 /* Los modelos a veces meten saltos de línea «de verdad» dentro de las comillas (JSON no válido): se escapan */
 export function escaparSaltos(t) {
@@ -244,7 +304,7 @@ export async function reaprovechar(env, negocio, q) {
   const usr = "Source content:\n\"\"\"\n" + texto.slice(0, 6000) + "\n\"\"\"\n\nCreate these pieces:\n" + tipos.map((t) => "- " + t + ": " + PIEZAS[t]).join("\n") +
     '\n\nJSON shape: {"piezas":[{"tipo":"posts|hilo|carrusel|guion|historias|newsletter","titulo":"short internal title","texto":"full text ready to paste (for hilo: posts separated by blank lines; for carrusel: the caption)","diapositivas":[{"titulo":"","texto":""}],"hashtags":["#x"]}]}. For "posts" return 3 separate items of tipo "posts". Only include "diapositivas" for carrusel. Use \\n for line breaks inside strings.' +
     "\n\nIMPORTANT: every piece must be written in " + nombreEn(lc) + " (" + lc + "), even if the source content is in another language: translate and adapt it.";
-  const j = sacarJson(await llm(env, negocio, sis, usr, 2200));
+  const j = await llmJson(env, negocio, sis, usr, 2200, (x) => Array.isArray(x.piezas) && x.piezas.some((p) => p && p.texto));
   const piezas = (j.piezas || []).filter((p) => p && p.texto).map((p) => ({ tipo: PIEZAS[p.tipo] ? p.tipo : "posts", titulo: String(p.titulo || "").slice(0, 120), texto: String(p.texto), diapositivas: Array.isArray(p.diapositivas) ? p.diapositivas.slice(0, 10) : undefined, hashtags: Array.isArray(p.hashtags) ? p.hashtags.slice(0, 10) : undefined, idioma: lc }));
   if (!piezas.length) throw new FalloIA("La IA no devolvió piezas; prueba otra vez", 502);
   return { piezas, idioma: lc, aviso: avisoIdioma([lc]), modelo: MODELOS.texto };
@@ -255,7 +315,7 @@ export async function escribir(env, negocio, q) {
   const lc = idioma(q.idioma);
   const sis = "You write social media posts for " + (q.negocio || "a small local business") + (q.sector ? " (" + q.sector + ")" : "") + (q.ciudad ? " in " + q.ciudad : "") + ". Tone: close, warm, with a spark. Write in " + nombreEn(lc) + ". Do not invent prices or dates. Answer ONLY with JSON.";
   const usr = 'Idea: ' + idea.slice(0, 800) + '\nFormat: ' + (q.formato || "post") + '\nJSON: {"titulo":"max 6 words for the image","texto":"40-110 words, hook first line, 1-3 emojis, call to action","hashtags":["#..."]}';
-  const j = sacarJson(await llm(env, negocio, sis, usr, 600));
+  const j = await llmJson(env, negocio, sis, usr, 600, (x) => !!x.texto);
   return { titulo: String(j.titulo || "").slice(0, 80), texto: String(j.texto || ""), hashtags: Array.isArray(j.hashtags) ? j.hashtags.slice(0, 8) : [], idioma: lc, aviso: avisoIdioma([lc]) };
 }
 /* ---------------- ESTUDIO PARA CREADORES (miniseries y guiones) ----------------
@@ -277,7 +337,7 @@ export async function serie(env, negocio, q) {
   const sis = "You are a showrunner of short vertical video series for " + quienEs(q) + ". You plan mini-series where every episode ends with a cliffhanger that makes people watch the next one. " + REGLAS_CREADOR + " Write EVERYTHING in " + nombreEn(lc) + " (" + lc + "). Answer ONLY with valid JSON, no markdown.";
   const usr = "Topic / niche: " + tema.slice(0, 400) + (q.publico ? "\nAudience: " + String(q.publico).slice(0, 200) : "") + "\nPlatform: " + P.nombre + " (" + P.dur + ")\nEpisodes: " + n +
     '\nJSON: {"titulo":"series title, max 6 words","premisa":"one sentence","episodios":[{"titulo":"max 9 words","gancho":"first spoken line, max 15 words","guion":"3-5 short spoken lines separated by \\n","cliffhanger":"last line that leads to the next episode (for the last episode: the payoff)","texto_pantalla":"max 6 words"}],"hashtags":["#x"]}. Exactly ' + n + " episodes. Use \\n for line breaks inside strings.";
-  const j = sacarJson(await llm(env, negocio, sis, usr, 2200));
+  const j = await llmJson(env, negocio, sis, usr, 2400, (x) => Array.isArray(x.episodios) && x.episodios.filter((e) => e && e.titulo).length >= 2);
   const eps = (Array.isArray(j.episodios) ? j.episodios : []).filter((e) => e && e.titulo).slice(0, n).map((e) => ({
     titulo: String(e.titulo).slice(0, 120), gancho: String(e.gancho || "").slice(0, 200), guion: String(e.guion || "").slice(0, 1200),
     cliffhanger: String(e.cliffhanger || "").slice(0, 300), texto_pantalla: String(e.texto_pantalla || "").slice(0, 60),
@@ -292,7 +352,7 @@ export async function guion(env, negocio, q) {
   const sis = "You write short vertical video scripts for " + quienEs(q) + ". Optimised for " + P.nombre + ": " + P.dur + ", the goal is " + P.objetivo + ". Hook in the first 2 seconds that also works without sound, a cut every 1.5-3 seconds, a micro-hook before each third, a payoff that loops to the start, and a call to action that is NOT 'like and subscribe'. " + REGLAS_CREADOR + " Write EVERYTHING in " + nombreEn(lc) + " (" + lc + "). Answer ONLY with valid JSON, no markdown.";
   const usr = "Video topic: " + tema.slice(0, 600) + (q.variante ? "\nWrite a DIFFERENT version from the usual one (variant " + (parseInt(q.variante, 10) || 2) + ")." : "") +
     '\nJSON: {"titulo":"max 8 words","gancho":"spoken hook, max 15 words","texto_pantalla":"on-screen text for the first frame, max 6 words","escenas":[{"dice":"spoken line","se_ve":"what is on screen"}],"remate":"payoff line","cta":"call to action","descripcion":"caption for the post, 1-2 lines","hashtags":["#x"],"duracion":"approx seconds"}. 4-7 escenas.';
-  const j = sacarJson(await llm(env, negocio, sis, usr, 1400));
+  const j = await llmJson(env, negocio, sis, usr, 1400, (x) => !!x.gancho && Array.isArray(x.escenas) && x.escenas.length > 0);
   const escenas = (Array.isArray(j.escenas) ? j.escenas : []).filter((e) => e && (e.dice || e.se_ve)).slice(0, 8).map((e) => ({ dice: String(e.dice || "").slice(0, 300), se_ve: String(e.se_ve || "").slice(0, 200) }));
   if (!j.gancho || !escenas.length) throw new FalloIA("La IA no devolvió el guion completo; prueba otra vez", 502);
   return {
@@ -314,7 +374,7 @@ export async function traducir(env, negocio, q) {
     const usr = "Translate each text" + (origen ? " from " + nombreEn(origen) : "") + " into: " + idiomas.map((c) => c + " (" + nombreEn(c) + ")").join(", ") +
       ".\nTexts (JSON array):\n" + JSON.stringify(textos) + "\nReturn exactly this JSON object, replacing each placeholder with the translation (" + textos.length + " item(s) per language, same order as the input):\n" +
       JSON.stringify(Object.fromEntries(idiomas.map((c) => [c, textos.map((_, k) => "<text " + (k + 1) + " in " + nombreEn(c) + ">")])));
-    const j = sacarJson(await llm(env, negocio, sis, usr, Math.min(3500, 300 + Math.ceil(textos.join("").length / 2.5) * idiomas.length)));
+    const j = await llmJson(env, negocio, sis, usr, Math.min(3500, 300 + Math.ceil(textos.join("").length / 2.5) * idiomas.length), (x) => idiomas.every((c) => x[c] != null));
     const out = {};
     for (const c of idiomas) { const v = j[c]; out[c] = Array.isArray(v) ? v.map(String) : typeof v === "string" ? [v] : null; if (!out[c] || out[c].length !== textos.length) throw new Error("faltan traducciones"); }
     return { traducciones: out, modelo: MODELOS.texto, aviso: avisoIdioma(idiomas) };
@@ -336,12 +396,26 @@ export function juntarIdiomas(base, lcBase, trad) {
   return partes.join("\n\n");
 }
 
-/* ---------------- VÍDEO CON IA: hueco preparado (sin contratar nada) ----------------
-   Workers AI no genera vídeo. Opciones con precio y recomendación: docs/VIDEO-IA.md.
-   Cuando se elija proveedor: poner su clave con «wrangler secret put» (FAL_KEY o GEMINI_API_KEY)
-   y rellenar aquí la llamada. Hasta entonces el Estudio monta el vídeo con las fotos (Ken Burns,
-   texto, voz y subtítulos), que es gratis. */
-export async function generarVideo(env, negocio, q) {
-  throw new FalloIA("El vídeo generado por IA todavía no está activado (hace falta elegir proveedor de pago: ver docs/VIDEO-IA.md). " +
-    "Mientras tanto, el Estudio monta el vídeo con tus fotos, voz y subtítulos, gratis.", 501, { pendiente: "video-ia", opciones: ["veo-3.1-lite", "ltx-2-fast", "wan-2.2"] });
+/* ---------------- VÍDEO CON IA GRATIS: guion por escenas ----------------
+   La página pide aquí el guion; luego genera UNA imagen IA por escena (/ia/imagen con «prompt»),
+   la voz de cada escena (/ia/voz) y monta el vídeo vertical en el propio aparato (gratis).
+   El vídeo realista generado clip a clip (de pago) está en video-ia.js. */
+export async function escenasVideo(env, negocio, q) {
+  const tema = String(q.tema || q.texto || "").trim();
+  if (tema.length < 3) throw new FalloIA("Dime el tema del vídeo o pega el guion");
+  const lc = idioma(q.idioma), pl = plataforma(q.plataforma), P = PLATAFORMAS[pl];
+  const n = Math.min(Math.max(parseInt(q.escenas, 10) || 5, 3), 6);
+  const esGuion = tema.length > 160 || /\n/.test(tema);
+  const sis = "You are a director of short vertical videos for " + quienEs(q) + ", for " + P.nombre + ". You split a video into scenes: each scene has ONE spoken line (voice-over) and ONE photo generated by AI. " + REGLAS_CREADOR +
+    " Spoken lines and on-screen texts in " + nombreEn(lc) + " (" + lc + "); the image descriptions ALWAYS in English. Answer ONLY with valid JSON, no markdown.";
+  const usr = (esGuion ? "Turn this script into scenes, keeping its meaning and language:\n\"\"\"\n" + tema.slice(0, 2500) + "\n\"\"\"" : "Video topic: " + tema.slice(0, 400)) +
+    "\nScenes: exactly " + n + ". Total spoken length 20-40 seconds. Scene 1 is a hook that works in the first 2 seconds; the last one closes with a call to action that is NOT 'like and subscribe'." +
+    '\nJSON: {"titulo":"max 7 words","escenas":[{"dice":"spoken line, 8-22 words, natural, no emojis, no hashtags","texto_pantalla":"max 5 words","imagen":"English description of ONE realistic photo for this scene: subject, place, light, camera angle, vertical composition; no text, no letters, no logos; no real famous people"}],"descripcion":"caption for the post, 1-2 lines","hashtags":["#x"]}';
+  const j = await llmJson(env, negocio, sis, usr, 1800, (x) => Array.isArray(x.escenas) && x.escenas.filter((e) => e && e.dice).length >= 2);
+  const escenas = j.escenas.filter((e) => e && e.dice).slice(0, n).map((e) => ({
+    dice: textoParaVoz(String(e.dice)).slice(0, 260), texto_pantalla: String(e.texto_pantalla || "").slice(0, 50),
+    imagen: String(e.imagen || e.dice).replace(/\s+/g, " ").slice(0, 600),
+  }));
+  return { titulo: String(j.titulo || tema).slice(0, 80), escenas, descripcion: String(j.descripcion || "").slice(0, 400), hashtags: Array.isArray(j.hashtags) ? j.hashtags.slice(0, 6).map(String) : [],
+    plataforma: pl, idioma: lc, vozServidor: !!VOZ_IDIOMAS[lc], aviso: avisoIdioma([lc]), modelo: MODELOS.texto };
 }

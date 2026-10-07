@@ -38,7 +38,8 @@
   function idioma() { var i = info().idioma; return ((i && (i.base || i.codigo)) || window._lang || 'es').slice(0, 2).toLowerCase(); }
   function nombreIdioma(c) { try { if (window.Intl && Intl.DisplayNames) { var t = new Intl.DisplayNames(['es'], { type: 'language' }).of(c); if (t && t !== c) return t; } } catch (e) {} return c; }
   function copiar(t) { try { navigator.clipboard.writeText(t).then(function () { aviso('Copiado ✓'); }, function () { prompt('Copia el texto', t); }); } catch (e) { prompt('Copia el texto', t); } }
-  function sinServidorHtml(que) { return '<div style="font-size:13px;color:var(--amber,#ffcc33);margin-top:6px">⚠️ ' + que + ' necesita el servidor de Chispa: entra con tu código en <a href="javascript:void 0" onclick="cerrarModal&&cerrarModal();panel(\'conectar\')">Conexiones</a>.</div>'; }
+  function sinSesion() { var s = sync(); return !!(s && s.estado && s.estado().modo === 'sin-sesion'); }
+  function sinServidorHtml(que) { return '<div style="font-size:13px;color:var(--amber,#ffcc33);margin-top:6px">' + (sinSesion() ? '🔑 ' + que + ' necesita que entres con tu código de negocio' : '⚠️ ' + que + ' necesita el servidor de Chispa: entra con tu código') + ' en <a href="javascript:void 0" onclick="cerrarModal&&cerrarModal();panel(\'conectar\')">Conexiones</a>.</div>'; }
 
   /* =====================================================================
      1 · MOTOR DE IMAGEN «chispa»
@@ -48,9 +49,9 @@
   if (M && M.proveedores) {
     M.proveedores.chispa = function (q) {
       if (!q.ia) return M.proveedores.fotos(q);
-      if (!activo()) return M.proveedores.fotos(q).then(function (m) { m.aviso = '📷 Foto libre: la IA de imágenes funciona al entrar en el servidor (Conexiones)'; return m; });
+      if (!activo()) return M.proveedores.fotos(q).then(function (m) { m.aviso = sinSesion() ? '🔑 Foto libre: para la imagen con IA entra con tu código de negocio (Conexiones)' : '📷 Foto libre: la IA de imágenes funciona al entrar en el servidor (Conexiones)'; return m; });
       var I = info();
-      return pedir('POST', '/ia/imagen', { texto: q.texto, titulo: q.titulo, sector: I.sector, ciudad: I.ciudad, cantidad: Math.min(q.cantidad || 1, 3), semilla: q.semilla })
+      return pedir('POST', '/ia/imagen', { texto: q.texto, titulo: q.titulo, sector: I.sector, ciudad: I.ciudad, cantidad: Math.min(q.cantidad || 1, 3) })
         .then(function (j) {
           var urls = j.urls || [];
           if (!urls.length) throw new Error('El servidor no devolvió imagen');

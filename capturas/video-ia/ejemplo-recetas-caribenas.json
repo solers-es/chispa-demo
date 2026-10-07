@@ -1,0 +1,37 @@
+{
+  "titulo": "Sabor Caribeño Rápido",
+  "ej": false,
+  "deIA": 5,
+  "voz": true,
+  "total": 23.29975,
+  "tipo": "video/mp4",
+  "tam": 3665218,
+  "escenas": [
+    {
+      "dice": "Descubre recetas caribeñas rápidas",
+      "tipo": "ia",
+      "url": "https://chispa-api.solers.workers.dev/medio/DO6egWzLKX4Toe4YxFE_Q9YJ.jpg"
+    },
+    {
+      "dice": "Con ingredientes frescos y sabores únicos",
+      "tipo": "ia",
+      "url": "https://chispa-api.solers.workers.dev/medio/CW-JgBmjivKnnbaIe4Q7qoxh.jpg"
+    },
+    {
+      "dice": "Prepara platos como pollo al curry",
+      "tipo": "ia",
+      "url": "https://chispa-api.solers.workers.dev/medio/346vonQ6AcUk0ibvhOdKhVe8.jpg"
+    },
+    {
+      "dice": "O arroz con vegetales y especias",
+      "tipo": "ia",
+      "url": "https://chispa-api.solers.workers.dev/medio/h8hxAY50meYoah9WhXPY1Dwt.jpg"
+    },
+    {
+      "dice": "Visita El Paraíso Bar Restaurante y prueba nuestros platos caribeños",
+      "tipo": "ia",
+      "url": "https://chispa-api.solers.workers.dev/medio/-xjdtHhUVUkcTkiMH-tuLE1_.jpg"
+    }
+  ],
+  "avisos": []
+}

@@ -166,6 +166,68 @@ API de Instagram, IG User `/media`. Probado con el simulador (`servidor-api.cjs`
 Pruebas: `alcance-navegador.cjs` (12: ordenador, sectores, idiomas, iPhone 390 px), `carta-paraiso-navegador.cjs` (3),
 `servidor-api.cjs` 22 → 23. Navegador **9 de 9 en verde**, servidor **7 de 7 en verde**.
 
+### 1 quinquies · 🎬 Vídeo con IA para creadores + arreglo de «La IA no ha podido» (trabajador N, 08/10/2026)
+
+**El fallo que vio Stalin** (Estudio → Miniserie con IA, «Recetas caribeñas en 60 segundos», TikTok, 5
+episodios): «⚠️ La IA no ha podido: La IA respondió algo que no se pudo leer» y una plantilla de El Paraíso.
+- **Causa medida** (6 llamadas iguales al modelo, Llama 3.3 70B de Workers AI): **2 de 6** respuestas traían
+  el JSON bien escrito pero con **una `}` de más al final**; el lector cogía hasta la última `}` y fallaba.
+  No era el modelo pequeño (ya es el 70B, el mejor del cupo gratis) ni la sesión. Encima, la plantilla de
+  respaldo caía en «Un día en El Paraíso» porque solo conocía tres temas fijos.
+- **Arreglo** (`conectores/ia.js`): se pide al modelo **modo JSON** (`response_format: json_object`: medido
+  **6 de 6** bien); el lector es tolerante (primer objeto con llaves equilibradas, saltos de línea, comas
+  finales, respuesta cortada); y si aun así sale mal, **lo pide otra vez** más estricto (`llmJson`). Lo usan
+  miniserie, guion, reaprovechar, escribir, traducir, el plan de ofertas y el vídeo.
+- **Respaldo con EL TEMA pedido** (`chispa-creadores.js`): si la IA falla, la plantilla de EJEMPLO se hace con
+  el tema («Recetas caribeñas…: el error más típico»…), nunca con El Paraíso.
+- **Sin sesión** (web con `?servidor=` pero sin entrar con el código): lo dice claro en la cabecera y al pulsar
+  («🔑 La IA necesita que entres con tu código de negocio») en Miniserie, Guion, Vídeo, Imagen, Reaprovechar.
+- «Crear imagen con IA»: el arreglo de `seed` de FLUX (encontrado ayer, sin desplegar) **ya está desplegado**
+  y la página ya no manda `semilla`.
+- Probado **una vez contra el servidor real**: la miniserie sale con IA en 13 s («Sabor Caribe en 60s»:
+  Arroz con Pollo, Salsa de Mango, Tostones Fritos, Empanadas de Pescado, Mojito Caribeño) →
+  `capturas/video-ia/miniserie-real.json`.
+
+**🎬 Crear vídeo con IA — versión GRATIS (funciona ya)** · `chispa-video-ia.js`, Estudio → «🎞️ Crear vídeo
+con IA» (`#video-ia`) y tarjeta «¿Creas contenido?» en el Asistente:
+1. La IA escribe el guion **por escenas** (4-6) de un tema o de un guion pegado (`/ia/texto` `accion:"video"`).
+2. **Una imagen IA real por escena** (FLUX, `/ia/imagen` con la descripción en inglés de cada escena). Si se
+   acaba el cupo o el plan (Básico: 5 imágenes al día), esa escena va con foto libre y se dice.
+3. **Voz IA por escena** (MeloTTS: es, en, fr, zh, ja, ko) con tiempos palabra a palabra; en otros idiomas,
+   solo subtítulos (la voz del navegador no se puede grabar dentro del vídeo).
+4. Se monta en el aparato con el **mismo montador del Estudio** (`hacerVideo`, ahora con `escenas`): 1080×1920,
+   Ken Burns, fundido entre escenas, **subtítulos palabra a palabra**, sello de marca, título al principio y
+   botón «Sígueme» al final, y **música suave opcional generada en el navegador** (acordes sintetizados, sin
+   derechos). El audio se prepara en el clic para que el iPhone lo deje sonar.
+5. **Descargar** (MP4 en Safari del iPhone y Chrome nuevos; WebM si el navegador no graba MP4; aviso si no graba
+   nada) y **«📅 Programar»**: entra en el calendario REAL como reel programado mañana a la mejor hora, con el
+   vídeo guardado en el aparato (`CHISPA_AGENDA.conVideo`) y subido al servidor al sincronizar.
+6. Sin servidor o sin entrar: vídeo de EJEMPLO con el tema y fotos libres, marcado EJEMPLO.
+- **Vídeo de ejemplo REAL** (servidor desplegado, 5 imágenes IA, voz IA, música, 23 s, MP4 3,6 MB):
+  `capturas/video-ia/ejemplo-recetas-caribenas-08-10-2026.mp4` (fotograma: `real-fotograma.png`). Tardó 94 s.
+  Gasto de cupo ≈ 1.500 neuronas de 10.000/día; un negocio puede hacer ≈ 3-4 vídeos al día (20 imágenes Pro).
+
+**🎥 Vídeo realista con IA — versión PRO (programada, APAGADA)** · `conectores/video-ia.js`: Google Veo 3.1 Lite
+(≈ 0,40 $ por clip de 8 s) o fal.ai LTX-2 Fast (≈ 0,24 $ por 6 s), detrás de `VIDEO_IA_PROVEEDOR` + su clave
+(`GEMINI_API_KEY` o `FAL_KEY`). Hasta entonces la web y el servidor dicen **«Vídeo realista con IA: se activa
+al conectar el proveedor (de pago).»** (501). Límite por plan en el servidor (`precios.js` → `videoIAMes`:
+Básico 0, Pro 8, Agencia 30 clips/mes; NO se promete en «incluye» mientras esté apagado), contador de coste
+por negocio y mes (tabla `video_ia`, la baja la borra) y **tope de gasto de toda la cuenta** (`VIDEO_IA_TOPE_USD_MES`,
+20 $ por defecto). Probado con el proveedor IMITADO; **contra Google/fal.ai no se ha probado** (no hay clave ni
+tarjeta: no se ha contratado nada). El primer día con clave, hacer UNA prueba.
+
+**Portada y Asistente**: sección nueva «¿Creas contenido? Chispa también es para ti» (`#creadores`): vídeo con IA,
+miniseries y guiones, reaprovechar y cortar vídeos largos, idiomas, TikTok/Reels/Shorts al conectar cuentas, y
+«Vídeo realista con IA: todavía no está disponible». El chat de la portada lo cuenta igual.
+
+**Ojo:** la web pública sigue en demostración (`CHISPA_SERVIDOR` vacío desde el 08/10, ver arriba). Para usar la
+IA de verdad hay que abrirla con `?servidor=https://chispa-api.solers.workers.dev` y entrar con el código.
+
+Pruebas nuevas: `ia-json-tolerante.cjs` (7), `video-ia-api.cjs` (11), `video-ia-navegador.cjs` (7: sin servidor,
+sin entrar, iPhone con sesión —5 imágenes IA, 5 voces, música, MP4, Programar—, portada y Asistente);
+`video-ia-real-una-vez.cjs` (una vez, contra el servidor real; crea un negocio temporal y lo borra).
+Servidor **9 de 9 grupos en verde**, navegador **10 de 10 en verde**.
+
 ## 2 · TRÁMITES (lo que queda para vender), con los pasos exactos
 
 Ninguno lo puede hacer un Claude: piden la cara, el DNI, el CIF o la tarjeta de Stalin.
@@ -256,7 +318,7 @@ días no hay copia esos días (Cloudflare guarda 7 días de Time Travel aparte).
 
 | # | Decisión | Qué bloquea | Qué pasa al decidir |
 |---|---|---|---|
-| D1 | **Proveedor de vídeo con IA** (`docs/VIDEO-IA.md`): recomendado Google Veo 3.1 Lite (≈ 0,40 $ por clip de 8 s) | El vídeo 100 % generado por IA (lo único de código que queda) | Stalin activa la facturación del proyecto de Google Cloud «Chispa El Paraiso» y crea la clave; un Claude la pone con `wrangler secret put` y escribe la llamada en `generarVideo` de `conectores/ia.js` (≈ 1 h) |
+| D1 | **Proveedor de vídeo con IA** (`docs/VIDEO-IA.md`): recomendado Google Veo 3.1 Lite (≈ 0,40 $ por clip de 8 s) | El vídeo realista clip a clip. **El código ya está** (`conectores/video-ia.js`, apagado); el vídeo gratis con imágenes IA + voz ya funciona | Stalin activa la facturación del proyecto de Google Cloud «Chispa El Paraiso» y crea la clave; un Claude la pone con `wrangler secret put` y escribe la llamada en `generarVideo` de `conectores/ia.js` (≈ 1 h) |
 | D2 | **Precio final** (hoy 39/79/149 € + IVA) y **qué plan lleva el Estudio para creadores** (K lo ha puesto en Pro y Agencia) | Vender con el precio bueno | Se cambia en `precios.js` (y `FUNCIONES.estudio` en `conectores/panel-real.js` si el Estudio cambia de plan) + `legal/terminos.html`; regrabar los vídeos (T3) |
 | D3 | **Número de WhatsApp Business** para recordatorios y bandeja de WhatsApp | WhatsApp en la bandeja y en automatizaciones | WhatsApp Business Platform: empresa verificada (T1), número propio y plantillas aprobadas por Meta; luego ≈ ½ día de código |
 | D4 | **Voz de pago para alemán y catalán** (opcional) | Que «Habla con Chispa» y los vídeos tengan voz del servidor en esos idiomas (hoy, voz del navegador y subtítulos) | Elegir proveedor (p. ej. ElevenLabs o Google TTS) y clave; ≈ 1 h de código |

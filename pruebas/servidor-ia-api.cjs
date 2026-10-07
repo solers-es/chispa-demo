@@ -66,7 +66,7 @@ const { arrancar } = require('./servidor-simulador.cjs');
   assert.equal(r.st, 422); assert.equal(r.j.alternativa, 'navegador'); assert.match(r.j.error, /alemán/); paso('alemán: el servidor no tiene voz y lo dice (alternativa: voz del navegador)');
 
   r = await pedir('POST', '/ia/video', { texto: 'x' }, equipo);
-  assert.equal(r.st, 501); assert.match(r.j.error, /VIDEO-IA/); paso('vídeo con IA: hueco preparado que dice claro que falta elegir proveedor (501)');
+  assert.equal(r.st, 501); assert.match(r.j.error, /se activa al conectar el proveedor \(de pago\)/); paso('vídeo realista con IA: apagado y lo dice claro (501, «se activa al conectar el proveedor (de pago)»)');
 
   // --- TEXTO ---
   r = await pedir('POST', '/ia/texto', { accion: 'reaprovechar', texto: 'Este fin de semana celebramos 56 años con paella y música en directo en la terraza. '.repeat(2), idioma: 'de', piezas: ['posts', 'hilo', 'carrusel'] }, equipo);
