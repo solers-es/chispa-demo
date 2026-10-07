@@ -280,7 +280,7 @@
   }
   function vAjustes() {
     sembrar();
-    var n = S.negocio, logos = ['🍽️', '✂️', '🔧', '🏗️', '☕', '💅', '🐶', '🏠', '👗', '🥐'], pct = completado();
+    var n = S.negocio, logos = (window.ChispaSector ? ChispaSector.iconos() : ['🍽️', '✂️', '🔧', '🏗️', '☕', '💅', '🐶', '🏠', '👗', '🥐']), pct = completado();
     return '<div class="hd"><h2>🏪 Mi negocio</h2><div class="row" style="flex:none;gap:8px">' +
       '<button class="btn g sm" style="flex:none" onclick="panel(\'conectar\')">🔗 Conecta tus redes</button>' +
       '<button class="btn pp sm" style="flex:none" onclick="guardarAjustes()">💾 Guardar</button></div></div>' +
