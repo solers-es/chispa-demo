@@ -204,9 +204,14 @@
 
   /* ---------------- ciclo de sincronización ---------------- */
   function activo() { return !!(servidor() && SES && SES.sesion); }
+  /* Con chispa-cuentas.js (trabajador E) un aparato puede abrir OTRO negocio (cambia S de golpe).
+     La sesión del servidor es de UN negocio: si en pantalla hay otro, la sincronización se pausa
+     para no subir los datos de un negocio encima de los de otro. */
+  function cuentasId() { try { return window.ChispaCuentas && typeof ChispaCuentas.idActual === 'function' ? ChispaCuentas.idActual() : null; } catch (e) { return null; } }
+  function pausado() { var c = cuentasId(); return !!(SES && SES.cuentasId && c && c !== SES.cuentasId); }
   function enSerie(fn) { cola = cola.then(fn, fn).catch(function () {}); return cola; }
   function programarSubida(doc, ms) {
-    if (!activo() || !DOCS[doc]) return;
+    if (!activo() || pausado() || !DOCS[doc]) return;
     clearTimeout(temporizadores[doc]);
     temporizadores[doc] = setTimeout(function () { enSerie(function () { return sincronizarDoc(doc); }); }, ms == null ? 700 : ms);
   }
@@ -226,7 +231,7 @@
   }
 
   function sincronizarDoc(doc) {
-    if (!activo() || !DOCS[doc]) return Promise.resolve();
+    if (!activo() || pausado() || !DOCS[doc]) return Promise.resolve();
     var m = META.docs[doc] || (META.docs[doc] = { version: 0, base: null });
     return llamar('GET', '/estado/' + encodeURIComponent(doc) + (m.version && m.base != null ? '?v=' + m.version : ''))
       .then(function (r) {
@@ -325,7 +330,7 @@
   function entrar(negocio, codigo) {
     if (!servidor()) return Promise.reject(new Error('No hay servidor configurado'));
     return llamar('POST', '/sesion', { negocio: negocio, codigo: codigo }).then(function (j) {
-      guardarSesion({ servidor: servidor(), sesion: j.sesion, negocio: j.negocio, nombre: j.nombre, rol: j.rol, esAdministrador: !!j.esAdministrador });
+      guardarSesion({ servidor: servidor(), sesion: j.sesion, negocio: j.negocio, nombre: j.nombre, rol: j.rol, esAdministrador: !!j.esAdministrador, cuentasId: cuentasId() });
       META = { servidor: servidor(), negocio: j.negocio, docs: {} };
       Object.keys(DOCS).forEach(function (d) { META.docs[d] = { version: 0, base: null }; });
       guardarMeta();
@@ -379,8 +384,7 @@
       '<h3 style="margin:0 0 4px">☁️ Conectado en el servidor · vale para todos tus dispositivos</h3>' +
       '<div style="font-size:13px;color:var(--tx2)">Negocio: <b>' + esc(SES.nombre || SES.negocio) + '</b> · ' + (SES.esAdministrador ? 'dueño' : 'equipo') +
       ' · <span id="csCorto">' + estadoCorto() + '</span></div>';
-    var cuentas = window.ChispaCuentas;
-    try { if (cuentas && typeof cuentas.negocioActual === 'function') { var na = cuentas.negocioActual(), id = na && (na.id || na); if (id && id !== SES.negocio) h += '<div style="color:#ffcc33;font-size:13px;margin-top:4px">⚠️ Estás viendo «' + esc(id) + '» pero este aparato está entrado en «' + esc(SES.negocio) + '».</div>'; } } catch (e) {}
+    if (pausado()) h += '<div style="color:#ffcc33;font-size:13px;margin-top:6px">⏸️ En este aparato estás viendo otro negocio («' + esc(cuentasId()) + '»). La sincronización está en pausa para no mezclar datos; vuelve a «' + esc(SES.cuentasId) + '» y sigue sola.</div>';
     h += '<div style="margin-top:10px;display:grid;gap:8px">';
     REDES.forEach(function (r) {
       var c = conexion(r.id), est = !c ? 'Sin conectar' : c.estado === 'conectada' ? '✓ Conectada' : '⚠️ Hay que volver a conectar';
@@ -472,7 +476,7 @@
     vincular: vincular, guardar: guardarDoc, leer: leerDoc, suscribir: suscribir,
     api: api, conexiones: function () { return cargarConexiones(); }, conectar: conectar,
     entrar: entrar, salir: salir, sincronizarAhora: function () { aviso('Sincronizando…'); return sincronizarTodo().then(function () { repintarSiSePuede(); return cargarConexiones(); }); },
-    estado: function () { return { modo: !servidor() ? 'demostracion' : !activo() ? 'sin-sesion' : 'servidor', servidor: servidor(), negocio: SES && SES.negocio, nombre: SES && SES.nombre, esAdministrador: !!(SES && SES.esAdministrador), ultimo: ultimo }; },
+    estado: function () { return { modo: !servidor() ? 'demostracion' : !activo() ? 'sin-sesion' : 'servidor', pausado: pausado(), servidor: servidor(), negocio: SES && SES.negocio, nombre: SES && SES.nombre, esAdministrador: !!(SES && SES.esAdministrador), ultimo: ultimo }; },
     esAdministrador: function () { return !!(SES && SES.esAdministrador); },
     negocioActual: function () { return SES ? { id: SES.negocio, nombre: SES.nombre } : null; },
     _fusionar: fusionar,

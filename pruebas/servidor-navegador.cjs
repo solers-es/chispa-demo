@@ -87,6 +87,15 @@ fs.mkdirSync(OUT, { recursive: true });
   assert.equal(await A.evaluate(() => !!(window.CHISPA_PUBLICADOR && CHISPA_PUBLICADOR.conectada('gbp') && !CHISPA_PUBLICADOR.conectada('tt'))), true);
   paso('el móvil de equipo no ve botones de conectar; la agenda publica por el servidor en las redes conectadas');
 
+  // 6 bis) si en el portátil se abre OTRO negocio (chispa-cuentas.js), la sincronización se pausa
+  const vAntes = s.db.exec("SELECT version FROM estado WHERE doc='principal'")[0].values[0][0];
+  await A.evaluate(() => { window._idReal = ChispaCuentas.idActual; ChispaCuentas.idActual = () => 'ej-cafeteria'; S.negocio.nombre = 'Cafetería de ejemplo'; guardar(); });
+  await A.waitForTimeout(1500);
+  assert.equal(s.db.exec("SELECT version FROM estado WHERE doc='principal'")[0].values[0][0], vAntes);
+  assert.equal(await A.evaluate(() => ChispaSync.estado().pausado), true);
+  await A.evaluate(() => { ChispaCuentas.idActual = window._idReal; S.negocio.nombre = 'El Paraíso'; guardar(); });
+  paso('con otro negocio abierto (modo Solers) no se sube nada encima de El Paraíso');
+
   // 7) ningún token en el navegador
   const todo = await A.evaluate(() => JSON.stringify(localStorage));
   assert.ok(!/g-acceso|SECRETO/.test(todo)); paso('en el navegador no hay ningún token de las redes');
