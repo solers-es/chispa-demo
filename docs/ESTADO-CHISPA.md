@@ -1,7 +1,7 @@
 # Estado de Chispa · 07/10/2026 (por la mañana)
 
-> **Para Stalin, en una línea:** lo que es **programar** está hecho y probado: **≈ 84 % de todo el código**
-> (≈ 88 % sin el «Estudio de contenido», que espera una decisión tuya). Lo poco que falta de código depende
+> **Para Stalin, en una línea:** lo que es **programar** está hecho y probado: **≈ 85 % de todo el código**
+> (≈ 89 % sin el «Estudio de contenido», que espera una decisión tuya). Lo poco que falta de código depende
 > de una decisión o de un trámite (proveedor de vídeo IA, permisos). Lo que queda para venderla son
 > **trámites**: CIF, Stripe, permisos de las redes, abogado, dominio y correo. Abajo, cada uno con sus
 > pasos exactos.
@@ -32,11 +32,11 @@ probado con el simulador** y se dice.
 | **Estadísticas** | 20 % | **90 %** | Recogida diaria por el cron (Instagram, Facebook, Google, YouTube, TikTok), guardado por día, gráfica «Día a día», totales de 7 días frente a los 7 anteriores y **consejos con los datos propios**. Sin conexión: EJEMPLO marcado | Nada |
 | **Anuncios** | 15 % | **85 %** | Meta: campaña + público local (radio y edad) + creatividad + anuncio, **en pausa**; el dueño la activa; resultados (impresiones, clics, gasto). Google: campaña **preparada** con las operaciones exactas de Google Ads | Google Ads se envía solo cuando haya token de desarrollador (trámite); sin probar contra Meta de verdad |
 | **Automatizaciones** | 15 % | **90 %** | En el servidor con la app cerrada: palabra clave en comentario → mensaje privado con enlace; reseña nueva → respuesta sugerida o automática según nota; recordatorio de publicar; resumen semanal (correo si hay proveedor; si no, aviso en la app); aviso de fin de prueba | Correo: falta el proveedor (trámite). WhatsApp: trámite |
-| Chat y «Habla con Chispa» | 30 % | **85 %** | El chat de la portada y «Habla con Chispa» contestan con IA de verdad (Llama 3.3 en el servidor, con topes por visitante y por día); si no hay cupo, frases preparadas | La voz de «Habla» es la del navegador; pasarla a la voz del servidor ≈ 2 h |
+| Chat y «Habla con Chispa» | 30 % | **95 %** | El chat de la portada y «Habla con Chispa» contestan con IA de verdad (Llama 3.3 en el servidor, con topes por visitante y por día) y «Habla» lo dice con la voz del servidor (español, inglés y francés); si no hay cupo, frases preparadas y voz del navegador | Alemán y catalán siguen con la voz del navegador (el modelo de voz gratuito no los tiene) |
 | Estudio de contenido (canales, miniseries) | 30 % | 30 % | Herramienta interna de ideas | **Decisión** de Stalin: ¿se vende o se queda interna? Si se vende, hay que conectarla al servidor |
 | Cuentas, varios negocios, sectores, modo Solers | 5 % | **85 %** | Alta sola, código de acceso, sesiones, roles dueño/equipo, 8 sectores, «Mis clientes», «Altas y pagos» con avisos | Verificación del correo del alta: necesita proveedor de correo (trámite) |
 | Cobro, seguridad y RGPD | 0 % | **80 %** | Stripe programado y **apagado**, límites por plan en el servidor (también Anuncios y Respuestas solo en Pro y Agencia), tokens cifrados AES-GCM, baja y borrado de datos, textos legales | Encender Stripe (trámite); copia de la base fuera de Cloudflare (D1 guarda sola 7 días de historia en el plan gratuito, 30 en el de pago; exportar: `npx wrangler d1 export chispa --remote`, ≈ 1 h para programarla) |
-| **Chispa entera (media de las 14 áreas)** | ≈ 35 % (cobrable) | **≈ 84 % del código** · ≈ 88 % sin el Estudio | | |
+| **Chispa entera (media de las 14 áreas)** | ≈ 35 % (cobrable) | **≈ 85 % del código** · ≈ 89 % sin el Estudio | | |
 
 Cómo se ha medido «ahora»: recorrido automático de **todas las pantallas y botones** (sección 4), las
 pruebas del servidor y del navegador en verde, y leyendo el código de cada área. Lo que no se ha
@@ -44,9 +44,8 @@ podido probar contra las redes de verdad (porque no hay permisos) está dicho en
 
 ### Lo que NO es trámite y queda de código (dicho claro)
 1. **Vídeo generado por IA**: ≈ 1 h cuando Stalin elija proveedor (recomendado Google Veo 3.1 Lite, ≈ 0,40 $ por clip de 8 s; ver `docs/VIDEO-IA.md`). Sin la decisión y la clave no se puede escribir ni probar.
-2. **«Habla con Chispa» con la voz del servidor**: ≈ 2 h. Hoy piensa con la IA del servidor pero habla con la voz del navegador (funciona, suena peor).
-3. **Copia de la base fuera de Cloudflare** con un guion programado: ≈ 1 h (hoy D1 guarda 7 días de historia sola).
-4. **Estudio de contenido**: depende de la decisión de si se vende.
+2. **Copia de la base fuera de Cloudflare** con un guion programado: ≈ 1 h (hoy D1 guarda 7 días de historia sola).
+3. **Estudio de contenido**: depende de la decisión de si se vende.
 
 ---
 
@@ -173,7 +172,7 @@ Resultado (07/10/2026, mañana):
 
 - **Arreglado esta noche:** la web pública **no se actualizaba desde las ≈ 02:00** (GitHub Pages pasaba
   los ficheros por Jekyll y `docs/API-CHISPA.md`, con expresiones `{{ … }}` de n8n, rompía la
-  publicación). Con `.nojekyll` se publica tal cual. Desde las 06:00 la web enseña todo lo de G, H, la
+  publicación). Con `.nojekyll` se publica tal cual. Desde las 05:55 la web enseña todo lo de G, H, la
   visita guiada y lo de este documento. Efecto secundario: los `.md` de `docs/` se ven como texto en
   github.io; para leerlos bonitos, en GitHub (enlaces de arriba).
 

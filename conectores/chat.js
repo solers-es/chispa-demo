@@ -1,7 +1,9 @@
 /* =====================================================================
    Chispa · CHAT de la portada con IA de verdad (público, sin sesión)
    ---------------------------------------------------------------------
-   POST /chat {mensajes:[{yo:true|false, texto}], idioma?} → {texto}
+   POST /chat {mensajes:[{yo:true|false, texto}], voz?:"es"} → {texto, audio?}
+   Con «voz» (es, en, fr, zh, ja, ko) devuelve además la respuesta leída por la
+   voz del servidor (MeloTTS, ≈ 6 neuronas): la usa «Habla con Chispa».
    Contesta a quien visita la web lo que Chispa hace y cuesta, con
    Workers AI (Llama 3.3, el mismo modelo que conectores/ia.js) y con
    datos que NO se inventa: precios de precios.js y lo que hace hoy.
@@ -13,7 +15,7 @@
    con sus frases preparadas: el visitante nunca se queda sin respuesta.
    ===================================================================== */
 import "../precios.js";
-import { MODELOS, CUPO_GLOBAL } from "./ia.js";
+import { MODELOS, CUPO_GLOBAL, VOZ_IDIOMAS, textoParaVoz } from "./ia.js";
 
 export const ESQUEMA_CHAT = ["CREATE TABLE IF NOT EXISTS chat_uso (huella TEXT NOT NULL, hora TEXT NOT NULL, veces INTEGER NOT NULL, PRIMARY KEY (huella, hora))"];
 const POR_HORA = 20, AL_DIA = 200, NEURONAS = 120;
@@ -54,5 +56,14 @@ export async function rutaChat(req, env, h) {
   if (!texto) throw new Fallo("La IA no ha contestado", 503);
   const n = r && r.usage && typeof r.usage.neurons === "number" ? r.usage.neurons : NEURONAS;
   try { await env.DB.prepare("INSERT INTO uso_ia (dia, negocio, tipo, veces, neuronas) VALUES (?, '_chat', 'texto', 1, ?) ON CONFLICT (dia, negocio, tipo) DO UPDATE SET veces = veces + 1, neuronas = neuronas + excluded.neuronas").bind(dia, n).run(); } catch (e) {}
-  return { texto: texto.slice(0, 1200) };
+  const out = { texto: texto.slice(0, 1200) };
+  const lang = c.voz && VOZ_IDIOMAS[String(c.voz).slice(0, 2).toLowerCase()];
+  if (lang) {
+    try {
+      const v = await env.AI.run(MODELOS.voz, { prompt: textoParaVoz(out.texto).slice(0, 600), lang });
+      if (v && typeof v.audio === "string") { out.audio = "data:" + (v.audio.slice(0, 4) === "UklG" ? "audio/wav" : "audio/mpeg") + ";base64," + v.audio; }
+      try { await env.DB.prepare("UPDATE uso_ia SET neuronas = neuronas + 6 WHERE dia = ? AND negocio = '_chat' AND tipo = 'texto'").bind(dia).run(); } catch (e) {}
+    } catch (e) { /* sin voz del servidor: la página usa la del navegador */ }
+  }
+  return out;
 }

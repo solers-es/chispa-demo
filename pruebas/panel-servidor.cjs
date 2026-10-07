@@ -236,11 +236,13 @@ const R = require('./redes-imitadas-j.cjs'), ayer = R.ayer;
   assert.equal(r.st, 200, JSON.stringify(r.j)); assert.ok(r.j.texto.length > 5);
   const sis = s.llamadasIA.filter((x) => /llama/.test(x.modelo)).pop().e.messages[0].content;
   assert.ok(/39 €\/mes/.test(sis) && /79 €\/mes/.test(sis) && /NO hace todavía/.test(sis));
-  for (let i = 0; i < 19; i++) await pedir('POST', '/chat', { mensajes: [{ yo: true, texto: 'hola' }] });
+  r = await pedir('POST', '/chat', { mensajes: [{ yo: true, texto: 'Hola' }], voz: 'es' });
+  assert.match(r.j.audio || '', /^data:audio\/wav;base64,/); // «Habla con Chispa» con la voz del servidor
+  for (let i = 0; i < 18; i++) await pedir('POST', '/chat', { mensajes: [{ yo: true, texto: 'hola' }] });
   r = await pedir('POST', '/chat', { mensajes: [{ yo: true, texto: 'hola' }] });
   assert.equal(r.st, 429); r = await pedir('POST', '/chat', { mensajes: [] });
   assert.ok(r.st === 400 || r.st === 429);
-  paso('chat de la portada con IA: sin sesión, con los precios de precios.js y lo que NO hace, y con tope por visitante');
+  paso('chat de la portada y «Habla con Chispa» con IA (y voz del servidor): sin sesión, con los precios de precios.js y lo que NO hace, y con tope por visitante');
 
   // --- un negocio no ve lo de otro ---
   r = await pedir('GET', '/bandeja/ig:c:k1', undefined, basico);
