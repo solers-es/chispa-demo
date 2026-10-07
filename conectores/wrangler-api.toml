@@ -43,3 +43,12 @@ RESERVAS_URL = "https://el-paraiso-eight.vercel.app/reservas.html"
 TIKTOK_PRIVACIDAD = "SELF_ONLY"
 # Si activas R2: la URL pública del bucket (r2.dev o dominio propio)
 # MEDIA_PUBLICA = "https://pub-XXXX.r2.dev"
+
+# --- Alta sola, planes y pago (conectores/suscripciones.js · docs/VENDER-CHISPA.md) ---
+# El pago está APAGADO. Para cobrar: secretos STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET
+# (wrangler secret put …) y descomentar PAGO_ENCENDIDO. Sin las tres cosas, el alta funciona sin cobrar.
+# PAGO_ENCENDIDO = "1"
+# STRIPE_TASA_IVA = "txr_…"            # IVA 21 % creado en Stripe (o STRIPE_IVA_AUTOMATICO = "1")
+# STRIPE_PRECIO_BASICO = "price_…"     # opcional: si no, el precio sale de precios.js
+# TURNSTILE_SITIO = "0x…"              # opcional: casilla «No soy un robot» (secreto: TURNSTILE_SECRETO)
+# ALTA_MAX_DIA = "200"                 # tope de altas automáticas al día

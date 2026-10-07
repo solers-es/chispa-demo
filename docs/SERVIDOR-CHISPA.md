@@ -349,3 +349,13 @@ móvil de un solo uso; versión y 409 sin pisar; OAuth de las cuatro redes; toke
 el navegador; renovación con refresh_token; lista blanca de `/api`; cron que publica; cambios a la
 vez en portátil e iPhone que se juntan; el portátil se pone al día solo; pausa con otro negocio
 abierto; cero errores de JavaScript.
+
+---
+
+## Alta sola, planes, límites y pago (trabajador H, 07/10/2026)
+
+Va en un módulo aparte, `conectores/suscripciones.js`, importado por el Worker: `/planes`, `/alta/reto`,
+`/alta`, `/cuenta`, `/cuenta/baja`, `/pago/checkout`, `/pago/portal`, `/stripe/webhook`, `/admin/clientes`
+y `DELETE /admin/negocios/:id`. Precios y límites: `precios.js`. Los negocios dados de alta por Solers con
+`/admin/negocios` (como `el-paraiso`) no tienen fila en `cuentas` y siguen **sin límites**.
+Todo lo que falta para vender y los pasos exactos: [`docs/VENDER-CHISPA.md`](VENDER-CHISPA.md).
