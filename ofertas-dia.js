@@ -763,7 +763,7 @@
   /* ---------------- la carta ---------------- */
   function urlCartaDefecto() {
     var u = D().cartaUrl || N().carta || '';
-    // El Paraíso: el enlace de «Mi negocio» es el EDITOR (carta.html); la carta que ven los clientes (QR de las mesas) es carta-paraiso.html
+    // El Paraíso: si queda guardado el EDITOR (carta.html), se lee la carta de los clientes (carta-paraiso.html); Mi negocio ya la trae por defecto
     if (/el-paraiso-eight\.vercel\.app\/carta\.html(?!\?c=)/.test(u)) u = 'https://el-paraiso-eight.vercel.app/carta-paraiso.html';
     return u;
   }

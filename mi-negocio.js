@@ -25,7 +25,7 @@
     web: 'https://el-paraiso-eight.vercel.app/links',
     club: 'https://el-paraiso-eight.vercel.app',
     reserva: 'https://el-paraiso-eight.vercel.app/reservas.html',   // su propio sistema de reservas
-    carta: 'https://el-paraiso-eight.vercel.app/carta.html',
+    carta: 'https://el-paraiso-eight.vercel.app/carta-paraiso.html',   // la carta de los CLIENTES (carta.html es el editor)
     eventos: 'https://el-paraiso-eight.vercel.app/eventos.html',
     telefono: '971 37 90 28',
     whatsapp: '689 98 02 02',        // móvil: el botón «Reserva por wasap» de los clientes
@@ -80,8 +80,26 @@
       if (!n.logoUrl || logosViejosP.indexOf(n.logoUrl) >= 0) { n.logoUrl = PARAISO.logoUrl; guardar(); }
       if (!n.logo || n.logo === '🏠') { n.logo = '🍽️'; guardar(); }
     }
+    // 07/10/2026 (5): carta.html de El Paraíso es el EDITOR; la de los clientes es carta-paraiso.html.
+    // Se cambia en todo lo guardado (Mi negocio, botones de publicaciones, ofertas…) sin tocar nada más.
+    cartaDeClientes();
     CAMPOS.forEach(function (k) { if (n[k] === undefined) n[k] = ''; });
     S.conexiones = S.conexiones || {};
+  }
+
+  var EDITOR_CARTA = /^\s*(https?:\/\/)?el-paraiso-eight\.vercel\.app\/carta\.html\/?\s*$/i;
+  function cartaDeClientes() {
+    var cambios = 0, vistos = 0;
+    (function recorre(o, prof) {
+      if (!o || typeof o !== 'object' || prof > 8 || ++vistos > 20000) return;
+      Object.keys(o).forEach(function (k) {
+        var v = o[k];
+        if (typeof v === 'string') { if (EDITOR_CARTA.test(v)) { o[k] = PARAISO.carta; cambios++; } }
+        else if (v && typeof v === 'object') recorre(v, prof + 1);
+      });
+    })(S, 0);
+    if (cambios) guardar();
+    return cambios;
   }
 
   /* ---------- validar y normalizar enlaces ---------- */
