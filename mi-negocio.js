@@ -21,7 +21,7 @@
     sector: 'Bar restaurante · cocina dominicana · buen ambiente',
     ciudad: 'Palma de Mallorca',
     direccion: "Carrer d'Anselm Turmeda, 5, 07010 Palma",
-    logoUrl: 'marca/elparaiso-logo.png',
+    logoUrl: 'marca/elparaiso-logo-negro.jpg',   // fondo negro, como su Instagram (Stalin 07/10)
     web: 'https://el-paraiso-eight.vercel.app/links',
     club: 'https://el-paraiso-eight.vercel.app',
     reserva: 'https://el-paraiso-eight.vercel.app/reservas.html',   // su propio sistema de reservas
@@ -70,6 +70,8 @@
       CAMPOS.forEach(function (k) { if (!n[k] || (v3[k] && v3[k].indexOf(n[k]) >= 0)) n[k] = PARAISO[k]; });
       n._datosB = 3; guardar();
     }
+    // 07/10/2026 (3), trabajador A: el logo por defecto pasa a la versión de fondo negro
+    if (/^marca\/elparaiso-logo(-160)?\.png$/.test(n.logoUrl || '')) { n.logoUrl = PARAISO.logoUrl; guardar(); }
     CAMPOS.forEach(function (k) { if (n[k] === undefined) n[k] = ''; });
     S.conexiones = S.conexiones || {};
   }

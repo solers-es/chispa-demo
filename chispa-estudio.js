@@ -91,9 +91,10 @@ function ctasPorDefecto(){var c=[{t:"📅 Reservar",tipo:"reserva",url:""},{t:"�
 
 /* ---------- logo y marca de agua ---------- */
 var LOGO={url:"",urlOsc:"",img:null};
-function logoOscUrl(){return N().logoOscuroUrl||LOGO.urlOsc||(esParaiso()?"marca/elparaiso-logo-negro-160.jpg":"");}
-function logoIntUrl(){return N().logoUrl||LOGO.url||(esParaiso()?"marca/elparaiso-logo-integrado.png":"");}
-function logoUrl(){return N().logoUrl||LOGO.url||(esParaiso()?"marca/elparaiso-logo.png":"");}
+function esLogoNuestro(u){return /^marca\/elparaiso-logo/.test(u||"");}
+function logoOscUrl(){var n=N();if(n.logoOscuroUrl||LOGO.urlOsc)return n.logoOscuroUrl||LOGO.urlOsc;if(esParaiso()&&(!n.logoUrl||esLogoNuestro(n.logoUrl)))return "marca/elparaiso-logo-negro-160.jpg";return n.logoUrl||"";}
+function logoIntUrl(){var n=N();if(LOGO.url)return LOGO.url;if(n.logoUrl&&!esLogoNuestro(n.logoUrl))return n.logoUrl;return esParaiso()?"marca/elparaiso-logo-integrado.png":"";}
+function logoUrl(){return logoIntUrl();}
 function logoListo(){cargarLogo();var im=LOGO.img;if(!im||im.complete)return Promise.resolve();return new Promise(function(ok){im.onload=ok;im.onerror=ok;setTimeout(ok,3000);});}
 function cargarLogo(){var u=logoIntUrl();if(!u){LOGO.img=null;return;}if(LOGO.img&&LOGO.img._u===u)return;var im=new Image();im._u=u;im.src=u;LOGO.img=im;}
 function logoHtml(){var o=logoOscUrl();if(o)return '<img class="cm-lg osc" src="'+esc(o)+'" alt="'+esc(N().nombre||"logo")+'">';var u=logoUrl();return u?'<img class="cm-lg" src="'+esc(u.replace("elparaiso-logo.png","elparaiso-logo-160.png"))+'" alt="'+esc(N().nombre||"logo")+'">':esc(N().logo||"🍽️");}
