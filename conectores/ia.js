@@ -107,8 +107,10 @@ export async function generarImagen(env, negocio, q, urlBase) {
   const prompt = promptImagen(q);
   const salida = [];
   for (let k = 0; k < cantidad; k++) {
+    // flux-1-schnell de Workers AI solo admite {prompt, steps}: con «seed» devuelve el error 5006
+    // y la imagen nunca salía desde la página (que siempre manda «semilla»). Sin semilla cada
+    // llamada ya sale distinta, que es lo que pide «Otra versión».
     const entrada = { prompt, steps: 4 };
-    if (q.semilla != null) entrada.seed = (Math.abs(parseInt(q.semilla)) || 1) + k;
     const r = await correr(env, MODELOS.imagen, entrada);
     if (!r || !r.image) throw new FalloIA("La IA no devolvió imagen", 502);
     const id = idMedio();

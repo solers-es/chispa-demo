@@ -1,21 +1,31 @@
 // Graba el vídeo de Chispa escena a escena con el Chromium de Playwright (nunca el Chrome del Mac).
 // Uso: node motor.js largo|corto [escenaId ...]   (con ids, graba solo esas: para probar)
+// Tres navegadores aislados (contextos):
+//   a = visitante: El Paraíso y negocios de EJEMPLO, sin sesión
+//   b = negocio de prueba «Café Aurora (ejemplo)» creado con el alta para la grabación (privado/estado-b.json)
+//   c = navegador limpio para grabar el alta (el negocio que crea se borra después: borrar-altas.js)
 const { chromium } = require('playwright-core');
 const fs = require('fs');
 const path = require('path');
+const cache = require('./cache-ia');
 const EXE = '/Users/usuario/Library/Caches/ms-playwright/chromium-1234/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing';
 const URL = 'https://solers-es.github.io/chispa-demo/';
 const modo = process.argv[2] || 'largo';
 const solo = process.argv.slice(3);
 const W = __dirname;
+const P = W + '/privado/';
 const guion = require(`${W}/guion-${modo}.js`);
 const dur = JSON.parse(fs.readFileSync(`${W}/audio/${modo}/duraciones.json`, 'utf8'));
 const OUT = `${W}/grab/${modo}`;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const ahora = () => Date.now() / 1000;
+// Lo que nunca debe verse: códigos de acceso, id del negocio y correo.
+const OCULTAR = `#alCod,.al-cod{filter:blur(16px)!important}
+#altaPag .al-w > div[style*="text-align:center"] b{filter:blur(9px)}
+.v-oculto{filter:blur(9px)!important}`;
 
 class H {
-  constructor(page) { this.p = page; }
+  constructor(page, nombre) { this.p = page; this.nombre = nombre; this.extra = null; this.t0 = 0; }
   loc(sel) { return typeof sel === 'string' ? this.p.locator(sel).first() : sel; }
   async v(fn, ...a) { return this.p.evaluate(fn, ...a); }
   async esperar(ms) { await sleep(ms); }
@@ -47,9 +57,11 @@ class H {
     return { x, y, b };
   }
   async resaltar(sel, ms = 1400) {
-    const b = await this.caja(sel);
-    await this.v(([x, y, w, h]) => window.__V.resaltar(x, y, w, h), [b.x, b.y, b.width, b.height]);
-    if (ms) { await sleep(ms); await this.v(() => window.__V.apagar()); await sleep(250); }
+    try {
+      const b = await this.caja(sel);
+      await this.v(([x, y, w, h]) => window.__V.resaltar(x, y, w, h), [b.x, b.y, b.width, b.height]);
+      if (ms) { await sleep(ms); await this.v(() => window.__V.apagar()); await sleep(250); }
+    } catch (e) { console.log('   ! resaltar', String(sel), e.message.split('\n')[0]); }
   }
   async clic(sel, opt = {}) {
     try {
@@ -59,22 +71,22 @@ class H {
       await this.v(([x, y]) => window.__V.clic(x, y), [x, y]);
       await this.p.mouse.click(x, y);
       await sleep(180);
-      await this.v(() => window.__V.apagar());
+      await this.v(() => window.__V.apagar()).catch(() => { });
       await sleep(opt.despues || 500);
       return true;
     } catch (e) { console.log('   ! clic fallido', String(sel), e.message.split('\n')[0]); return false; }
   }
   async escribir(sel, texto, delay = 55) {
+    await this.loc(sel).fill('').catch(() => { });
     await this.clic(sel, { despues: 200 });
     await this.p.keyboard.type(texto, { delay });
     await sleep(300);
   }
   async rueda(dy, pasos = 12, ms = 900) {
-    // desplazamiento suave con la rueda en el sitio del cursor
     for (let i = 0; i < pasos; i++) { await this.p.mouse.wheel(0, dy / pasos); await sleep(ms / pasos); }
     await sleep(250);
   }
-  async scrollSuave(sel, y) { // y absoluto dentro de un contenedor (o la página si sel=null)
+  async scrollSuave(sel, y) {
     await this.v(([s, y]) => { const e = s ? document.querySelector(s) : window; e.scrollTo({ top: y, behavior: 'smooth' }); }, [sel, y]);
     await sleep(1000);
   }
@@ -110,42 +122,69 @@ class H {
     await sleep(400);
   }
   async pestana(nombre) { return this.clic(this.p.locator('#nav button', { hasText: nombre }).first(), { despues: 900 }); }
+  async panel(tab) { await this.v(t => { vista('panel'); if (t) panel(t); window.scrollTo(0, 0); }, tab || null); await sleep(900); }
+  // ocultar con desenfoque lo que contenga este texto (correo, id del negocio…)
+  async ocultarTexto(re) {
+    await this.v(src => { const r = new RegExp(src); document.querySelectorAll('#main p, #main div, #main small, #main span').forEach(e => { if (e.children.length < 4 && r.test(e.textContent || '') && (e.textContent || '').length < 220) e.classList.add('v-oculto'); }); }, re);
+  }
+  // sonido extra (p. ej. el vídeo que hace Chispa) a partir de ahora en la escena
+  audioExtra(fichero) { if (this.extra) this.extra.push({ t: ahora() - this.t0, f: fichero }); }
+  // quitar del montaje un rato de espera (p. ej. mientras se graba el vídeo): cortarDesde() … cortarHasta()
+  cortarDesde() { this._corte = ahora() - this.t0; }
+  cortarHasta() { if (this._corte != null && this.cortes) { const b = ahora() - this.t0; if (b - this._corte > 1) this.cortes.push([this._corte, b]); } this._corte = null; }
 }
 
 (async () => {
-  fs.mkdirSync(OUT, { recursive: true });
-  const b = await chromium.launch({ headless: true, executablePath: EXE, args: ['--hide-scrollbars', '--force-color-profile=srgb'] });
-  const ctx = await b.newContext({ viewport: { width: 1440, height: 810 }, deviceScaleFactor: 4 / 3, locale: 'es-ES', timezoneId: 'Europe/Madrid' });
-  let principal = null;
-  ctx.on('page', pg => { if (!principal) return; setTimeout(() => { console.log('   (pestaña nueva cerrada: ' + pg.url() + ')'); pg.close().catch(() => { }); }, 1500); });
-  await ctx.addInitScript({ path: `${W}/overlay.js` });
-  const page = await ctx.newPage(); principal = page;
-  page.on('dialog', d => d.dismiss().catch(() => { }));
-  await page.goto(URL, { waitUntil: 'networkidle' });
-  await sleep(1500);
-  const h = new H(page);
-  const cdp = await ctx.newCDPSession(page);
-  let cur = null;
-  cdp.on('Page.screencastFrame', f => {
-    cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => { });
-    if (!cur) return;
-    const n = cur.frames.length;
-    const file = `${cur.dir}/${String(n).padStart(5, '0')}.jpg`;
-    fs.writeFileSync(file, Buffer.from(f.data, 'base64'));
-    cur.frames.push({ f: path.basename(file), ts: f.metadata.timestamp, wall: ahora() });
-  });
+  fs.mkdirSync(OUT, { recursive: true }); fs.mkdirSync(P + 'descargas', { recursive: true });
+  const b = await chromium.launch({ headless: true, executablePath: EXE, args: ['--hide-scrollbars', '--force-color-profile=srgb', '--autoplay-policy=no-user-gesture-required'] });
+  const base = { viewport: { width: 1440, height: 810 }, deviceScaleFactor: 4 / 3, locale: 'es-ES', timezoneId: 'Europe/Madrid', acceptDownloads: true };
+  const H_ = {};
+  async function abrir(nombre) {
+    if (H_[nombre]) return H_[nombre];
+    const o = Object.assign({}, base);
+    if (nombre === 'b') o.storageState = P + 'estado-b.json';
+    const ctx = await b.newContext(o);
+    if (nombre === 'b') await cache.instalar(ctx);
+    await ctx.addInitScript({ path: `${W}/overlay.js` });
+    await ctx.addInitScript(css => { const f = () => { if (document.getElementById('v-ocultar')) return; const s = document.createElement('style'); s.id = 'v-ocultar'; s.textContent = css; document.documentElement.appendChild(s); }; if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', f); else f(); }, OCULTAR);
+    const page = await ctx.newPage();
+    const principal = page;
+    ctx.on('page', pg => { if (pg === principal) return; setTimeout(() => { console.log('   (pestaña nueva cerrada: ' + pg.url() + ')'); pg.close().catch(() => { }); }, 1500); });
+    page.on('dialog', d => { console.log('   (diálogo: ' + d.message().slice(0, 80) + ')'); d.dismiss().catch(() => { }); });
+    page.on('pageerror', e => console.log('   ! error de la página (' + nombre + '):', e.message.split('\n')[0]));
+    page.on('download', async d => { const f = P + 'descargas/' + Date.now() + '-' + d.suggestedFilename(); await d.saveAs(f).catch(() => { }); H_[nombre].ultimaDescarga = f; console.log('   (descarga ' + path.basename(f) + ')'); });
+    if (nombre === 'c') page.on('response', async r => { if (/\/alta$/.test(r.url()) && r.request().method() === 'POST') { try { const j = await r.json(); const f = P + 'altas-grabacion.json'; const l = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : []; l.push({ cuando: new Date().toISOString(), negocio: j.negocio, sesion: j.sesion, estado: r.status() }); fs.writeFileSync(f, JSON.stringify(l, null, 1)); console.log('   (alta creada: ' + j.negocio + ')'); } catch (e) { } } });
+    await page.goto(URL, { waitUntil: 'networkidle' });
+    await sleep(1500);
+    const h = new H(page, nombre);
+    const cdp = await ctx.newCDPSession(page);
+    h.cdp = cdp; h.cur = null;
+    cdp.on('Page.screencastFrame', f => {
+      cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => { });
+      const cur = h.cur; if (!cur) return;
+      const n = cur.frames.length;
+      const file = `${cur.dir}/${String(n).padStart(5, '0')}.jpg`;
+      fs.writeFileSync(file, Buffer.from(f.data, 'base64'));
+      cur.frames.push({ f: path.basename(file), ts: f.metadata.timestamp, wall: ahora() });
+    });
+    H_[nombre] = h;
+    return h;
+  }
 
   const resumen = fs.existsSync(`${OUT}/escenas.json`) ? JSON.parse(fs.readFileSync(`${OUT}/escenas.json`, 'utf8')) : {};
   for (const esc of guion.escenas) {
-    if (solo.length && !solo.includes(esc.id)) { if (esc.preparar && solo.length) { /* nada */ } continue; }
-    console.log('== escena', esc.id);
+    if (solo.length && !solo.includes(esc.id)) continue;
+    console.log('== escena', esc.id, '(' + (esc.ctx || 'a') + ')');
+    const h = await abrir(esc.ctx || 'a');
+    await h.p.bringToFront(); await sleep(300);   // si no, la página de otro navegador queda en segundo plano y no da fotogramas
     const dir = `${OUT}/${esc.id}`;
     fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
     if (esc.preparar) { try { await esc.preparar(h); } catch (e) { console.log('   ! preparar', e.message.split('\n')[0]); } }
     await h.v(() => window.__V.negro(true)); await sleep(500);
-    cur = { dir, frames: [] };
-    await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 92, maxWidth: 1920, maxHeight: 1080, everyNthFrame: 2 });
-    const t0 = ahora();
+    h.cur = { dir, frames: [] };
+    h.extra = []; h.cortes = [];
+    await h.cdp.send('Page.startScreencast', { format: 'jpeg', quality: 92, maxWidth: 1920, maxHeight: 1080, everyNthFrame: 2 });
+    const t0 = ahora(); h.t0 = t0;
     await sleep(100);
     await h.v(() => window.__V.negro(false));
     if (esc.rotulo) await h.rotulo(...esc.rotulo);
@@ -168,17 +207,19 @@ class H {
     await h.v(() => window.__V.negro(true));
     await sleep(500);
     const D = ahora() - t0;
-    await cdp.send('Page.stopScreencast');
+    await h.cdp.send('Page.stopScreencast');
     await sleep(200);
-    const fr = cur.frames; cur = null;
+    const fr = h.cur.frames; h.cur = null;
     const offs = fr.map(x => x.wall - x.ts).sort((a, b) => a - b);
     const off = offs[Math.floor(offs.length / 2)] || 0;
     const frames = fr.map(x => ({ f: x.f, t: x.ts + off - t0 }));
     resumen[esc.id] = { D, marcas, frames: frames.length };
-    fs.writeFileSync(`${dir}/frames.json`, JSON.stringify({ D, marcas, frames }));
+    fs.writeFileSync(`${dir}/frames.json`, JSON.stringify({ D, marcas, frames, extra: h.extra, cortes: h.cortes }));
     fs.writeFileSync(`${OUT}/escenas.json`, JSON.stringify(resumen, null, 1));
     console.log(`   ${D.toFixed(1)} s, ${frames.length} fotogramas (${(frames.length / D).toFixed(1)} fps)`);
+    h.extra = null; h.cortes = null;
     if (esc.despues) { try { await esc.despues(h); } catch (e) { } }
   }
+  console.log('imágenes IA nuevas gastadas en esta pasada:', cache.gastadas());
   await b.close();
 })();

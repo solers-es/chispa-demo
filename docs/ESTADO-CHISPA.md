@@ -150,8 +150,9 @@ Ninguno lo puede hacer un Claude: piden la cara, el DNI, el CIF o la tarjeta de 
 ### T3 · Precio final · ⏱ 5 min
 Hoy: Básico 39 €, Pro 79 €, Agencia 149 € al mes + IVA, 14 días gratis. Stalin decide; se cambia solo en
 `precios.js` y en la tabla de `legal/terminos.html`.
-**Ojo:** los vídeos ya grabados (`videos/`) dicen precios viejos → **regrabarlos** después (lo hace un
-Claude con el guion de `videos/GUION.md`, ≈ 1 h).
+**Vídeos regrabados el 07/10 por la tarde** (fecha en el nombre: 08-10-2026) con 39/79/149 € + IVA y todo
+lo nuevo: <https://solers-es.github.io/chispa-demo/videos/>. Si cambia el precio, se regraban con
+`videos/fuente/` (pasos en `videos/GUION.md`).
 
 ### T4 · Cuenta de Stripe (cobrar con tarjeta) · ⏱ 30 min + verificación de Stripe · necesita T1
 Pasos exactos en `docs/VENDER-CHISPA.md` → «D · El día de vender» (cuenta con `admin@solers.es`,
@@ -295,8 +296,15 @@ Resultado (07/10/2026, repaso de K):
   las que sí lleguen (al menos seguidores) y no se rompe.
 - **TikTok**: estadísticas sí (seguidores y vistas de los últimos 20 vídeos), comentarios no.
 - **Reseñas de TripAdvisor y TheFork**: no tienen API para contestar; Chispa redacta, copia y abre su panel.
-- Los **vídeos explicativos** grabados tienen los precios viejos (regrabar tras T3) y no enseñan el
-  Estudio para creadores.
+- **Encontrado al regrabar los vídeos (07/10 tarde):**
+  - **«Crear imagen con IA» fallaba SIEMPRE desde la web**: la página manda `semilla` y el servidor se la pasaba
+    a FLUX como `seed`, que Workers AI no admite (error 5006) → salía «Foto libre (la IA no estaba disponible)».
+    **Arreglado en `conectores/ia.js` pero SIN DESPLEGAR** (no tuve permiso para desplegar): falta
+    `npx wrangler deploy -c conectores/wrangler-api.toml`. Pruebas del servidor en verde (147).
+  - **Estadísticas da error en un negocio recién dado de alta** (`vStats2` en `chispa-agenda.js`:
+    «Cannot read properties of undefined (reading 'fecha')») cuando aún no hay datos. Sin arreglar.
+  - El vídeo vertical que hace la app sale **sin imagen** en el Chromium de pruebas de Playwright cuando elige
+    MP4 (con WebM sí sale bien). En Chrome/Safari normales no se ha visto; vigilarlo en Chrome de Windows/Linux.
 - **Copias**: dependen de que el MacBook de Stalin esté encendido a las 04:17 (si dormía, launchd la hace
   al despertar). La exportación deja la base ocupada unos segundos (de noche, sin efecto visible).
 - **Estudio para creadores**: escribe el plan y los guiones; **no graba** los vídeos. Los episodios

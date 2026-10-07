@@ -1,192 +1,235 @@
-# Guion · vídeos explicativos de Chispa
+# Guion · vídeos explicativos de Chispa (08/10/2026)
 
-Voz: «Marisol (Premium)», voz española del Mac. Grabado con el Chromium propio de Playwright sobre https://solers-es.github.io/chispa-demo/ (1920×1080, 30 fps). Subtítulos incrustados y en .srt.
+Voz: «Marisol (Premium)», voz española del Mac (frente a la voz en español del servidor de Chispa, MeloTTS, Marisol suena más natural; la del servidor sí se oye, tal cual, dentro del vídeo que hace Chispa en la sección 6). Grabado con el Chromium propio de Playwright sobre https://solers-es.github.io/chispa-demo/ con el servidor encendido (1920×1080, 30 fps). Subtítulos incrustados y en .srt. Sin música.
 
-Lo que se dice con honestidad en el vídeo: la publicación real aún no está activada (la demo de publicar avisa «No se sube nada de verdad»; «cuando conectes tus cuentas y cada red dé su permiso, se publica sola»), las reseñas y algunas estadísticas son de EJEMPLO, y la ficha de Google espera el permiso de Google. No salen precios, ni datos personales, ni el modo de administración.
+Lo que se dice con honestidad: «cuando conectes tus cuentas y cada red dé su permiso, se publica solo»; la demostración de publicar avisa «No se sube nada de verdad»; bandeja, reseñas y estadísticas de El Paraíso son de EJEMPLO (salvo Instagram, real); el pago con tarjeta aún no está activado. Lo que necesita sesión se grabó con un negocio de prueba («Café Aurora (ejemplo)») creado con el alta y borrado después; su código de acceso, su correo y su identificador salen tapados. No sale el modo Solers ni ningún código de El Paraíso.
 
-## Vídeo explicativo completo (6:58)
+Cómo se rehace: `videos/fuente/` (node tts.js largo → node motor.js largo → python3 montar.py largo → node entregar.js). Hace falta `privado/estado-b.json` (sesión de un negocio de prueba creado con el alta; no se sube nunca).
+
+## Vídeo explicativo completo (9:38)
 
 ### 0:00 · Portada
 
 *En pantalla:* Tarjeta de título «Chispa · Tu marketing en automático».
 
-> Esto es Chispa: el asistente que lleva las redes sociales de tu negocio mientras tú atiendes a tus clientes.
-> En los próximos minutos te enseño, paso a paso, todo lo que hace. El ejemplo es El Paraíso, un bar restaurante de Palma.
+> Esto es Chispa: tu marketing en automático. En unos minutos te enseño, paso a paso, todo lo que hace, con todo lo nuevo de esta versión.
+> Los ejemplos son El Paraíso, un bar restaurante de Palma, y un café de prueba que hemos creado para este vídeo.
 
-### 0:16 · 1 · Qué es Chispa y para quién
+### 0:17 · 1 · Qué es Chispa
 
-*En pantalla:* Página de presentación: titular y las seis cosas que hace; botón «Ver cómo funciona por dentro».
+*En pantalla:* Portada de la web: para negocios y creadores, en cualquier idioma.
 
-> Chispa es para el dueño de un negocio que no tiene tiempo, ni ganas, de pelearse con Instagram.
-> Escribe tus publicaciones, les pone imagen, las programa a la mejor hora, te ayuda a contestar a tus clientes y te dice qué funciona.
-> Y no hace falta saber nada de redes: se lo pides con tus palabras, como se lo pedirías a un empleado.
+> Chispa es un asistente con inteligencia artificial que lleva el marketing de tu negocio: escribe tus publicaciones, crea las imágenes, las programa y te ayuda a contestar a tus clientes.
+> Sirve para cualquier negocio de cara al público, un bar, una peluquería, un gimnasio o una tienda, y también para creadores de contenido.
+> Y trabaja en el idioma que quieras: español, inglés, alemán, francés… el que hablen tus clientes.
 
-### 0:38 · 2 · El Asistente
+### 0:45 · 2 · Darse de alta
 
-*En pantalla:* Escribir la idea, «Que Chispa lo escriba», versiones con enfoques distintos, chat «Pídeselo a Chispa».
+*En pantalla:* Alta sola en #alta: nombre, sector, idioma, correo, plan (39/79/149 € + IVA, de precios.js), 14 días gratis. El código de acceso sale TAPADO. Negocio de prueba «Café Aurora (ejemplo)», borrado después.
 
-> Este es el panel de tu negocio. A la izquierda, todas las secciones. Empezamos por el Asistente.
-> Le escribes la idea en una frase. Por ejemplo: paella de marisco este domingo.
-> Pulsas «Que Chispa lo escriba», y en un momento tienes varias versiones, cada una con su texto, sus etiquetas y su foto.
-> Cada versión usa un enfoque distinto: una va directa al grano, otra empuja con una oferta, y otra hace una pregunta para que la gente comente.
-> Y si prefieres hablar, abajo a la derecha está «Pídeselo a Chispa». Le dices «programa la semana» o «¿cuál es la mejor hora?», con tus palabras.
-> Y te contesta con la respuesta pensada para tu negocio.
+> Darse de alta es cosa de un minuto. Pulsas «Empieza gratis 14 días».
+> Escribes el nombre de tu negocio, tocas a qué te dedicas, y eliges el idioma de tus publicaciones.
+> Pones tu correo y eliges plan: Básico, 39 € al mes; Pro, 79 €; y Agencia, 149 €. Más IVA.
+> Los 14 días de prueba son gratis, sin tarjeta y sin permanencia.
+> Pulsas «Crear mi Chispa gratis», y en unos segundos tu Chispa está lista, con todo lo de tu sector ya puesto.
+> Te da un código de acceso: es tu llave para entrar desde cualquier aparato. Guárdalo y no se lo enseñes a nadie; por eso aquí sale tapado.
 
-### 1:21 · 3 · Estudio de contenido
+### 1:28 · 3 · Mi negocio
 
-*En pantalla:* Imagen con movimiento (zoom), sello de marca con el logo, botones Reservar/Ver carta/Cómo llegar, otra versión, subir foto, Editar.
+*En pantalla:* El Paraíso: datos y botones, pegar un enlace, tipo de negocio (sector) e idioma del contenido.
 
-> Ahora miramos una publicación de cerca.
-> La foto no está quieta: tiene un movimiento suave y el titular entra animado, como un vídeo corto. Se puede descargar como imagen o como vídeo vertical.
-> Arriba lleva el sello de tu marca, con tu logo y tu nombre. Sale en todas las imágenes.
-> Debajo van los botones que tu cliente puede pulsar: Reservar, Ver carta o Cómo llegar. Usan los enlaces de tu propio negocio.
-> ¿No te convence la foto? Pides otra versión. ¿Tienes una tuya? La subes desde el móvil, foto o vídeo.
-> Y con «Editar» lo cambias todo: el texto, el titular, los botones, la fecha, y el formato: post, carrusel, historia o reel.
+> En «Mi negocio» están los datos que Chispa usa en cada publicación: el nombre, la dirección, la web, la carta y las reservas.
+> Para rellenarlo no hace falta escribir: pegas cualquier enlace, de tu Instagram, tu web o tu ficha de Google, y Chispa lo coloca en su sitio.
+> Aquí está tu tipo de negocio. Con él, Chispa sabe qué botones poner, qué ideas proponerte y a qué horas publicar.
+> Y este es el idioma de tu contenido. Puede ser cualquiera: si tus clientes son turistas, Chispa les escribe en su idioma.
 
-### 2:05 · 4 · Publicar en todas las redes y «Así lo ve tu cliente»
+### 2:02 · 4 · Conexiones
 
-*En pantalla:* 10 vistas previas (Instagram feed/Stories/Reels, TikTok, Facebook, WhatsApp, Google, YouTube) y la demostración de publicación (marcada como demostración).
+*En pantalla:* Negocio de prueba con sesión: «Conectado en el servidor · vale para todos tus dispositivos», redes sin conectar, guía de 5 minutos.
 
-> Cuando te gusta, pulsas «Así lo ve tu cliente».
-> Ves la misma publicación tal como saldrá en cada sitio: Instagram, con sus historias y sus reels, TikTok, Facebook, WhatsApp, Google y YouTube.
-> Así no hay sorpresas: compruebas que se lee bien antes de que nadie la vea.
-> Y para publicar, eliges las redes y pulsas un botón. Mira la demostración.
-> Chispa marca Instagram, TikTok, Facebook y tu ficha de Google, y te enseña la vista previa de cada una.
-> Una cosa clara: en esta demostración no se sube nada de verdad. Hoy, Chispa te deja cada publicación preparada para subirla con un toque.
-> Cuando conectes tus cuentas, y cada red dé su permiso, se publica sola.
+> En «Conexiones» unes tus redes: Instagram y Facebook, tu ficha de Google, YouTube y TikTok.
+> Tu negocio vive en el servidor de Chispa: entras una vez en cada aparato, y lo que conectas vale para todos, el móvil, la tablet y el ordenador.
+> Debajo tienes una guía, paso a paso, para dejarlo todo listo en cinco minutos.
+> Y una cosa clara: cuando conectes tus cuentas y cada red dé su permiso, se publica solo. Hasta entonces, Chispa te lo deja todo preparado para subirlo con un toque.
 
-### 2:52 · 5 · Calendario
+### 2:35 · 5 · Crear una publicación
 
-*En pantalla:* Semana con colores por red y estados, mejores horas, «Planificar mi semana», promo por franja, vista mes.
+*En pantalla:* Idea → 4 versiones → «Otra versión» con IMAGEN IA REAL del servidor (FLUX) → sello de marca → «Otros idiomas» (traducción real al inglés y al alemán) → «Reaprovechar».
 
-> Todo lo que preparas va al calendario. Cada color es una red, y cada publicación dice si está en borrador, programada o publicada.
-> Las casillas con brillo son las mejores horas para un restaurante en Palma.
-> Con «Planificar mi semana», Chispa reparte tus publicaciones en esas horas y te explica por qué: el menú, a las once y media; los planes de noche, a las seis y media; y los reels, a las ocho y media.
-> También entiende franjas y promociones. Le puedes decir: «pon una promo el viernes de seis a once de la noche, con cuatro historias», y lo reparte él solo.
-> Las publicaciones se arrastran de un día a otro, y lo puedes ver por semana, por mes o en lista. Y si quieres, te avisa a la hora de publicar.
+> Ahora, lo principal: crear una publicación. Le escribes la idea en una frase.
+> Pulsas «Que Chispa lo escriba», y te prepara cuatro versiones, cada una con un enfoque distinto.
+> Y la imagen la crea la inteligencia artificial, de verdad: pulsas «Otra versión», y la pinta a partir de tu texto.
+> Encima lleva el sello de tu marca, con tu nombre, y debajo los botones que tu cliente puede pulsar.
+> Con «Otros idiomas» la traduce. Por ejemplo, al inglés y al alemán, juntos en la misma publicación.
+> Y si tienes un texto largo, un artículo o el guion de un vídeo, «Reaprovechar» lo convierte en varias publicaciones, para cada red.
 
-### 3:37 · 6 · Reseñas
+### 3:22 · 6 · Vídeo con voz y subtítulos
 
-*En pantalla:* Google, TripAdvisor y TheFork; respuesta en el idioma del cliente; otra versión; responder; negativas siempre a mano; reseñas de ejemplo.
+*En pantalla:* Ventana «Descargar para redes»: voz de la IA y subtítulos; se graba el vídeo vertical (espera recortada) y se reproduce con su sonido.
+
+> De cada publicación, Chispa te hace también un vídeo vertical, para historias, reels o TikTok.
+> Lleva voz en off de la inteligencia artificial y subtítulos palabra a palabra. Y lo que dice, lo puedes cambiar.
+> Pulsas «Descargar vídeo vertical», y Chispa lo graba en un momento.
+> Así queda. Escúchalo.
+
+### 3:59 · 7 · Así lo ve tu cliente
+
+*En pantalla:* 10 vistas previas y demostración de publicar (marcada: «No se sube nada de verdad»).
+
+> Antes de publicar, pulsas «Así lo ve tu cliente».
+> Y ves la publicación tal como saldrá en cada sitio: Instagram, con sus historias y sus reels, TikTok, Facebook, WhatsApp, Google y YouTube.
+> Para publicar, eliges las redes y pulsas un botón. Esto es la demostración: aquí no se sube nada de verdad.
+> Cuando conectes tus cuentas y cada red dé su permiso, se publica solo, a su hora.
+
+### 4:29 · 8 · Calendario
+
+*En pantalla:* Semana, franja de promo, «Promo para llenar» (historias + publicación + estado de WhatsApp, «Todo cuadrado»), «promo el sábado todo el día».
+
+> En el calendario ves tu semana. Cada color es una red, y cada publicación dice si está en borrador, programada o publicada.
+> Ahora entiende franjas: una promoción de seis a nueve de la tarde, con varias historias repartidas, o un día entero.
+> Con «Promo para llenar», Chispa la monta en tus horas flojas: historias, una publicación y un aviso en el estado de WhatsApp, todo con el botón «Reservar».
+> Y comprueba que no se pisa con nada. Pulsas «Crear la promo», y listo.
+> También se lo pides con tus palabras: «promo el sábado todo el día», y la pone como día entero.
+
+### 5:08 · 9 · Comentarios y mensajes
+
+*En pantalla:* Bandeja con etiquetas y respuesta propuesta (con el enlace de reservas); «Enviar»; datos de EJEMPLO.
+
+> En «Comentarios y DMs» tienes juntos los comentarios, los mensajes privados y las reseñas de todas tus redes.
+> Chispa les pone etiquetas, reserva, pregunta, queja, y te propone la respuesta.
+> Si alguien quiere reservar para ocho, la contestación ya lleva tu enlace de reservas.
+> Pero nada sale sin tu visto bueno: la envías con un toque, o la cambias.
+> Estos mensajes son de ejemplo. Cuando entras con tu negocio, ves los de verdad.
+
+### 5:37 · 10 · Reseñas
+
+*En pantalla:* Google, TripAdvisor y TheFork; respuesta en inglés; negativas siempre a mano; reseñas de ejemplo.
 
 > En Reseñas, Chispa junta las opiniones de Google, TripAdvisor y TheFork, y te propone una respuesta para cada una.
 > Contesta en el tono de tu negocio y en el idioma del cliente: si te escriben en inglés, responde en inglés.
-> Pulsas «Responder» y listo. Si no te convence, pides otra versión, o la cambias a mano.
 > Las buenas se pueden contestar solas. Las negativas, nunca: Chispa te avisa para que las mires tú, con calma.
-> Lo que ves aquí son reseñas de ejemplo. Al conectar tu ficha de Google, Chispa trabaja con las de verdad.
+> Estas reseñas son de ejemplo. Al conectar tu ficha de Google, trabaja con las de verdad.
 
-### 4:15 · 7 · Comentarios y mensajes
+### 6:06 · 11 · Automatizaciones
 
-*En pantalla:* Respuesta sugerida y «Aprobar y enviar».
+*En pantalla:* Palabra clave → mensaje privado, reseñas según nota, recordatorio, resumen semanal; con cuenta, lo hace el servidor.
 
-> Lo mismo con los comentarios y los mensajes privados de Instagram y Facebook.
-> Chispa prepara la respuesta: si alguien pregunta el horario, o quiere reservar para ocho, ya tienes la contestación escrita.
-> Pero no sale nada sin tu visto bueno. La apruebas con un clic, o la cambias.
+> En Automatizaciones decides lo que Chispa hace sola.
+> Por ejemplo: alguien comenta «CARTA» en tu publicación, y le llega por privado el enlace a tu carta.
+> Las reseñas de cuatro y cinco estrellas se pueden contestar solas. Las negativas, nunca: te avisa para que las veas tú.
+> Te recuerda publicar si no tienes nada programado, y te manda un resumen cada semana.
+> Con tu cuenta, todo esto lo hace el servidor, aunque tengas la app cerrada.
 
-### 4:34 · 8 · Automatizaciones
+### 6:35 · 12 · Anuncios
 
-*En pantalla:* Interruptores, qué funciona ya y qué permiso falta; «Ver cómo queda» del menú del día.
+*En pantalla:* Campaña Meta o Google, presupuesto, tope «ni un euro más», simulación (con cuenta se crea en pausa).
 
-> En Automatizaciones enciendes lo que quieres que Chispa haga sola.
-> Proponer respuesta a cada reseña, contestar solas las de cuatro y cinco estrellas, avisarte de las negativas, publicar el menú del día a las once, o recordar a tus clientes su reserva por WhatsApp.
-> Cada una dice con sinceridad qué funciona ya y qué permiso falta. Si falta una conexión, la dejas encendida, y empieza sola cuando conectes.
+> En Anuncios preparas una campaña para Instagram y Facebook, o para las búsquedas de Google.
+> Eliges el objetivo, el texto, el presupuesto al día, cuántos días, y la zona alrededor de tu local.
+> Y Chispa te dice el tope: nunca se gasta ni un euro más de lo que pones.
+> En la demostración solo se simula. Con tu cuenta conectada, la campaña se crea en pausa, y la lanzas tú cuando quieras.
 
-### 5:01 · 9 · Anuncios
+### 7:02 · 13 · Estadísticas
 
-*En pantalla:* Objetivo, público y presupuesto; Chispa prepara texto, botones y gasto al mes.
+*En pantalla:* Día a día (cifras de EJEMPLO marcadas), consejos con tus datos, Instagram real (1.206 seguidores).
 
-> En Anuncios eliges qué quieres conseguir, por ejemplo más reservas, a quién va dirigido y cuánto quieres gastar al día.
-> Chispa prepara el texto del anuncio con sus botones, y te calcula lo que gastas al mes.
-> Lo dejas listo para lanzarlo desde tu cuenta de anuncios de Meta.
+> En Estadísticas ves el día a día: alcance, visualizaciones, interacciones y seguidores. Y de Google, cuánta gente pide cómo llegar o te llama.
+> Estas cifras son de ejemplo, y lo pone bien claro. Con tus redes conectadas, el servidor las recoge solo cada mañana.
+> Lo mejor son los consejos hechos con tus datos: tus días fuertes, y qué hacer para que te vea más gente.
+> Y los de Instagram sí son reales: El Paraíso tiene hoy mil doscientos seis seguidores.
 
-### 5:20 · 10 · Estadísticas
+### 7:33 · 14 · Estudio para creadores
 
-*En pantalla:* Instagram real (1.206 seguidores), cifras de EJEMPLO marcadas, consejos del algoritmo.
+*En pantalla:* Miniserie con IA real sobre «Recetas de café para hacer en casa», pasada al calendario como borrador; Pro y Agencia.
 
-> En Estadísticas ves lo que pasa en tus redes. Los datos de Instagram son reales: El Paraíso tiene hoy mil doscientos seis seguidores.
-> Lo que lleva la etiqueta «ejemplo» es para enseñarte el panel. Cuando conectes las redes, se rellena solo.
-> Y lo más útil son los consejos: Chispa te dice a qué hora te ven más, qué formato funciona mejor y cuántas veces publicar.
+> Para creadores de contenido, y para negocios que quieren hacer vídeos, está el Estudio para creadores.
+> Le dices un tema, por ejemplo: recetas de café para hacer en casa. Y la inteligencia artificial escribe una miniserie, episodio a episodio, con el gancho de cada uno.
+> Luego la pasas al calendario: entra como borrador, con fecha y hora, esperando a que grabes cada vídeo.
+> Viene en los planes Pro y Agencia, y escribe en el idioma que elijas.
 
-### 5:45 · 11 · Mi negocio
+### 8:14 · 15 · Crecer
 
-*En pantalla:* Datos del negocio, botones Reservar/Ver carta/Cómo llegar, ficha de Google, pegar un enlace.
+*En pantalla:* Guía para crecer: OFICIAL / ESTUDIO / OPINIÓN, mejores horas, no te penalicen.
 
-> En Mi negocio están tus datos: el nombre, la dirección, tu web, tu carta y tus reservas.
-> Estos datos los usan todos los botones de Chispa. «Reservar» lleva a tu página de reservas, «Ver carta» a tu carta, y «Cómo llegar» abre Google Maps.
-> También lleva tu ficha de Google, que es lo primero que ve quien te busca: novedades, ofertas, horario y fotos, en cuanto Google dé el permiso.
-> Y para rellenarlo no hace falta escribir nada: pegas cualquier enlace, y Chispa lo coloca en su sitio.
+> En «Crecer» tienes una guía para conseguir más clientes desde las redes, hecha para tu tipo de negocio.
+> Cada consejo dice de dónde sale: si lo dice la propia red, si lo mide un estudio, o si es una opinión razonada.
+> Cómo hacer un vídeo que enganche, cuánto publicar, a qué hora, y qué no hacer para que no te penalicen.
 
-### 6:17 · 12 · Conexiones
+### 8:36 · 16 · Visita guiada
 
-*En pantalla:* Guía de 5 minutos: Google, Instagram, Facebook, TikTok, YouTube, WhatsApp.
+*En pantalla:* «Ver cómo funciona»: elegir sector y recorrido paso a paso con Siguiente.
 
-> Por último, Conexiones: una guía de cinco minutos para unir tu ficha de Google, Instagram, Facebook, TikTok, YouTube y WhatsApp.
-> Se hace una sola vez. A partir de ahí, Chispa usa tus enlaces en cada publicación, y queda lista para publicar sola en cuanto cada red apruebe la conexión.
+> Y si quieres que la propia Chispa te lo enseñe, pulsa «Ver cómo funciona».
+> Eliges un tipo de negocio, un restaurante, una peluquería, un gimnasio, y te lleva paso a paso por la app de verdad, con un negocio de ejemplo.
+> En cada paso te señala qué es cada cosa. Vas con «Siguiente», a tu ritmo.
 
-### 6:38 · Cierre
+### 8:59 · 17 · Mi plan
 
-*En pantalla:* Tarjeta final con la llamada a la acción y la dirección de la demo.
+*En pantalla:* Plan Pro en prueba, uso, elegir plan, pago aún no activado, baja con borrado (correo y negocio tapados).
 
-> Lo has visto con un bar restaurante, pero Chispa está pensada para cualquier negocio de cara al público: en Mi negocio eliges tu sector y el tono con el que quieres hablar.
-> Tú atiendes tu negocio; Chispa llena tus redes.
-> ¿Lo probamos con el tuyo? Pídenos una demostración.
+> En «Mi plan» ves tu plan, los días de prueba que te quedan, y lo que llevas usado este mes.
+> Puedes cambiar de plan cuando quieras. De momento el pago con tarjeta no está activado, así que la prueba no te cobra nada.
+> Y sin permanencia: te das de baja cuando quieras, y se borran todos tus datos.
 
-## Corte corto para redes (1:35)
+### 9:21 · 18 · Cierre
+
+*En pantalla:* Tarjeta final: 14 días gratis y la dirección de la demo.
+
+> Chispa: para tu negocio o para tu canal, y en tu idioma.
+> Cuando conectes tus cuentas y cada red dé su permiso, se publica solo.
+> Pruébalo 14 días gratis, sin tarjeta. Tú atiendes tu negocio; Chispa llena tus redes.
+
+## Corte corto para redes (1:37)
 
 ### 0:00 · Portada
 
 *En pantalla:* «¿No te da la vida para las redes?»
 
-> ¿Tienes un negocio y no te da la vida para las redes sociales? Esto es Chispa: el asistente que lleva tus redes mientras tú atiendes a tus clientes.
+> ¿Tienes un negocio, o un canal, y no te da la vida para las redes? Esto es Chispa: tu marketing en automático.
 
-### 0:10 · 1 · Le dices la idea
+### 0:08 · 1 · Le dices la idea
 
-*En pantalla:* Escribir la idea, versiones con foto en movimiento y sello de marca, otra versión.
+*En pantalla:* Publicación escrita, imagen IA real con sello y traducción al inglés y al alemán.
 
-> Le dices la idea en una frase,
-> y Chispa escribe la publicación, le pone una foto con movimiento y el sello de tu marca.
-> ¿No te convence? Pides otra versión, o subes tu propia foto desde el móvil.
+> Le dices la idea en una frase, y Chispa escribe la publicación.
+> La imagen la crea la inteligencia artificial, con el sello de tu marca.
 
-### 0:29 · 2 · Así lo ve tu cliente
+### 0:28 · 2 · Y el vídeo
+
+*En pantalla:* Vídeo vertical con voz y subtítulos, con su sonido.
+
+> Y te hace el vídeo vertical, con voz y subtítulos.
+> Escucha.
+
+### 0:44 · 3 · Así lo ve tu cliente
 
 *En pantalla:* Vistas previas en todas las redes.
 
 > Antes de publicar, ves cómo quedará en Instagram, TikTok, Facebook, WhatsApp, Google y YouTube.
 
-### 0:38 · 3 · Publicar
+### 0:54 · 4 · Calendario
 
-*En pantalla:* Demostración de publicación (marcada como demostración).
+*En pantalla:* «Promo para llenar» y «Todo cuadrado».
 
-> Eliges las redes, y queda todo listo para publicar con un toque.
+> Te monta la semana, con franjas y promociones para llenar tus horas flojas.
+> Y comprueba que no se pisa con nada.
 
-### 0:49 · 4 · Calendario
-
-*En pantalla:* «Planificar mi semana» y promo por franja.
-
-> Con un toque, reparte tu semana en las mejores horas, con tus promociones incluidas.
-> Y entiende frases como: «pon una promo el viernes de seis a once, con cuatro historias».
-
-### 1:02 · 5 · Comentarios y mensajes
+### 1:06 · 5 · Mensajes y reseñas
 
 *En pantalla:* Respuesta lista para aprobar.
 
-> Te deja escritas las respuestas a comentarios y mensajes. Tú solo las apruebas.
+> Te deja escritas las respuestas a comentarios, mensajes y reseñas, en el idioma de cada cliente. Tú solo las apruebas.
 
-### 1:09 · 6 · Reseñas
+### 1:16 · 6 · 14 días gratis
 
-*En pantalla:* Respuesta en inglés y filtro de negativas.
+*En pantalla:* Precios de la web (desde 39 € + IVA).
 
-> Contesta tus reseñas en el idioma de cada cliente. Las negativas, siempre las revisas tú.
+> Desde 39 € al mes más IVA, con 14 días gratis y sin tarjeta.
 
-### 1:17 · 7 · Estadísticas
-
-*En pantalla:* Cifras y consejos.
-
-> Y te dice qué funciona: a qué hora te ven más, y qué tipo de publicación te trae más gente.
-
-### 1:24 · Cierre
+### 1:23 · Cierre
 
 *En pantalla:* Llamada a la acción.
 
-> Al conectar tus cuentas, se publica solo.
-> Tú atiendes tu negocio; Chispa llena tus redes. Pide tu demostración.
+> Para negocios y para creadores de contenido, en cualquier idioma.
+> Cuando conectes tus cuentas y cada red dé su permiso, se publica solo.
+> Tú atiendes tu negocio; Chispa llena tus redes.

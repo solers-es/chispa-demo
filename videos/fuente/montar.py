@@ -25,6 +25,18 @@ for esc in orden:
         print('falta escena', esc); continue
     d = json.load(open(fj))
     D, marcas, frames = d['D'], d['marcas'], d['frames']
+    extras = d.get('extra') or []
+    for a, b in sorted(d.get('cortes') or [], reverse=True):   # esperas que se quitan
+        L = b - a
+        frames = [f for f in frames if not (a <= f['t'] < b)]
+        for f in frames:
+            if f['t'] >= b: f['t'] -= L
+        marcas = [m - L if m >= b else m for m in marcas]
+        for x in extras:
+            if x['t'] >= b: x['t'] -= L
+        D -= L
+        print(f'  {esc}: quitados {L:.1f} s de espera')
+    d['extra'] = extras
     frames = [f for f in frames if f['t'] < D]
     if not frames:
         print('sin fotogramas', esc); continue
@@ -59,6 +71,9 @@ for esc in orden:
             dd = dur * len(x) / tot
             subs.append((ini, ini + dd, x))
             ini += dd
+    for x in d.get('extra') or []:   # sonido del vídeo que hace Chispa dentro de la escena
+        if os.path.exists(x['f']):
+            voz.append((off + x['t'], x['f']))
     off += D
 total = off
 print(f'duración total {total:.1f} s ({int(total//60)}:{int(total%60):02d}), {len(lista)} fotogramas, {len(voz)} frases')
@@ -70,16 +85,19 @@ with open(f'{G}/lista.txt', 'w') as fh:
     fh.write(f"file '{lista[-1][0]}'\n")
 
 # pista de voz
+import array
 n = int(total * RATE) + RATE
-buf = bytearray(n * 2)
+buf = array.array('h', bytes(n * 2))
 for ini, w in voz:
     with wave.open(w) as wf:
         assert wf.getframerate() == RATE and wf.getnchannels() == 1
-        data = wf.readframes(wf.getnframes())
-    p = int(ini * RATE) * 2
-    buf[p:p + len(data)] = data[:max(0, len(buf) - p)]
+        data = array.array('h', wf.readframes(wf.getnframes()))
+    p = int(ini * RATE)
+    for k in range(min(len(data), n - p)):   # se suma (mezcla), con tope
+        s = buf[p + k] + data[k]
+        buf[p + k] = 32767 if s > 32767 else (-32768 if s < -32768 else s)
 with wave.open(f'{G}/voz.wav', 'wb') as wf:
-    wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(RATE); wf.writeframes(bytes(buf))
+    wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(RATE); wf.writeframes(buf.tobytes())
 
 def ts(s):
     ms = int(round(s * 1000)); h, ms = divmod(ms, 3600000); m, ms = divmod(ms, 60000); se, ms = divmod(ms, 1000)
