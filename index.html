@@ -270,7 +270,7 @@
       <button class="btn pp talk" onclick="abrirChat()"><span class="mic">🎤</span> TOCA PARA HABLAR</button>
       <button class="btn g" onclick="vista('panel')">Ver cómo funciona por dentro ›</button>
     </div>
-    <div class="mini">Habla con Chispa y te lo explica en 30 segundos · <span class="chip">demo</span> la voz real se conecta con ElevenLabs</div>
+    <div class="mini">Habla con Chispa y te lo explica en 30 segundos · con la voz de tu navegador</div>
   </div></div>
 
   <section><div class="wrap">
@@ -414,7 +414,7 @@ var GUION={
   "¿Cuánto cuesta?":"Desde 39 €/mes + IVA el plan Básico. El que más eligen es el Pro, 79 €/mes + IVA. Pruebas 14 días gratis y sin permanencia. 💜",
   "¿Y si no sé de redes?":"¡Perfecto, para eso estoy yo! Tú me dices una idea en una frase (o ni eso) y yo hago el resto. No necesitas saber diseñar, ni escribir, ni a qué hora publicar. Yo aprendo qué funciona en tu negocio.",
   "Quiero probarlo":"¡Me encanta! 🎉 Te activo una cuenta de prueba y en 2 minutos tienes tu primera semana de publicaciones lista. Pulsa “Ver cómo funciona por dentro” y mira el panel con un negocio de ejemplo.",
-  "¿Publicas los anuncios?":"Te dejo el anuncio montado (texto, imagen y público) listo para lanzar en Meta. En el plan Equipo puedo gestionarlos yo directamente una vez conectas tu cuenta publicitaria. 📣"
+  "¿Publicas los anuncios?":"Sí, en los planes Pro y Agencia: te monto el anuncio (texto, imagen, presupuesto y público de tu zona) y, con tu cuenta publicitaria de Meta conectada, lo dejo creado en pausa. Tú lo activas con un toque y ves los clics y lo gastado. 📣"
 };
 var PREGS=["¿Qué haces exactamente?","¿Cuánto cuesta?","¿Y si no sé de redes?","¿Publicas en TikTok?","¿Haces vídeos?","¿En otros idiomas?","¿Publicas los anuncios?","Quiero probarlo"];
 function abrirChat(){
@@ -441,7 +441,7 @@ function cerebroChat(t){
   if(has("anuncio","anuncios","publicidad","meta","ads"))return GUION["¿Publicas los anuncios?"];
   if(has("probar","prueba","empezar","quiero","contratar","apuntar","alta"))return GUION["Quiero probarlo"];
   if(has("tiktok","instagram","facebook","publicar","redes","programar","subir","youtube"))return "Publico en Instagram, Facebook, TikTok y YouTube por ti, a la hora en que más te ven. Tú solo apruebas y yo lo subo. 📲 ¿Quieres verlo en el panel de ejemplo?";
-  if(has("vídeo","video","imagen","reel","carrusel","foto","contenido"))return "Yo creo el contenido: escribo el texto, genero la imagen o el vídeo con IA, le pongo música y subtítulos, y lo dejo listo. 🎬 ¿De qué es tu negocio?";
+  if(has("vídeo","video","imagen","reel","carrusel","foto","contenido"))return "Yo creo el contenido: escribo el texto, genero la imagen o el vídeo con IA, le pongo voz y subtítulos, y lo dejo listo. 🎬 ¿De qué es tu negocio?";
   if(has("restaurante","bar","comida","platos","cocina","menú","menu","paella","cafetería"))return "¡Con un restaurante hago maravillas! 😋 Fotos de los platos, vídeos con música, la oferta del día, reservas… ¿Te preparo una promoción?";
   if(has("idioma","inglés","ingles","alemán","aleman","francés","frances","turista"))return "Sí, creo el contenido en varios idiomas (español, inglés, alemán, francés) — ideal para turistas en Mallorca. 🌍 ¿En qué idioma lo quieres?";
   if(has("cara","avatar","mi foto","mi imagen","rostro"))return "¡Claro! Puedo ponerte TU cara: subes una foto y tu avatar habla y responde por ti. 🤳 ¿Lo probamos?";
@@ -1142,6 +1142,8 @@ else if(_h.indexOf("panel")>=0){vista("panel");}
 <script src="tour.js"></script>
 <!-- IA de verdad (imagen, voz y subtítulos, idiomas, reaprovechar, claves de API): trabajador G -->
 <script src="chispa-ia.js"></script>
+<!-- Cortar un vídeo largo en clips verticales, en el propio aparato (trabajador J) -->
+<script src="chispa-clips.js"></script>
 <!-- Bandeja real, estadísticas día a día, anuncios y automatizaciones del servidor (trabajador J).
      Es un módulo: se ejecuta después de todo lo anterior y envuelve panel() el último. -->
 <link rel="stylesheet" href="chispa-panel.css">

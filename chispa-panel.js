@@ -350,7 +350,7 @@ import { resumen, serieEjemplo, REDES_M, NOMBRE_CAMPO } from "./conectores/conse
   /* =====================================================================
      AUTOMATIZACIONES (reglas del servidor) y AVISOS
      ===================================================================== */
-  let REG = null, AVI = null, cargandoR = false;
+  let REG = null, AVI = null, cargandoR = false, avisado = false;
   const DIAS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
   const TIPOS_R = {
     palabra_dm: { ic: "📩", nm: "Palabra clave en un comentario → mensaje privado con enlace", d: "Alguien comenta la palabra (por ejemplo CARTA) en Instagram o Facebook y le llega por privado el enlace. Es la «respuesta privada» oficial de Meta: una por comentario.", def: { palabra: "CARTA", redes: ["ig", "fb"], mensaje: "¡Hola! 👋 Aquí la tienes: {enlace}\n¿Te reservamos mesa?", enlace: "", publica: "¡Te la mandamos por privado! 📩" }, pro: true },
@@ -362,7 +362,11 @@ import { resumen, serieEjemplo, REDES_M, NOMBRE_CAMPO } from "./conectores/conse
     if (!enServidor() || cargandoR) return;
     cargandoR = true;
     Promise.all([pedir("GET", "/reglas"), pedir("GET", "/avisos")]).then(([r, a]) => { REG = r; AVI = a; }, (e) => { REG = { reglas: [], registro: [], error: e.message }; AVI = { avisos: [] }; })
-      .then(() => { cargandoR = false; pintarNav(); if (TAB === "automatizaciones") pintar("automatizaciones"); });
+      .then(() => {
+        cargandoR = false; pintarNav(); if (TAB === "automatizaciones") pintar("automatizaciones");
+        const nuevos = avisos().filter((a) => !a.leido);
+        if (nuevos.length && !avisado) { avisado = true; const p = nuevos.find((a) => a.tipo === "prueba"); aviso("🔔 " + (p ? p.titulo : nuevos.length + " aviso(s) de Chispa") + " · míralo en Automatizaciones"); }
+      });
   }
   function reglas() { return enServidor() ? (REG && REG.reglas) || [] : demo().reglas; }
   function avisos() { return enServidor() ? (AVI && AVI.avisos) || [] : demo().avisos; }

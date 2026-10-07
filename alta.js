@@ -364,6 +364,13 @@
       }).join('');
       d.innerHTML = '<p style="font-size:12.5px;color:var(--tx2);margin:8px 0">' + r.clientes.length + ' negocios · pago con tarjeta: <b>' + (r.pago.encendido ? 'encendido' : 'apagado (modo prueba, no se cobra)') + '</b></p>' +
         '<div class="al-scroll"><table class="al-tabla"><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Pago</th><th>Uso</th><th></th></tr>' + filas + '</table></div>';
+      // avisos del servidor (trabajador J, panel-real.js): pruebas que acaban en 3 días o menos y reseñas negativas
+      llamar('GET', '/admin/avisos', undefined, { 'X-Chispa-Admin': claveAdmin() }).then(function (av) {
+        var d2 = $('alAdmL'); if (!d2 || !av.avisos || !av.avisos.length) return;
+        d2.insertAdjacentHTML('beforeend', '<h4 style="margin:14px 0 6px">🔔 Avisos</h4>' + av.avisos.slice(0, 20).map(function (a) {
+          return '<div style="font-size:12.5px;color:var(--tx2);border-top:1px solid var(--line);padding:5px 0"><b>' + esc(a.nombre || a.negocio) + '</b> · ' + esc(a.titulo) + ' <span style="color:var(--tx3)">' + esc(fecha(a.creado)) + '</span></div>';
+        }).join(''));
+      }, function () {});
     }, function (e) { if (e.status === 401) ls(LS_ADMIN_SRV, null); var d = $('alAdmL'); if (d) d.innerHTML = '<p style="color:#fb7185">' + esc(e.message) + '</p>'; });
   };
   API._adminK = function () { var v = (($('alAdmK') || {}).value || '').trim(); if (!v) return; ls(LS_ADMIN_SRV, v); cerrarModal(); API._admin(); };

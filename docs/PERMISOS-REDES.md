@@ -43,7 +43,10 @@ Conviene que las revise un abogado/gestoría.
 7. **Revisión de la app** (*Revisión de la app → Permisos y funciones*), pedir **acceso avanzado** a:
    `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `pages_manage_engagement`,
    `instagram_basic`, `instagram_content_publish`, `instagram_manage_comments`,
-   `instagram_manage_insights`, `business_management`.
+   `instagram_manage_insights`, `business_management`, y para la bandeja, las estadísticas y los
+   anuncios (trabajador J): `pages_messaging`, `instagram_manage_messages`, `read_insights`,
+   `ads_management`, `ads_read`. Los anuncios piden además una **cuenta publicitaria con forma de
+   pago** en el portfolio de cada negocio.
    Para cada uno: explicar el uso en una frase y **un vídeo de pantalla** (Chispa → Conectar →
    permiso → crear publicación → aparece en Instagram/Facebook). Lo grabamos con Stalin.
 8. Pasar la app a **modo «Activo»** (Live).
@@ -56,7 +59,7 @@ Conviene que las revise un abogado/gestoría.
    condiciones**, y **verificar el dominio** donde están (TikTok da un fichero o registro para subir).
 3. Añadir productos **Login Kit** y **Content Posting API** (activar *Direct Post*).
    *Redirect URI*: `https://chispa-api.solers.workers.dev/oauth/vuelta`.
-4. Ámbitos: `user.info.basic`, `video.publish`, `video.upload`.
+4. Ámbitos: `user.info.basic`, `video.publish`, `video.upload`, y para las estadísticas `user.info.stats` y `video.list` (producto **Display API**). Los comentarios de TikTok NO se pueden leer con esta API: solo con la API de empresa (otra solicitud aparte).
 5. Copiar **Client key** y **Client secret** → `wrangler secret put TIKTOK_CLIENT_KEY` y `TIKTOK_CLIENT_SECRET`.
 6. **Submit for review** con vídeo de demostración. Mientras no se apruebe, la app es *sandbox*:
    solo cuentas de prueba añadidas y los vídeos salen **solo para mí** (por eso el servidor tiene

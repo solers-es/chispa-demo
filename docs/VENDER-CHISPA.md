@@ -104,7 +104,7 @@ Es lo que dice `docs/SERVIDOR-CHISPA.md`: cada red revisa la app (Meta *App Revi
 
 ## 4 · Límites conocidos (dicho claro)
 
-- Las **diferencias entre planes que hace cumplir el servidor** son las cuatro cifras (publicaciones/mes, redes, imágenes IA/día, usuarios) y que tras la prueba sin pagar no publica. Las frases de la portada como «Anuncios preparados» o «Soporte prioritario» no están bloqueadas por plan.
+- Las **diferencias entre planes que hace cumplir el servidor** son las cuatro cifras (publicaciones/mes, redes, imágenes IA/día, usuarios), que tras la prueba sin pagar no publica, y (desde el 07/10, `conectores/panel-real.js`) que **«Anuncios preparados»** y **«Respuestas a comentarios y reseñas»** (contestar desde Chispa y las reglas automáticas de respuesta) son solo de **Pro y Agencia**. «Soporte prioritario» es un compromiso de personas, no de código.
 - La IA de imágenes tiene además el **cupo gratuito de la cuenta de Cloudflare** (lo lleva `conectores/ia.js` de G): con muchos clientes hay que pasar Workers AI a pago.
 - El **correo no se verifica** todavía (punto H). Hay tope de 3 Chispas por correo.
 - La entrada en modo cliente usa el enlace de cliente de `chispa-cuentas.js`. Si en ese navegador había otra cosa (p. ej. la demostración de El Paraíso), se guarda una copia y se recupera abriendo `…/index.html#recuperar`.
