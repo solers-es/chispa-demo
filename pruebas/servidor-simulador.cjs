@@ -34,6 +34,7 @@ function crearD1(db) {
 }
 
 /* ---------- redes imitadas ---------- */
+const estado = { cuotaGbp0: false }; // true = Google aún no ha aprobado la API de la ficha (cuota 0)
 const registro = []; // lo que el Worker ha pedido a las «redes»
 let nGoogle = 0;
 const respuestas = [
@@ -48,7 +49,7 @@ const respuestas = [
     nGoogle++; return [200, { access_token: 'g-acceso-' + nGoogle, expires_in: 3600 }];
   }],
   [/openidconnect\.googleapis\.com\/v1\/userinfo/, () => [200, { email: 'cuenta-prueba@ejemplo.com' }]],
-  [/mybusinessaccountmanagement\.googleapis\.com\/v1\/accounts/, () => [200, { accounts: [{ name: 'accounts/111' }] }]],
+  [/mybusinessaccountmanagement\.googleapis\.com\/v1\/accounts/, () => (estado.cuotaGbp0 ? [429, { error: { code: 429, message: "Quota exceeded for quota metric 'Requests' (0 per minute)", status: 'RESOURCE_EXHAUSTED' } }] : [200, { accounts: [{ name: 'accounts/111' }] }])],
   [/mybusinessbusinessinformation\.googleapis\.com\/v1\/accounts\/111\/locations/, () => [200, { locations: [{ name: 'locations/222', title: 'El Paraíso (prueba)' }] }]],
   [/mybusiness\.googleapis\.com\/v4\/accounts\/111\/locations\/222\/localPosts/, () => [200, { name: 'accounts/111/locations/222/localPosts/9' }]],
   [/mybusiness\.googleapis\.com\/v4\/accounts\/111\/locations\/222\/reviews/, () => [200, { reviews: [{ reviewId: 'r1', starRating: 'FIVE', comment: '¡Muy bueno!' }] }]],
@@ -119,7 +120,7 @@ async function arrancar(opciones = {}) {
   const alta = await worker.fetch(new Request(env.URL_BASE + '/admin/negocios', { method: 'POST', headers: { 'X-Chispa-Admin': env.ADMIN_CLAVE, 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'el-paraiso', nombre: 'El Paraíso' }) }), env);
   const { codigo } = await alta.json();
   return {
-    env, worker, db, registro, codigo, medios,
+    env, worker, db, registro, estado, codigo, medios,
     base: env.URL_BASE, web: 'http://localhost:' + PUERTO_WEB,
     cron: () => worker.scheduled({}, env),
     cerrar: () => { api.close(); web.close(); },

@@ -28,7 +28,7 @@
      MEDIOS (opcional)       bucket R2 para fotos y vídeos que las redes descargan
      CLAVE_CIFRADO   secreto  32 bytes en base64 (openssl rand -base64 32)
      ADMIN_CLAVE     secreto  para dar de alta negocios (cabecera X-Chispa-Admin)
-     GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET     (Google y YouTube)
+     GOOGLE_CLIENT_ID (var, público) / GOOGLE_CLIENT_SECRET (secreto)   (Google y YouTube)
      META_APP_ID / META_APP_SECRET [/ META_CONFIG_ID]
      TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET
      URL_BASE        var      https://chispa-api.<cuenta>.workers.dev
@@ -205,7 +205,8 @@ async function leerEstado(env, negocio, doc, vCliente) {
   const f = await env.DB.prepare("SELECT version, datos, actualizado FROM estado WHERE negocio = ? AND doc = ?").bind(negocio, doc).first();
   if (!f) return { version: 0, datos: null, actualizado: null };
   if (vCliente != null && Number(vCliente) === f.version) return { sinCambios: true, version: f.version };
-  return { version: f.version, datos: JSON.parse(f.datos), actualizado: f.actualizado };
+  // se devuelve el texto tal cual (sin JSON.parse + JSON.stringify) para gastar poca CPU: el plan gratuito da 10 ms
+  return { __crudo: '{"version":' + f.version + ',"actualizado":' + f.actualizado + ',"datos":' + f.datos + "}" };
 }
 async function escribirEstado(env, negocio, doc, cuerpo) {
   const base = Number(cuerpo.base) || 0;
@@ -217,8 +218,8 @@ async function escribirEstado(env, negocio, doc, cuerpo) {
     : await env.DB.prepare("UPDATE estado SET version = version + 1, datos = ?, actualizado = ? WHERE negocio = ? AND doc = ? AND version = ?").bind(texto, ahora(), negocio, doc, base).run();
   if (r.meta && r.meta.changes === 1) return { version: base + 1 };
   // Alguien guardó antes (otro móvil u otra pestaña): se devuelve lo que hay para que el navegador lo junte
-  const actual = await leerEstado(env, negocio, doc);
-  throw new Fallo("Hay cambios más nuevos en otro dispositivo", 409, { conflicto: true, version: actual.version, datos: actual.datos });
+  const actual = await env.DB.prepare("SELECT version, datos FROM estado WHERE negocio = ? AND doc = ?").bind(negocio, doc).first();
+  throw new Fallo("Hay cambios más nuevos en otro dispositivo", 409, { conflicto: true, version: actual ? actual.version : 0, datos: actual ? JSON.parse(actual.datos) : null });
 }
 
 /* ---------------- conexiones (tokens cifrados) ---------------- */
@@ -295,6 +296,11 @@ async function credPara(env, negocio, codigoRed, cache = {}) {
   }
   if (red === "tiktok") return { ...base, TIKTOK_TOKEN: t.access };
   if (red === "youtube") return { ...base, GOOGLE_ACCESS: t.access, YT_CANAL: detalle.canal || "" };
+  if (!detalle.local) { // aún sin ficha (p. ej. Google no había aprobado la API): se vuelve a mirar
+    Object.assign(detalle, await descubrirFicha(t.access));
+    if (detalle.local) await env.DB.prepare("UPDATE conexiones SET detalle = ? WHERE negocio = ? AND red = 'google'").bind(JSON.stringify(detalle), negocio).run();
+    else throw new Fallo(detalle.aviso || AVISO_GBP, 409);
+  }
   return { ...base, GOOGLE_ACCESS: t.access, GBP_CUENTA: detalle.cuentaGbp || "", GBP_LOCAL: detalle.local || "" };
 }
 
@@ -359,16 +365,7 @@ async function vueltaGoogle(env, est, code, vuelta) {
   let cuenta = "";
   try { cuenta = (await getJson("https://openidconnect.googleapis.com/v1/userinfo", t.access)).email || ""; } catch (e) {}
   if (est.red === "google") {
-    try { // la primera ficha de la cuenta; si Google aún no ha aprobado la API, se queda pendiente
-      const cs = await getJson("https://mybusinessaccountmanagement.googleapis.com/v1/accounts", t.access);
-      const c = (cs.accounts || [])[0];
-      if (c) {
-        detalle.cuentaGbp = c.name;
-        const ls = await getJson("https://mybusinessbusinessinformation.googleapis.com/v1/" + c.name + "/locations?readMask=name,title&pageSize=100", t.access);
-        const l = (ls.locations || [])[0];
-        if (l) { detalle.local = l.name; detalle.ficha = l.title; }
-      }
-    } catch (e) { detalle.aviso = "Conectado, pero aún no se pueden leer las fichas: " + (e.message || e); }
+    Object.assign(detalle, await descubrirFicha(t.access));
   } else {
     try {
       const ch = await getJson("https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true", t.access);
@@ -390,6 +387,24 @@ async function vueltaMeta(env, est, code, vuelta) {
   const elegida = (paginas.find((p) => p.ig) || paginas[0]).id;
   const t = { usuario: largo.access_token, usuarioCaduca: largo.expires_in ? ahora() + largo.expires_in * 1000 : null, paginas, elegida };
   await guardarConexion(env, est.negocio, "meta", t, cuentaMeta(t), detalleMeta(t));
+}
+/* La primera ficha de Google de la cuenta. Mientras Google no aprueba el acceso a la API de Business
+   Profile la cuota es 0 y falla: se dice claro y se vuelve a intentar sola en cada uso. */
+const AVISO_GBP = "Google todavía no ha aprobado el acceso a la API de la ficha (solicitud en revisión, 7-10 días hábiles). " +
+  "La conexión ya está guardada: cuando Google lo apruebe, la ficha funcionará sola, sin volver a conectar.";
+async function descubrirFicha(access) {
+  try {
+    const cs = await getJson("https://mybusinessaccountmanagement.googleapis.com/v1/accounts", access);
+    const c = (cs.accounts || [])[0];
+    if (!c) return { aviso: "Esta cuenta de Google no gestiona ninguna ficha de negocio" };
+    const ls = await getJson("https://mybusinessbusinessinformation.googleapis.com/v1/" + c.name + "/locations?readMask=name,title&pageSize=100", access);
+    const l = (ls.locations || [])[0];
+    if (!l) return { cuentaGbp: c.name, aviso: "La cuenta de Google no tiene fichas de negocio" };
+    return { cuentaGbp: c.name, local: l.name, ficha: l.title, aviso: null };
+  } catch (e) {
+    const m = String(e.message || e);
+    return { aviso: /quota|cuota|429|rate|RESOURCE_EXHAUSTED|has not been used|disabled|PERMISSION_DENIED/i.test(m) ? AVISO_GBP : "Conectado, pero aún no se pueden leer las fichas: " + m };
+  }
 }
 const cuentaMeta = (t) => { const p = t.paginas.find((x) => x.id === t.elegida) || t.paginas[0]; return p.nombre + (p.igUsuario ? " · @" + p.igUsuario : ""); };
 const detalleMeta = (t) => ({ elegida: t.elegida, paginas: t.paginas.map((p) => ({ id: p.id, nombre: p.nombre, instagram: p.igUsuario || null })), aviso: (t.paginas.find((x) => x.id === t.elegida) || {}).ig ? undefined : "La página elegida no tiene Instagram profesional enlazado" });
@@ -554,7 +569,7 @@ export default {
     try {
       const r = await atender(req, env);
       if (r instanceof Response) return r;
-      return new Response(JSON.stringify(r), { headers: { ...cors, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
+      return new Response(r && r.__crudo ? r.__crudo : JSON.stringify(r), { headers: { ...cors, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
     } catch (e) {
       const status = e instanceof Fallo ? e.status : 500;
       const cuerpo = { error: String((e && e.message) || e), ...(e && e.extra) };

@@ -29,6 +29,9 @@ URL_BASE = "https://chispa-api.PON_AQUI_TU_SUBDOMINIO.workers.dev"
 PANEL_URL = "https://solers-es.github.io/chispa-demo/"
 # Páginas que pueden hablar con el servidor (separadas por comas)
 ORIGENES = "https://solers-es.github.io"
+# Google Cloud · proyecto «Chispa El Paraiso» (id hispa-el-paraiso, nº 518008968805).
+# El ID de cliente es PÚBLICO (va en la URL de Google). El SECRETO va aparte: wrangler secret put GOOGLE_CLIENT_SECRET
+GOOGLE_CLIENT_ID = "518008968805-va0k5v0m5i6k8kipflhschaqk07ki35e.apps.googleusercontent.com"
 RESERVAS_URL = "https://el-paraiso-eight.vercel.app/reservas.html"
 # Hasta que TikTok audite la app solo deja publicar en privado
 TIKTOK_PRIVACIDAD = "SELF_ONLY"

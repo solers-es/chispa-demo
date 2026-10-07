@@ -389,7 +389,7 @@
     REDES.forEach(function (r) {
       var c = conexion(r.id), est = !c ? 'Sin conectar' : c.estado === 'conectada' ? '✓ Conectada' : '⚠️ Hay que volver a conectar';
       h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--bd,rgba(255,255,255,.12));border-radius:10px">' +
-        '<span style="flex:1;min-width:160px"><b>' + r.ic + ' ' + esc(r.nm) + '</b><br><span style="font-size:12px;color:var(--tx3)">' + est + (c && c.cuenta ? ' · ' + esc(c.cuenta) : '') + (c && c.detalle && c.detalle.aviso ? '<br>' + esc(c.detalle.aviso) : '') + '</span></span>';
+        '<span style="flex:1;min-width:160px"><b>' + r.ic + ' ' + esc(r.nm) + '</b><br><span style="font-size:12px;color:var(--tx3)">' + est + (c && c.cuenta ? ' · ' + esc(c.cuenta) : '') + (c && c.detalle && c.detalle.aviso ? '<br>⏳ ' + esc(c.detalle.aviso) : '') + (!c && r.id === 'google' ? '<br>⏳ Se puede conectar ya; la ficha empezará a funcionar cuando Google apruebe el acceso a su API (en revisión).' : '') + '</span></span>';
       if (SES.esAdministrador) {
         h += '<button class="btn ' + (c && c.estado === 'conectada' ? 'g' : 'pp') + ' sm" style="flex:none" onclick="ChispaSync.conectar(\'' + r.id + '\')">' + (c ? 'Volver a conectar' : 'Conectar') + '</button>';
         if (c) h += '<button class="btn g sm" style="flex:none" onclick="ChispaSync._desconectar(\'' + r.id + '\')">Quitar</button>';
