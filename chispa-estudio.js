@@ -15,6 +15,13 @@
      window.CHISPA_MOTOR={proveedor:"servidor",url:"https://…/imagen"}
    Hay un servidor de ejemplo en conectores/imagen-ia-worker.js. La clave del
    modelo NUNCA va en este fichero: la guarda el servidor.
+   Con el servidor de Chispa (chispa-ia.js, trabajador G) el proveedor es
+   «chispa»: IA de imágenes de verdad (Workers AI) SOLO cuando se pulsa
+   «Crear imagen con IA» (pedido.ia=true); las propuestas automáticas siguen
+   con fotos libres para no gastar el cupo gratuito.
+   VÍDEO: hacerVideo(p, progreso, dur, extras) acepta extras de chispa-ia.js
+   (voz grabada en el vídeo, subtítulos palabra a palabra) y, en carruseles,
+   pasa por todas las fotos.
 
    PUBLICAR DIRECTO (sin herramientas puente de pago)
    Con las APIs oficiales (Meta Graph, TikTok Content Posting, YouTube Data)
@@ -169,10 +176,11 @@ function tarjeta(i){
     (p.por?'<div class="cm-por">💡 '+esc(p.por)+'</div>':'')+
     '<input type="file" accept="image/*,video/*" id="file_'+i+'" style="display:none" onchange="subirFoto('+i+',this)">'+
     '<div class="cm-acts">'+
-      '<button class="btn pp" onclick="crearImagenIA('+i+')">'+(p.media&&p.media.tipo!=="propia"?"↻ Otra versión":"✨ Crear imagen con IA")+'</button>'+
+      '<button class="btn pp" onclick="crearImagenIA('+i+',1)">'+(p.media&&p.media.tipo!=="propia"?"↻ Otra versión":"✨ Crear imagen con IA")+'</button>'+
       '<button class="btn g" onclick="cmElegirArchivo('+i+')">📷 '+(p.media&&p.media.tipo==="propia"?"Cambiar foto":"Subir foto o vídeo")+'</button>'+
       '<button class="btn g" onclick="cmEditar('+i+')">✏️ Editar</button>'+
       '<button class="btn g" onclick="programarGen('+i+')">📅 Programar</button>'+
+      (window.ChispaIA&&ChispaIA.botonesTarjeta?ChispaIA.botonesTarjeta(i):'')+
       '<button class="btn g full" onclick="cmCliente('+i+')">👁 Así lo ve tu cliente</button>'+
       '<button class="btn full" onclick="publicarGen('+i+')">🚀 Publicar</button>'+
     '</div></div>';
@@ -203,7 +211,7 @@ function medio(i,mini){
   var p=window._posts[i];
   if(p.creando)return '<div class="cm-crea"><div class="sp"></div><b>Creando tu imagen…</b><small id="cmPaso_'+i+'">Leyendo tu texto</small></div>';
   if(!p.media)return '<div class="cm-empty"><div class="ic">🖼️</div><div>Tu publicación todavía no tiene imagen</div><div class="row2">'+
-    '<button class="p" onclick="crearImagenIA('+i+')">✨ Crear con IA</button><button onclick="cmElegirArchivo('+i+')">📷 Subir foto</button></div></div>';
+    '<button class="p" onclick="crearImagenIA('+i+',1)">✨ Crear con IA</button><button onclick="cmElegirArchivo('+i+')">📷 Subir foto</button></div></div>';
   var m=p.media,h=escena(p);
   var nav="";
   if(m.slides&&m.slides.length>1){
@@ -214,7 +222,7 @@ function medio(i,mini){
   var badge='<div class="cm-badge">'+(m.tipo==="propia"?(m.esVideo?"🎬 Tu vídeo":"📷 Tu foto"):(m.tipo==="ia"?"✨ Imagen generada por IA":"✨ Creada por Chispa"))+'</div>';
   var tool='<div class="cm-tool">'+
     '<button title="Volver a animar" onclick="cmRepetir('+i+')">▶</button>'+
-    (m.tipo!=="propia"?'<button title="Otra versión" onclick="crearImagenIA('+i+')">↻</button>':'<button title="Cambiar" onclick="cmElegirArchivo('+i+')">📷</button>')+
+    (m.tipo!=="propia"?'<button title="Otra versión" onclick="crearImagenIA('+i+',1)">↻</button>':'<button title="Cambiar" onclick="cmElegirArchivo('+i+')">📷</button>')+
     '<button title="Descargar imagen o vídeo" onclick="cmExportar('+i+')">⬇</button>'+
     '<button title="Quitar imagen" onclick="cmQuitar('+i+')">✕</button></div>';
   return h+nav+tool;
@@ -261,17 +269,18 @@ MOTOR.generar=function(q){
   return fn(q).catch(function(e){if(fn===MOTOR.proveedores.fotos)throw e;try{console.warn("Motor de imagen «"+MOTOR.proveedor+"» falló; uso fotos:",e&&e.message);}catch(x){}return MOTOR.proveedores.fotos(q);});
 };
 var PASOS=["Leyendo tu texto","Eligiendo la mejor imagen","Ajustando luz y encuadre","Animando el texto"];
-window.crearImagenIA=function(i){
+window.crearImagenIA=function(i,conIA){
   var p=window._posts&&window._posts[i];if(!p)return;
   if(p.media&&p.media.tipo!=="propia")p.foto=(p.foto||0)+1; // otra versión
   if(p.media&&p.media.tipo==="propia"&&p.media.url){try{URL.revokeObjectURL(p.media.url);}catch(e){}}
   p.creando=true;repintar(i);
   var t0=Date.now(),k=0,iv=setInterval(function(){k=(k+1)%PASOS.length;var e=$("cmPaso_"+i);if(e)e.textContent=PASOS[k];},450);
   var w=1080,h=vertical(p)?1920:(p.formato==="carrusel"?1350:1080);
-  var listo=function(media){clearInterval(iv);var d=Math.max(0,1300-(Date.now()-t0));setTimeout(function(){p.creando=false;p.media=media;p.slide=0;repintar(i);toast(media.tipo==="ia"?"✨ Imagen creada por IA":"✨ Imagen lista · pulsa ↻ para otra versión");},d);};
-  MOTOR.generar({prompt:promptDe(p),cat:p.cat,formato:p.formato,ancho:w,alto:h,cantidad:p.formato==="carrusel"?3:1,semilla:SEM+i*3+(p.foto||0)})
+  var listo=function(media){clearInterval(iv);var d=Math.max(0,1300-(Date.now()-t0));setTimeout(function(){p.creando=false;p.media=media;p.slide=0;repintar(i);toast(media.tipo==="ia"?"✨ Imagen creada por IA":(media.aviso||"✨ Imagen lista · pulsa ↻ para otra versión"));},d);};
+  MOTOR.generar({prompt:promptDe(p),cat:p.cat,formato:p.formato,ancho:w,alto:h,cantidad:p.formato==="carrusel"?3:1,semilla:SEM+i*3+(p.foto||0),ia:!!conIA,texto:p.txt,titulo:p.titulo})
     .then(listo,function(){clearInterval(iv);p.creando=false;repintar(i);toast("No se pudo crear la imagen. Prueba otra vez.");});
 };
+window.cmRepintar=function(i){repintar(i);};
 window.cmSlide=function(i,d){var p=window._posts[i];var n=p.media.slides.length;p.slide=((p.slide||0)+d+n)%n;repintarMedio(i);};
 window.cmRepetir=function(i){repintarMedio(i);};
 window.cmQuitar=function(i){var p=window._posts[i];if(p.media&&p.media.tipo==="propia"){try{URL.revokeObjectURL(p.media.url);}catch(e){}}p.media=null;p.file=null;repintar(i);toast("Imagen quitada");};
@@ -315,7 +324,7 @@ window.cmEditar=function(i,foco){
     '<div class="row"><div>'+f("cmeFecha","Fecha y hora de publicación",p.fecha,"","datetime-local")+'</div><div><label class="lb" style="margin-top:10px">Formato</label><select id="cmeFmt">'+
       ["post","carrusel","historia","reel"].map(function(x){return '<option value="'+x+'"'+(x===p.formato?" selected":"")+'>'+fmtNombre(x)+'</option>';}).join("")+'</select></div></div>'+
     '<label class="lb" style="margin-top:12px">Imagen</label><div class="row" style="gap:8px">'+
-      '<button class="btn g sm" style="flex:none" onclick="cerrarModal();crearImagenIA('+i+')">✨ '+(p.media?"Otra versión":"Crear con IA")+'</button>'+
+      '<button class="btn g sm" style="flex:none" onclick="cerrarModal();crearImagenIA('+i+',1)">✨ '+(p.media?"Otra versión":"Crear con IA")+'</button>'+
       '<button class="btn g sm" style="flex:none" onclick="cerrarModal();cmElegirArchivo('+i+')">📷 Subir la mía</button>'+
       (p.media?'<button class="btn g sm" style="flex:none" onclick="cerrarModal();cmQuitar('+i+')">✕ Quitar</button>':'')+'</div>'+
     '<p style="font-size:11.5px;color:var(--tx3);margin:10px 0 0">Si dejas un enlace vacío, el botón usa el de «Mi negocio».</p>'+
@@ -479,28 +488,38 @@ function fuenteDe(p){
   if(m.esVideo)return new Promise(function(ok){var v=document.createElement("video");v.muted=true;v.playsInline=true;v.loop=true;v.src=src;v.oncanplay=function(){v.oncanplay=null;ok(v);};v.onerror=function(){ok(null);};v.load();});
   return cargarImg(src).catch(function(){return null;});
 }
+function fuentesDe(p){
+  var m=p.media;if(!m||!m.slides||m.slides.length<2||m.esVideo)return fuenteDe(p).then(function(f){return [f];});
+  return Promise.all(m.slides.map(function(s){return cargarImg(s.url).catch(function(){return null;});})).then(function(l){return l.filter(Boolean);});
+}
 function medidas(p){return vertical(p)?[1080,1920]:(p.formato==="carrusel"?[1080,1350]:[1080,1080]);}
 function hacerImagen(p){
   return Promise.all([fuentesListas(),fuenteDe(p),logoListo()]).then(function(r){var src=r[1],wh=medidas(p),c=document.createElement("canvas");c.width=wh[0];c.height=wh[1];
     var x=c.getContext("2d");dibujar(x,wh[0],wh[1],p,src,4,6);
     return new Promise(function(ok,ko){try{c.toBlob(function(b){b?ok(b):ko(new Error("vacío"));},"image/jpeg",.92);}catch(e){ko(e);}});});
 }
-function tipoVideo(){var t=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"];if(!window.MediaRecorder)return "";for(var k=0;k<t.length;k++){try{if(MediaRecorder.isTypeSupported(t[k]))return t[k];}catch(e){}}return "";}
-function hacerVideo(p,progreso,dur){
-  dur=dur||6;var mt=tipoVideo();if(!mt)return Promise.reject(new Error("Este navegador no graba vídeo"));
-  return Promise.all([fuentesListas(),fuenteDe(p),logoListo()]).then(function(r){
-    var src=r[1],wh=[1080,1920];
+function tipoVideo(conAudio){var t=conAudio?["video/mp4;codecs=avc1.42E01E,mp4a.40.2","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"]:["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"];if(!window.MediaRecorder)return "";for(var k=0;k<t.length;k++){try{if(MediaRecorder.isTypeSupported(t[k]))return t[k];}catch(e){}}return "";}
+function hacerVideo(p,progreso,dur,extras){
+  extras=extras||{};dur=extras.dur||dur||6;var mt=tipoVideo(!!extras.audio);if(!mt)return Promise.reject(new Error("Este navegador no graba vídeo"));
+  return Promise.all([fuentesListas(),fuentesDe(p),logoListo()]).then(function(r){
+    var fuentes=r[1].length?r[1]:[null],src=fuentes[0],wh=[1080,1920];
     if(!vertical(p)&&p.formato!=="carrusel")wh=[1080,1080];
     if(p.formato==="carrusel")wh=[1080,1350];
     var c=document.createElement("canvas");c.width=wh[0];c.height=wh[1];var x=c.getContext("2d");
     if(src&&src.play){try{src.currentTime=0;src.play();}catch(e){}}
-    var st=c.captureStream(30),rec=new MediaRecorder(st,{mimeType:mt,videoBitsPerSecond:8000000}),trozos=[];
+    var st=c.captureStream(30),actx=extras.actx||null,voz=null;
+    if(extras.audio&&actx){try{var dest=actx.createMediaStreamDestination();voz=actx.createBufferSource();voz.buffer=extras.audio;voz.connect(dest);dest.stream.getAudioTracks().forEach(function(t){st.addTrack(t);});}catch(e){voz=null;}}
+    var rec=new MediaRecorder(st,{mimeType:mt,videoBitsPerSecond:8000000}),trozos=[],V=wh[1]>wh[0]*1.3,DV=extras.retraso||0;
     rec.ondataavailable=function(e){if(e.data&&e.data.size)trozos.push(e.data);};
     return new Promise(function(ok,ko){
-      rec.onstop=function(){if(src&&src.pause)try{src.pause();}catch(e){}ok(new Blob(trozos,{type:mt.split(";")[0]}));};
+      rec.onstop=function(){if(src&&src.pause)try{src.pause();}catch(e){}if(actx&&extras.cerrarAudio!==false)try{actx.close();}catch(e){}ok(new Blob(trozos,{type:mt.split(";")[0]}));};
       rec.onerror=function(e){ko(e.error||e);};
       var t0=performance.now();rec.start(250);
-      (function paso(){var t=(performance.now()-t0)/1000;dibujar(x,wh[0],wh[1],p,src,Math.min(t,dur),dur);if(progreso)progreso(Math.min(1,t/dur));
+      if(voz){try{if(actx.resume)actx.resume();voz.start(actx.currentTime+DV);}catch(e){}}
+      (function paso(){var t=(performance.now()-t0)/1000,tt=Math.min(t,dur),k=fuentes.length>1?Math.min(fuentes.length-1,Math.floor(tt/(dur/fuentes.length))):0;
+        dibujar(x,wh[0],wh[1],p,fuentes[k],tt,dur);
+        if(extras.palabras&&window.ChispaIA&&ChispaIA.dibujarSubtitulos)ChispaIA.dibujarSubtitulos(x,wh[0],wh[1],extras.palabras,tt-DV,V);
+        if(progreso)progreso(Math.min(1,t/dur));
         if(t<dur)requestAnimationFrame(paso);else setTimeout(function(){rec.stop();},120);})();
     });
   });
@@ -523,15 +542,18 @@ window.cmExportar=function(i){
   abrirOv('<div class="cm-bh"><h3>⬇ Descargar para redes</h3><button class="x" onclick="cmCerrar()" aria-label="Cerrar">×</button></div><div class="cm-bb"><div class="cm-exp">'+
     '<p style="margin:0;color:var(--tx2);font-size:14px">La imagen sale con el texto y tu marca encima, lista para subir. El vídeo dura 6 segundos, con el zoom lento y el texto entrando.</p>'+
     '<button class="btn pp cm-big" onclick="cmBajarImg('+i+')">🖼️ Descargar imagen ('+medidas(p).join("×")+')</button>'+
-    (puedeV?'<button class="btn cm-big" style="margin-top:0" onclick="cmBajarVid('+i+')">🎬 Descargar vídeo vertical (6 s)</button>':'<div class="cm-note">Este navegador no puede grabar vídeo. En el iPhone (Safari) y en Chrome sí.</div>')+
+    (puedeV&&window.ChispaIA&&ChispaIA.opcionesVideoHtml?ChispaIA.opcionesVideoHtml(i):'')+
+    (puedeV?'<button class="btn cm-big" style="margin-top:0" onclick="cmBajarVid('+i+')">🎬 Descargar vídeo vertical</button>':'<div class="cm-note">Este navegador no puede grabar vídeo. En el iPhone (Safari) y en Chrome sí.</div>')+
     '<div class="cm-bar" id="cmBar" style="display:none"><i></i></div><div id="cmExpMsg" style="font-size:12.5px;color:var(--tx3)"></div></div></div>');
 };
 window.cmBajarImg=function(i){var p=window._posts[i];$("cmExpMsg").textContent="Preparando la imagen…";
   hacerImagen(p).then(function(b){var nm=nombreArchivo(p,"jpg");if(esMovil())return compartirArchivo(b,nm,p.txt).then(function(r){if(r==="no")bajar(b,nm);$("cmExpMsg").textContent="✓ Imagen lista";});bajar(b,nm);$("cmExpMsg").textContent="✓ Imagen descargada";})
   .catch(function(){$("cmExpMsg").textContent="No se pudo preparar la imagen. Prueba otra versión.";});};
-window.cmBajarVid=function(i){var p=window._posts[i],bar=$("cmBar");bar.style.display="block";$("cmExpMsg").textContent="Grabando el vídeo… (6 segundos)";
+window.cmBajarVid=function(i){var p=window._posts[i],bar=$("cmBar");bar.style.display="block";$("cmExpMsg").textContent="Grabando el vídeo…";
   var vp=Object.assign({},p);if(!vertical(p)&&p.formato!=="carrusel")vp.formato="reel";
-  hacerVideo(vp,function(f){bar.firstChild.style.width=(f*100)+"%";}).then(function(b){var nm=nombreArchivo(p,ext(b));window._cmUltimoVideo={i:i,b:b};
+  var pre=window.ChispaIA&&ChispaIA.prepararVideo?ChispaIA.prepararVideo(p,function(m){$("cmExpMsg").textContent=m;}):Promise.resolve({});
+  pre.then(function(ex){$("cmExpMsg").textContent="Grabando el vídeo… ("+Math.round(ex.dur||6)+" segundos)"+(ex.nota?" · "+ex.nota:"");
+    return hacerVideo(vp,function(f){bar.firstChild.style.width=(f*100)+"%";},6,ex);}).then(function(b){var nm=nombreArchivo(p,ext(b));window._cmUltimoVideo={i:i,b:b};
     if(esMovil())return compartirArchivo(b,nm,p.txt).then(function(r){if(r==="no")bajar(b,nm);$("cmExpMsg").textContent="✓ Vídeo listo";});
     bajar(b,nm);$("cmExpMsg").textContent="✓ Vídeo descargado ("+ext(b).toUpperCase()+", "+Math.round(b.size/1024)+" KB)";})
   .catch(function(e){$("cmExpMsg").textContent="No se pudo grabar el vídeo: "+(e&&e.message||"error");});};
@@ -621,7 +643,7 @@ function pintarPub(){
   var h='<div class="cm-bh"><div><h3>🚀 Publicar</h3>'+pasos+'</div><button class="x" onclick="cmCerrar()" aria-label="Cerrar">×</button></div>'+(PUB.demo?'<div class="cm-demo"><b>▶ DEMOSTRACIÓN</b> Así se publica con Chispa. No se sube nada de verdad. <button onclick="cmDemoParar()">Parar</button></div>':'')+'<div class="cm-bb">';
   if(PUB.paso===1){
     h+='<div class="cm-grid"><div><div class="cm-lbl">¿Dónde lo publicamos?</div><div class="cm-redes">'+REDES.map(function(r){return '<button class="cm-red'+(PUB.sel[r.id]?" on":"")+'" onclick="cmRed(\''+r.id+'\')"><span class="ri '+r.cls+'">'+r.ic+'</span><span><div class="rn">'+r.nm+'</div><div class="rd">'+r.sub+'</div></span><span class="ck"></span></button>';}).join("")+'</div>'+
-      (p.media?'':'<div class="cm-note" style="border-color:rgba(255,204,51,.5);color:var(--amber)">⚠️ Esta publicación no tiene imagen. <a href="javascript:void 0" onclick="cmCerrar();crearImagenIA('+PUB.i+')">Crear una con IA</a> o <a href="javascript:void 0" onclick="cmCerrar();cmElegirArchivo('+PUB.i+')">subir tu foto</a>.</div>')+
+      (p.media?'':'<div class="cm-note" style="border-color:rgba(255,204,51,.5);color:var(--amber)">⚠️ Esta publicación no tiene imagen. <a href="javascript:void 0" onclick="cmCerrar();crearImagenIA('+PUB.i+',1)">Crear una con IA</a> o <a href="javascript:void 0" onclick="cmCerrar();cmElegirArchivo('+PUB.i+')">subir tu foto</a>.</div>')+
       '</div><div><div class="cm-lbl">Así se verá</div><div class="cm-tabs">'+sel.map(function(r){return '<button class="'+(PUB.tab===r.id?"on":"")+'" onclick="cmTab(\''+r.id+'\')">'+r.nm+'</button>';}).join("")+'</div>'+
       '<div class="cm-stage">'+(sel.length?vista(p,PUB.tab,false):'<div class="empty">Elige al menos una red</div>')+'</div></div></div>'+
       '<button class="btn pp cm-big" '+(sel.length?'':'disabled style="opacity:.5"')+' onclick="cmPaso(2)">Continuar · publicar en '+sel.length+' '+(sel.length===1?"red":"redes")+' →</button>';

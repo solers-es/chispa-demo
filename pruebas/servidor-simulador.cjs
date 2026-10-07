@@ -77,11 +77,20 @@ globalThis.fetch = async function (entrada, o = {}) {
 /* ---------- Workers AI imitada (sin red ni cupo) ---------- */
 const JPEG_MINI = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
 const llamadasIA = [];
+// Una foto de verdad para las pruebas en navegador (CHISPA_FOTO_IA=ruta.jpg) y un WAV válido de 2 s (pitidos)
+const fotoIA = () => (process.env.CHISPA_FOTO_IA ? fs.readFileSync(process.env.CHISPA_FOTO_IA).toString('base64') : JPEG_MINI);
+function wavSilencio(seg) {
+  const hz = 8000, n = hz * seg, b = Buffer.alloc(44 + n * 2);
+  b.write('RIFF', 0); b.writeUInt32LE(36 + n * 2, 4); b.write('WAVE', 8); b.write('fmt ', 12); b.writeUInt32LE(16, 16); b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22);
+  b.writeUInt32LE(hz, 24); b.writeUInt32LE(hz * 2, 28); b.writeUInt16LE(2, 32); b.writeUInt16LE(16, 34); b.write('data', 36); b.writeUInt32LE(n * 2, 40);
+  for (let i = 0; i < n; i++) b.writeInt16LE(Math.round(Math.sin(i / 8) * 900 * (i % 4000 < 2000 ? 1 : 0)), 44 + i * 2);
+  return b.toString('base64');
+}
 const aiFalsa = {
   async run(modelo, e) {
     llamadasIA.push({ modelo, e });
-    if (/flux/.test(modelo)) return { image: JPEG_MINI };
-    if (/melotts/.test(modelo)) { if (!['en', 'es', 'fr', 'jp', 'kr', 'zh'].includes(e.lang)) throw new Error("8007: Unsupported language"); return { audio: Buffer.from('RIFF....WAVEfmt prueba').toString('base64') }; }
+    if (/flux/.test(modelo)) return { image: fotoIA() };
+    if (/melotts/.test(modelo)) { if (!['en', 'es', 'fr', 'jp', 'kr', 'zh'].includes(e.lang)) throw new Error("8007: Unsupported language"); return { audio: wavSilencio(2) }; }
     if (/whisper/.test(modelo)) return { transcription_info: { language: e.language, duration: 2.5 }, segments: [{ words: [{ word: ' Hola', start: 0, end: 0.4 }, { word: ' mundo.', start: 0.5, end: 1.1 }] }], usage: { neurons: 2 } };
     if (/m2m100/.test(modelo)) return { translated_text: '[' + e.target_lang + '] ' + e.text, usage: { neurons: 1 } };
     if (/llama/.test(modelo)) {

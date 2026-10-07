@@ -475,6 +475,8 @@
   window.ChispaSync = {
     vincular: vincular, guardar: guardarDoc, leer: leerDoc, suscribir: suscribir,
     api: api, conexiones: function () { return cargarConexiones(); }, conectar: conectar,
+    /* llamada directa al servidor con la sesión de este aparato (la usa chispa-ia.js: /ia/…, /claves, /v1/…) */
+    pedir: function (metodo, ruta, cuerpo) { return activo() && !pausado() ? llamar(metodo, ruta, cuerpo) : Promise.reject(new Error('Sin servidor: modo demostración')); },
     entrar: entrar, salir: salir, sincronizarAhora: function () { aviso('Sincronizando…'); return sincronizarTodo().then(function () { repintarSiSePuede(); return cargarConexiones(); }); },
     estado: function () { return { modo: !servidor() ? 'demostracion' : !activo() ? 'sin-sesion' : 'servidor', pausado: pausado(), servidor: servidor(), negocio: SES && SES.negocio, nombre: SES && SES.nombre, esAdministrador: !!(SES && SES.esAdministrador), ultimo: ultimo }; },
     esAdministrador: function () { return !!(SES && SES.esAdministrador); },
