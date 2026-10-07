@@ -126,6 +126,24 @@ const { arrancar } = require('./servidor-simulador.cjs');
   assert.ok(s.registro.some((c) => /p2\/feed/.test(c.url) && /m-pagina2-SECRETO/.test(c.cuerpo)));
   paso('el cron publica lo programado en Google y Facebook con los tokens del servidor');
 
+  // --- reel de prueba (trial_params) y Collab (collaborators): «Llegar a gente nueva» ---
+  s.respuestas.unshift([/graph\.facebook\.com\/v21\.0\/ig9\/media_publish/, () => [200, { id: 'igpub1' }]]);
+  s.respuestas.unshift([/graph\.facebook\.com\/v21\.0\/ig9\/media$/, () => [200, { id: 'cont1' }]]);
+  s.respuestas.unshift([/graph\.facebook\.com\/v21\.0\/cont1\?/, () => [200, { status_code: 'FINISHED' }]]);
+  const antesIg = s.registro.length;
+  r = await pedir('POST', '/programar', { id: 'a2', redes: ['igf'], texto: 'Gancho nuevo', titulo: 'Prueba', formato: 'reel', cuando: new Date(Date.now() - 1000).toISOString(), medios: ['https://medios.test/v.mp4'], prueba: 'MANUAL', colaboradores: ['@elsazon', 'no vale!'] }, movil);
+  assert.equal(r.st, 200);
+  r = await pedir('POST', '/programar', { id: 'a3', redes: ['igs'], texto: 'Historia', titulo: 'H', formato: 'historia', cuando: new Date(Date.now() - 1000).toISOString(), medios: ['https://medios.test/f.jpg'], colaboradores: ['elsazon'] }, movil);
+  await s.cron();
+  r = await pedir('GET', '/agenda', undefined, portatil);
+  assert.equal(r.j.items.find((x) => x.id === 'a2').estado, 'publicada', r.j.items.find((x) => x.id === 'a2').motivo);
+  const conts = s.registro.slice(antesIg).filter((c) => /ig9\/media$/.test(c.url)).map((c) => new URLSearchParams(c.cuerpo));
+  const reel = conts.find((q) => q.get('media_type') === 'REELS'), hist = conts.find((q) => q.get('media_type') === 'STORIES');
+  assert.equal(reel.get('trial_params'), JSON.stringify({ graduation_strategy: 'MANUAL' }));
+  assert.equal(reel.get('collaborators'), JSON.stringify(['elsazon']));
+  assert.ok(hist && !hist.get('collaborators') && !hist.get('trial_params'), 'las historias no llevan colaboradores ni prueba');
+  paso('Instagram: el reel de prueba lleva trial_params (MANUAL) y la invitación collaborators; las historias no');
+
   // --- salir y cerrar todo ---
   r = await pedir('DELETE', '/sesiones', undefined, portatil);
   r = await pedir('GET', '/yo', undefined, movil);

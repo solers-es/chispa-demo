@@ -43,15 +43,22 @@ async function instagram(env, p, historia) {
   const t = env.META_TOKEN, ig = "/" + env.IG_USER_ID, m = p.medios || [];
   if (!m.length) throw new Error("Instagram necesita imagen o vídeo");
   let cont;
+  // Collab: hasta 3 usuarios invitados como colaboradores (no vale en historias) · reel de prueba: trial_params
+  // (API de Instagram, IG User /media: «collaborators» y «trial_params.graduation_strategy» MANUAL | SS_PERFORMANCE)
+  const extra = {};
+  const colab = (p.colaboradores || []).map((u) => String(u).replace(/^@/, "")).filter((u) => /^[\w.]{1,30}$/.test(u)).slice(0, 3);
+  if (!historia && colab.length) extra.collaborators = JSON.stringify(colab);
+  if (!historia && p.esVideo && p.prueba) extra.trial_params = JSON.stringify({ graduation_strategy: p.prueba === "SS_PERFORMANCE" ? "SS_PERFORMANCE" : "MANUAL" });
   if (!historia && m.length > 1 && !p.esVideo) {
     const hijos = [];
     for (const u of m.slice(0, 10)) hijos.push((await graph(ig + "/media", { image_url: u, is_carousel_item: "true", access_token: t })).id);
-    cont = (await graph(ig + "/media", { media_type: "CAROUSEL", children: hijos.join(","), caption: p.texto, access_token: t })).id;
+    cont = (await graph(ig + "/media", { media_type: "CAROUSEL", children: hijos.join(","), caption: p.texto, ...extra, access_token: t })).id;
   } else if (p.esVideo) {
-    cont = (await graph(ig + "/media", { media_type: historia ? "STORIES" : "REELS", video_url: m[0], caption: historia ? "" : p.texto, access_token: t })).id;
+    cont = (await graph(ig + "/media", { media_type: historia ? "STORIES" : "REELS", video_url: m[0], caption: historia ? "" : p.texto, ...extra, access_token: t })).id;
     await esperarContenedor(cont, t);
   } else {
-    const q = { image_url: m[0], access_token: t };
+    const q = { image_url: m[0], ...(historia ? {} : { collaborators: extra.collaborators }), access_token: t };
+    if (!q.collaborators) delete q.collaborators;
     if (historia) q.media_type = "STORIES"; else q.caption = p.texto;
     cont = (await graph(ig + "/media", q)).id;
   }

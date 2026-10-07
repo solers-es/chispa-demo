@@ -502,7 +502,7 @@ async function publicarItem(env, negocio, it, cache) {
     if (it.res[red] === "publicada") continue;
     try {
       const esVideo = it.formato === "reel" || it.formato === "historia" || (it.medios || []).some((m) => /\.(mp4|webm|mov)(\?|$)/i.test(m));
-      await publicarEn(await credPara(env, negocio, red, cache), red, { texto: it.texto, titulo: it.titulo, medios: it.medios || [], esVideo, formato: it.formato });
+      await publicarEn(await credPara(env, negocio, red, cache), red, { texto: it.texto, titulo: it.titulo, medios: it.medios || [], esVideo, formato: it.formato, prueba: it.prueba || "", colaboradores: it.colaboradores || [] });
       it.res[red] = "publicada";
     } catch (e) { it.res[red] = "fallo"; fallos.push(red + ": " + (e.message || e)); }
   }

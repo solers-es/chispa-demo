@@ -999,7 +999,7 @@ function enviarServidor(b,id,it,redes,formato,cuando,pz){
   return prepararMedios(it,pz).then(function(medios){
     if(!medios.length&&!it.mediaLocal){var u=it.media&&(it.media.slides?it.media.slides.map(function(s){return s.url;}):[it.media.url]);medios=(u||[]).map(function(x){return x.replace(/auto=format/,"fm=jpg");});}
     return fetch(b+"/programar",{method:"POST",headers:cab(),body:JSON.stringify({id:id,redes:redes,texto:it.txt+(it.tags?"\n\n"+it.tags:""),titulo:it.titulo,formato:formato,
-      cuando:new Date(cuando).toISOString(),medios:medios})});});
+      cuando:new Date(cuando).toISOString(),medios:medios,prueba:it.prueba||"",colaboradores:it.colaboradores||[]})});});
 }
 function sincronizar(it){
   var b=base();if(!b||!it)return;
