@@ -15,6 +15,7 @@
 <script>if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 <meta name="description" content="Chispa: el robot de IA que gestiona el marketing de tu negocio. Escribe, diseña, programa, publica y responde por ti.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="tour.css">
 <style>
   :root{
     --bg:#0b0d12;--bg2:#0f131b;--panel:#141821;--panel2:#1a1f2b;--line:#232a38;
@@ -265,6 +266,7 @@
     <h1 class="big">Deja de hacer tu marketing.<br><span class="sp">Chispa lo hace por ti.</span></h1>
     <p class="sub">El robot de inteligencia artificial que escribe tus publicaciones, te las diseña, las programa, las publica en Instagram y Facebook y hasta responde a tus clientes. Tú atiendes tu negocio; Chispa llena tus redes.</p>
     <div class="heroCta">
+<button class="ct-cta" onclick="ChispaTour&&ChispaTour.abrir()">▶ Ver cómo funciona</button>
       <button class="btn pp talk" onclick="abrirChat()"><span class="mic">🎤</span> TOCA PARA HABLAR</button>
       <button class="btn g" onclick="vista('panel')">Ver cómo funciona por dentro ›</button>
     </div>
@@ -1136,6 +1138,8 @@ else if(_h.indexOf("panel")>=0){vista("panel");}
 <!-- «Crecer»: guía de crecimiento accionable por sector e idioma (base: docs/CRECIMIENTO-ALGORITMOS.md).
      Va al final para tener ya ChispaSector (sectores.js) y la cadena de window.panel montada. -->
 <script src="chispa-crecer.js"></script>
+<!-- Visita guiada -->
+<script src="tour.js"></script>
 <!-- IA de verdad (imagen, voz y subtítulos, idiomas, reaprovechar, claves de API): trabajador G -->
 <script src="chispa-ia.js"></script>
 </body>
