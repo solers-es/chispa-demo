@@ -15,6 +15,12 @@ binding = "DB"
 database_name = "chispa"
 database_id = "58a28745-8473-48e5-b64d-948146b76c9e"
 
+# IA en el propio servidor (Workers AI): imágenes, voz, subtítulos, textos y traducción.
+# Plan gratuito: 10.000 «neuronas» al día por cuenta; el servidor corta antes (conectores/ia.js).
+# Sin claves: va con la propia cuenta de Cloudflare.
+[ai]
+binding = "AI"
+
 # OPCIONAL · fotos y vídeos que las redes descargan (necesita R2 activado en la cuenta).
 # Si no lo activas, deja estas líneas comentadas: lo demás funciona igual.
 # [[r2_buckets]]

@@ -74,6 +74,31 @@ globalThis.fetch = async function (entrada, o = {}) {
   return new Response(JSON.stringify({ error: { message: 'el simulador no conoce ' + url.hostname } }), { status: 404, headers: { 'Content-Type': 'application/json' } });
 };
 
+/* ---------- Workers AI imitada (sin red ni cupo) ---------- */
+const JPEG_MINI = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
+const llamadasIA = [];
+const aiFalsa = {
+  async run(modelo, e) {
+    llamadasIA.push({ modelo, e });
+    if (/flux/.test(modelo)) return { image: JPEG_MINI };
+    if (/melotts/.test(modelo)) { if (!['en', 'es', 'fr', 'jp', 'kr', 'zh'].includes(e.lang)) throw new Error("8007: Unsupported language"); return { audio: Buffer.from('RIFF....WAVEfmt prueba').toString('base64') }; }
+    if (/whisper/.test(modelo)) return { transcription_info: { language: e.language, duration: 2.5 }, segments: [{ words: [{ word: ' Hola', start: 0, end: 0.4 }, { word: ' mundo.', start: 0.5, end: 1.1 }] }], usage: { neurons: 2 } };
+    if (/m2m100/.test(modelo)) return { translated_text: '[' + e.target_lang + '] ' + e.text, usage: { neurons: 1 } };
+    if (/llama/.test(modelo)) {
+      const u = e.messages[1].content;
+      let r;
+      if (/Translate each text/.test(u)) {
+        const textos = JSON.parse(u.split('Texts (JSON array):\n')[1].split('\nReturn exactly')[0]);
+        const cods = [...u.matchAll(/(\b[a-z]{2}) \(/g)].map((x) => x[1]);
+        r = {}; for (const c of cods) r[c] = textos.map((t) => '[' + c + '] ' + t);
+      } else if (/Source content/.test(u)) r = { piezas: [{ tipo: 'posts', titulo: 'P1', texto: 'Post uno' }, { tipo: 'hilo', titulo: 'Hilo', texto: '1/ a\n\n2/ b' }, { tipo: 'carrusel', titulo: 'C', texto: 'Pie', diapositivas: [{ titulo: 'a', texto: 'b' }] }] };
+      else r = { titulo: 'Paella del domingo', texto: 'Texto escrito por la IA', hashtags: ['#Palma'] };
+      return { choices: [{ message: { content: '```json\n' + JSON.stringify(r) + '\n```' } }], usage: { neurons: 120 } };
+    }
+    throw new Error('modelo no imitado: ' + modelo);
+  },
+};
+
 /* ---------- servidor HTTP que ejecuta el Worker ---------- */
 async function arrancar(opciones = {}) {
   const initSqlJs = require('sql.js');
@@ -82,6 +107,7 @@ async function arrancar(opciones = {}) {
   const medios = new Map();
   const env = {
     DB: crearD1(db),
+    AI: aiFalsa,
     MEDIOS: { put: async (k, stream, o) => { medios.set(k, { datos: Buffer.from(await new Response(stream).arrayBuffer()), tipo: o.httpMetadata.contentType }); } },
     MEDIA_PUBLICA: 'http://localhost:' + PUERTO_API + '/_medios',
     CLAVE_CIFRADO: crypto.randomBytes(32).toString('base64'),
@@ -120,7 +146,7 @@ async function arrancar(opciones = {}) {
   const alta = await worker.fetch(new Request(env.URL_BASE + '/admin/negocios', { method: 'POST', headers: { 'X-Chispa-Admin': env.ADMIN_CLAVE, 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'el-paraiso', nombre: 'El Paraíso' }) }), env);
   const { codigo } = await alta.json();
   return {
-    env, worker, db, registro, estado, codigo, medios,
+    env, worker, db, registro, estado, codigo, medios, llamadasIA,
     base: env.URL_BASE, web: 'http://localhost:' + PUERTO_WEB,
     cron: () => worker.scheduled({}, env),
     cerrar: () => { api.close(); web.close(); },

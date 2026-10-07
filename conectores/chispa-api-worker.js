@@ -55,12 +55,24 @@
      POST   /admin/negocios {id, nombre}   (X-Chispa-Admin) → {codigo} del dueño
      GET    /admin/negocios                (X-Chispa-Admin) → lista
      Alta sola, /planes, /cuenta, /pago/*, /stripe/webhook, /admin/clientes: ver suscripciones.js
+     --- IA (Workers AI, plan gratuito; ver conectores/ia.js) ---
+     POST   /ia/imagen {texto,titulo,sector,prompt?,cantidad?}  → {urls:[…/medio/ID.jpg]}
+     POST   /ia/voz {texto, idioma}        → {audio (data:), palabras:[{t,i,f}], duracion}
+     POST   /ia/texto {accion: escribir|reaprovechar|traducir, …}
+     GET    /ia/uso                        lo gastado hoy y los límites
+     GET    /medio/:id.jpg                 público: imagen generada (las redes la descargan)
+     --- API pública y MCP (ver conectores/api-publica.js y docs/API-CHISPA.md) ---
+     GET    /claves · POST /claves {nombre} · DELETE /claves/:id   (dueño) claves de API
+     /v1/…                                 con «Authorization: Bearer chispa_…» (o la sesión)
+     POST   /mcp                           servidor MCP para Claude y otros agentes
    ===================================================================== */
 import { publicarEn, estadisticas } from "./redes.js";
+import * as IA from "./ia.js";
+import { crearApiPublica } from "./api-publica.js";
 // Alta sola, prueba, planes, límites y pago (trabajador H): todo en su módulo
 import { rutasPublicas, rutasConSesion, antesDeRuta, asegurarTablasSuscripciones, puedePublicar } from "./suscripciones.js";
 
-const VERSION = "1";
+const VERSION = "2";
 const MAX_ESTADO = 1_500_000; // D1 admite filas de hasta 2 MB
 const DIA = 864e5;
 const SESION_DIAS = 365;
@@ -100,6 +112,8 @@ const ESQUEMA = [
   "CREATE TABLE IF NOT EXISTS oauth_estados (estado TEXT PRIMARY KEY, negocio TEXT NOT NULL, red TEXT NOT NULL, verificador TEXT, volver TEXT, caduca INTEGER NOT NULL)",
   "CREATE TABLE IF NOT EXISTS agenda (negocio TEXT NOT NULL, id TEXT NOT NULL, datos TEXT NOT NULL, cuando INTEGER NOT NULL, estado TEXT NOT NULL, PRIMARY KEY (negocio, id))",
   "CREATE INDEX IF NOT EXISTS agenda_pendiente ON agenda (estado, cuando)",
+  "CREATE TABLE IF NOT EXISTS api_claves (id TEXT PRIMARY KEY, huella TEXT NOT NULL UNIQUE, negocio TEXT NOT NULL, nombre TEXT, prefijo TEXT NOT NULL, creado INTEGER NOT NULL, usado INTEGER, revocada INTEGER NOT NULL DEFAULT 0)",
+  ...IA.ESQUEMA_IA,
 ];
 let tablasListas = false;
 async function asegurarTablas(env) {
@@ -170,11 +184,19 @@ async function leerJson(req) { try { return await req.json(); } catch (e) { thro
 function tokenDe(req) {
   const a = req.headers.get("Authorization") || "";
   if (/^Bearer /i.test(a)) return a.slice(7).trim();
-  return req.headers.get("X-Chispa-Clave") || new URL(req.url).searchParams.get("s") || "";
+  const q = new URL(req.url).searchParams;
+  return req.headers.get("X-Chispa-Clave") || q.get("s") || q.get("clave") || "";
 }
+const PREFIJO_CLAVE = "chispa_";
 async function sesionDe(req, env) {
   const t = tokenDe(req);
   if (!t) throw new Fallo("Hace falta entrar con el código de acceso", 401);
+  if (t.startsWith(PREFIJO_CLAVE)) { // clave de API (n8n, Make, MCP…): solo vale para /v1 y /mcp
+    const k = await env.DB.prepare("SELECT k.id, k.negocio, k.usado, n.nombre FROM api_claves k JOIN negocios n ON n.id = k.negocio WHERE k.huella = ? AND k.revocada = 0").bind(await huella(env, "k:" + t)).first();
+    if (!k) throw new Fallo("Clave de API incorrecta o revocada", 401);
+    if (!k.usado || ahora() - k.usado > 36e5) await env.DB.prepare("UPDATE api_claves SET usado = ? WHERE id = ?").bind(ahora(), k.id).run();
+    return { negocio: k.negocio, rol: "api", nombre: k.nombre, esAdministrador: false, api: true, claveId: k.id, token: t };
+  }
   const f = await env.DB.prepare("SELECT s.negocio, s.rol, s.caduca, n.nombre FROM sesiones s JOIN negocios n ON n.id = s.negocio WHERE s.huella = ?").bind(await huella(env, "s:" + t)).first();
   if (!f || f.caduca < ahora()) throw new Fallo("La sesión ha caducado: vuelve a entrar con el código", 401);
   return { negocio: f.negocio, rol: f.rol, nombre: f.nombre, esAdministrador: f.rol === "dueno", token: t };
@@ -462,6 +484,10 @@ async function guardarItem(env, negocio, it) {
   await env.DB.prepare("INSERT INTO agenda (negocio, id, datos, cuando, estado) VALUES (?, ?, ?, ?, ?) ON CONFLICT (negocio, id) DO UPDATE SET datos = excluded.datos, cuando = excluded.cuando, estado = excluded.estado")
     .bind(negocio, it.id, JSON.stringify(it), new Date(it.cuando).getTime() || 0, it.estado).run();
 }
+async function leerItem(env, negocio, id) {
+  const f = await env.DB.prepare("SELECT datos FROM agenda WHERE negocio = ? AND id = ?").bind(negocio, String(id)).first();
+  return f ? JSON.parse(f.datos) : null;
+}
 async function publicarItem(env, negocio, it, cache) {
   it.res = it.res || {};
   const fallos = [];
@@ -490,12 +516,32 @@ function soloAdmin(req, env) {
   if (!env.ADMIN_CLAVE || a.length !== env.ADMIN_CLAVE.length || a !== env.ADMIN_CLAVE) throw new Fallo("Sin permiso de administración", 401);
 }
 
+/* ---------------- claves de API (se enseñan UNA vez; se guarda la huella) ---------------- */
+async function crearClave(env, s, cuerpo) {
+  soloDueno(s);
+  const n = await env.DB.prepare("SELECT COUNT(*) AS n FROM api_claves WHERE negocio = ? AND revocada = 0").bind(s.negocio).first();
+  if (n && n.n >= 10) throw new Fallo("Máximo 10 claves activas por negocio: revoca alguna");
+  const clave = PREFIJO_CLAVE + b64url(azar(24)), id = b64url(azar(9));
+  const nombre = String(cuerpo.nombre || "Clave de API").slice(0, 60);
+  await env.DB.prepare("INSERT INTO api_claves (id, huella, negocio, nombre, prefijo, creado, usado, revocada) VALUES (?, ?, ?, ?, ?, ?, NULL, 0)")
+    .bind(id, await huella(env, "k:" + clave), s.negocio, nombre, clave.slice(0, 13) + "…", ahora()).run();
+  return { id, nombre, clave, prefijo: clave.slice(0, 13) + "…", aviso: "Cópiala ahora: no se vuelve a enseñar. Si la pierdes, revócala y crea otra." };
+}
+async function listarClaves(env, s) {
+  soloDueno(s);
+  const { results } = await env.DB.prepare("SELECT id, nombre, prefijo, creado, usado FROM api_claves WHERE negocio = ? AND revocada = 0 ORDER BY creado DESC").bind(s.negocio).all();
+  return { claves: results || [] };
+}
+const API_PUBLICA = crearApiPublica({ Fallo, leerJson, guardarItem, listarAgenda, leerItem, publicarItem, listarConexiones, urlBase,
+  // lo creado por la API cuenta igual que lo programado desde el panel (límites del plan de suscripciones.js)
+  comprobarPlan: (req, env, s) => antesDeRuta(req, env, { Fallo, huella, guardarCodigo, crearSesion, leerJson, soloAdmin }, s, "POST", "/programar", ["programar"]) });
+
 /* ---------------- enrutador ---------------- */
 async function atender(req, env) {
   const url = new URL(req.url), ruta = url.pathname.replace(/\/+$/, "") || "/", m = req.method;
   const partes = ruta.split("/").filter(Boolean).map(decodeURIComponent);
 
-  if (m === "GET" && ruta === "/salud") return { ok: true, version: VERSION, redes: Object.keys(REDES).filter((r) => (r === "meta" ? env.META_APP_ID : r === "tiktok" ? env.TIKTOK_CLIENT_KEY : env.GOOGLE_CLIENT_ID)) };
+  if (m === "GET" && ruta === "/salud") return { ok: true, version: VERSION, ia: !!env.AI, redes: Object.keys(REDES).filter((r) => (r === "meta" ? env.META_APP_ID : r === "tiktok" ? env.TIKTOK_CLIENT_KEY : env.GOOGLE_CLIENT_ID)) };
   await asegurarTablas(env);
   await asegurarTablasSuscripciones(env);
   const ayuda = { Fallo, huella, guardarCodigo, crearSesion, leerJson, soloAdmin };
@@ -503,6 +549,7 @@ async function atender(req, env) {
   if (publica !== undefined) return publica;
   if (m === "GET" && ruta === "/oauth/vuelta") return vueltaOAuth(req, env);
   if (m === "POST" && ruta === "/sesion") return entrar(env, await leerJson(req));
+  if (m === "GET" && partes[0] === "medio" && partes.length === 2) return IA.servirMedio(env, partes[1]);
 
   if (partes[0] === "admin") {
     soloAdmin(req, env);
@@ -520,6 +567,28 @@ async function atender(req, env) {
   const deCuenta = await rutasConSesion(req, env, ayuda, s, m, ruta);
   if (deCuenta !== undefined) return deCuenta;
   await antesDeRuta(req, env, ayuda, s, m, ruta, partes); // límites del plan (lanza 402/429)
+  if (ruta === "/mcp") return API_PUBLICA.mcp(req, env, s);
+  if (partes[0] === "v1") return API_PUBLICA.v1(req, env, s, ruta, partes, url);
+  if (s.api) throw new Fallo("Una clave de API solo vale para /v1/… y /mcp", 403);
+  if (partes[0] === "ia") {
+    if (m === "GET" && ruta === "/ia/uso") return IA.usoHoy(env, s.negocio);
+    if (m === "POST" && ruta === "/ia/imagen") return IA.generarImagen(env, s.negocio, await leerJson(req), urlBase(env, req));
+    if (m === "POST" && ruta === "/ia/voz") return { __crudo: await IA.generarVoz(env, s.negocio, await leerJson(req)) };
+    if (m === "POST" && ruta === "/ia/texto") {
+      const c = await leerJson(req), q = { ...c, negocio: c.negocio || s.nombre };
+      if (c.accion === "reaprovechar") return IA.reaprovechar(env, s.negocio, q);
+      if (c.accion === "traducir") return IA.traducir(env, s.negocio, q);
+      if (c.accion === "escribir") return IA.escribir(env, s.negocio, q);
+      throw new Fallo("accion: escribir | reaprovechar | traducir");
+    }
+    throw new Fallo("No existe", 404);
+  }
+  if (ruta === "/claves") { if (m === "GET") return listarClaves(env, s); if (m === "POST") return crearClave(env, s, await leerJson(req).catch(() => ({}))); }
+  if (m === "DELETE" && partes[0] === "claves" && partes.length === 2) {
+    soloDueno(s);
+    await env.DB.prepare("UPDATE api_claves SET revocada = 1 WHERE negocio = ? AND id = ?").bind(s.negocio, partes[1]).run();
+    return { ok: true };
+  }
   if (m === "GET" && ruta === "/yo") return { negocio: s.negocio, nombre: s.nombre, rol: s.rol, esAdministrador: s.esAdministrador };
   if (m === "DELETE" && ruta === "/sesion") { await env.DB.prepare("DELETE FROM sesiones WHERE huella = ?").bind(await huella(env, "s:" + s.token)).run(); return { ok: true }; }
   if (m === "DELETE" && ruta === "/sesiones") { soloDueno(s); await env.DB.prepare("DELETE FROM sesiones WHERE negocio = ?").bind(s.negocio).run(); return { ok: true }; }
@@ -581,7 +650,7 @@ export default {
       if (r instanceof Response) return r;
       return new Response(r && r.__crudo ? r.__crudo : JSON.stringify(r), { headers: { ...cors, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
     } catch (e) {
-      const status = e instanceof Fallo ? e.status : 500;
+      const status = e && typeof e.status === "number" ? e.status : 500;
       const cuerpo = { error: String((e && e.message) || e), ...(e && e.extra) };
       return new Response(JSON.stringify(cuerpo), { status, headers: { ...cors, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
     }
@@ -592,6 +661,7 @@ export default {
     await asegurarTablas(env);
     const { results } = await env.DB.prepare("SELECT negocio, datos FROM agenda WHERE estado = 'programada' AND cuando <= ? ORDER BY cuando LIMIT 25").bind(ahora()).all();
     const caches = {};
+    if (new Date().getUTCMinutes() < 5) { try { await IA.limpiarMedios(env); } catch (e) {} } // una vez por hora
     for (const f of results || []) {
       const it = JSON.parse(f.datos);
       if (!(await puedePublicar(env, f.negocio))) continue; // prueba terminada, cancelada o impago
