@@ -231,6 +231,17 @@ const R = require('./redes-imitadas-j.cjs'), ayer = R.ayer;
   r = await pedir('POST', '/anuncios', { ...anuncio, simular: true }, basico);
   assert.equal(r.st, 402); paso('prueba terminada → no deja crear anuncios (402)');
 
+  // --- chat público de la portada ---
+  r = await pedir('POST', '/chat', { mensajes: [{ yo: true, texto: '¿Cuánto cuesta y qué hacéis?' }] });
+  assert.equal(r.st, 200, JSON.stringify(r.j)); assert.ok(r.j.texto.length > 5);
+  const sis = s.llamadasIA.filter((x) => /llama/.test(x.modelo)).pop().e.messages[0].content;
+  assert.ok(/39 €\/mes/.test(sis) && /79 €\/mes/.test(sis) && /NO hace todavía/.test(sis));
+  for (let i = 0; i < 19; i++) await pedir('POST', '/chat', { mensajes: [{ yo: true, texto: 'hola' }] });
+  r = await pedir('POST', '/chat', { mensajes: [{ yo: true, texto: 'hola' }] });
+  assert.equal(r.st, 429); r = await pedir('POST', '/chat', { mensajes: [] });
+  assert.ok(r.st === 400 || r.st === 429);
+  paso('chat de la portada con IA: sin sesión, con los precios de precios.js y lo que NO hace, y con tope por visitante');
+
   // --- un negocio no ve lo de otro ---
   r = await pedir('GET', '/bandeja/ig:c:k1', undefined, basico);
   assert.equal(r.st, 404); r = await pedir('GET', '/anuncios', undefined, basico);

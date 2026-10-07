@@ -523,5 +523,22 @@ import { resumen, serieEjemplo, REDES_M, NOMBRE_CAMPO } from "./conectores/conse
   if (pedida) { try { vista("panel"); window.panel(pedida); } catch (e) {} }
   else if ($("app") && $("app").classList.contains("on") && MIAS.includes(TAB)) { try { window.panel(TAB); } catch (e) {} }
   else { try { pintarNav(); } catch (e) {} }
+  /* ---------------- chat de la portada con IA (POST /chat del servidor, público) ----------------
+     Los botones de preguntas rápidas siguen siendo instantáneos; lo que se ESCRIBE va a la IA si hay
+     servidor configurado. Si el servidor no puede (sin cupo, sin red), contesta lo preparado. */
+  const historial = [];
+  const preguntarAntes = window.preguntarLibre, abrirChatAntes = window.abrirChat;
+  if (typeof abrirChatAntes === "function") window.abrirChat = function () { historial.length = 0; return abrirChatAntes.apply(this, arguments); };
+  if (typeof preguntarAntes === "function") window.preguntarLibre = function () {
+    const srv = CS() && CS().estado().servidor, i = $("chatTxt"), v = ((i && i.value) || "").trim();
+    if (!srv || !v) return preguntarAntes.apply(this, arguments);
+    i.value = ""; $("qs").innerHTML = "";
+    const st = $("stream"), yo = document.createElement("div"); yo.className = "bub me"; yo.textContent = v; st.appendChild(yo);
+    const esc2 = document.createElement("div"); esc2.className = "typing"; esc2.textContent = "Chispa está escribiendo…"; st.appendChild(esc2); st.scrollTop = st.scrollHeight;
+    historial.push({ yo: true, texto: v });
+    fetch(srv + "/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensajes: historial.slice(-8) }) })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status)))).then((j) => j.texto).catch(() => (typeof cerebroChat === "function" ? cerebroChat(v) : "Ahora mismo no puedo contestar, prueba en un momento 🙏"))
+      .then((txt) => { try { st.removeChild(esc2); } catch (e) {} historial.push({ yo: false, texto: txt }); const b = document.createElement("div"); b.className = "bub ia"; b.textContent = txt; st.appendChild(b); st.scrollTop = st.scrollHeight; try { pintarPregs(); } catch (e) {} });
+  };
   window.ChispaPanel = { enServidor, recargar: () => { BAND = MET = ANU = REG = AVI = null; if (MIAS.includes(TAB)) pintar(TAB); }, _demo: demo };
 })();

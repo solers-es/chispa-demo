@@ -72,6 +72,7 @@ import * as IA from "./ia.js";
 import { crearApiPublica } from "./api-publica.js";
 // Bandeja, estadísticas, anuncios y automatizaciones (trabajador J): todo en panel-real.js
 import { ESQUEMA_PANEL, rutasPanel, rutasAdminPanel, cronPanel } from "./panel-real.js";
+import { rutaChat } from "./chat.js"; // chat de la portada con IA (público y con topes)
 // Alta sola, prueba, planes, límites y pago (trabajador H): todo en su módulo
 import { rutasPublicas, rutasConSesion, antesDeRuta, asegurarTablasSuscripciones, puedePublicar } from "./suscripciones.js";
 
@@ -553,6 +554,7 @@ async function atender(req, env) {
   if (publica !== undefined) return publica;
   if (m === "GET" && ruta === "/oauth/vuelta") return vueltaOAuth(req, env);
   if (m === "POST" && ruta === "/sesion") return entrar(env, await leerJson(req));
+  if (m === "POST" && ruta === "/chat") return rutaChat(req, env, { Fallo, huella, leerJson });
   if (m === "GET" && partes[0] === "medio" && partes.length === 2) return IA.servirMedio(env, partes[1]);
 
   if (partes[0] === "admin") {
