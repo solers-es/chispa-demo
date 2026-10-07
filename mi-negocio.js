@@ -72,6 +72,14 @@
     }
     // 07/10/2026 (3), trabajador A: el logo por defecto pasa a la versión de fondo negro
     if (/^marca\/elparaiso-logo(-160)?\.png$/.test(n.logoUrl || '')) { n.logoUrl = PARAISO.logoUrl; guardar(); }
+    // 07/10/2026 (4): El Paraíso (el negocio de ejemplo) SIEMPRE lleva su logo. Si logoUrl
+    // quedó vacío o con un valor antiguo —p.ej. tras elegir un icono o cambiar de sector,
+    // que ponen logoUrl=''— salía la casita 🏠 en vez del logo. Se restaura.
+    if (/para[ií]so/i.test(n.nombre || '')) {
+      var logosViejosP = ['https://el-paraiso-eight.vercel.app/fotos/logo.png', 'marca/elparaiso-logo.png', 'marca/elparaiso-logo-160.png', 'marca/elparaiso-logo-integrado.png'];
+      if (!n.logoUrl || logosViejosP.indexOf(n.logoUrl) >= 0) { n.logoUrl = PARAISO.logoUrl; guardar(); }
+      if (!n.logo || n.logo === '🏠') { n.logo = '🍽️'; guardar(); }
+    }
     CAMPOS.forEach(function (k) { if (n[k] === undefined) n[k] = ''; });
     S.conexiones = S.conexiones || {};
   }
