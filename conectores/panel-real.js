@@ -37,7 +37,16 @@ export const ESQUEMA_PANEL = [...ESQUEMA_BANDEJA, ...ESQUEMA_METRICAS, ...ESQUEM
 export const FUNCIONES = {
   respuestas: { planes: ["pro", "agencia"], frase: "Respuestas a comentarios y reseñas" },
   anuncios: { planes: ["pro", "agencia"], frase: "Anuncios preparados" },
+  estudio: { planes: ["pro", "agencia"], frase: "Estudio para creadores (miniseries y guiones con IA)" },
 };
+/* Para rutas fuera del panel (p. ej. /ia/texto serie|guion): 402 si el plan no la incluye */
+export async function exigirFuncion(env, Fallo, negocio, funcion) {
+  const c = await comprobarLimite(env, Fallo, negocio, null);
+  if (c.interno) return c;
+  const f = FUNCIONES[funcion];
+  if (f && !f.planes.includes(c.plan)) throw new Fallo("«" + f.frase + "» viene en los planes Pro y Agencia. Tu plan es " + (c.nombrePlan || c.plan) + ": súbelo en «Mi plan».", 402, { motivo: "plan", funcion, plan: c.plan });
+  return c;
+}
 
 /* ---------------- contexto que reciben los módulos ---------------- */
 export function crearContexto(base, presupuesto = 40) {

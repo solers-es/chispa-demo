@@ -3,11 +3,14 @@
 > **Lo que pidió Stalin:** «una vez Chispa esté enlazado con todas las plataformas, que en todas las
 > páginas y en el teléfono se vea actualizado sin volver a enlazarlo».
 
-**Estado (07/10/2026):** el código está escrito y **probado en local** con un simulador (sin cuenta y
-sin red): 22 comprobaciones del servidor y 11 en el navegador (portátil + iPhone) en verde.
-**Falta desplegarlo**: crear la cuenta gratuita de Cloudflare y poner los secretos. Eso se hace con
-Stalin delante, siguiendo la guía de abajo. Hasta entonces Chispa sigue en **modo demostración**
-(todo en el navegador de cada aparato) y lo dice en *Panel → Conexiones*.
+**Estado (07/10/2026, corregido por K):** **desplegado** en `https://chispa-api.solers.workers.dev`
+(cuenta de Cloudflare de El Paraíso, base D1 `chispa` en Europa) y **encendido** en la web pública
+(`CHISPA_SERVIDOR` en `index.html`). Lo que falta de cada red son sus permisos (trámite: ver
+`docs/ESTADO-CHISPA.md`). La guía de abajo sirve para rehacerlo desde cero.
+
+**Copia de seguridad de la base:** diaria a las 04:17, cifrada, en el repositorio PRIVADO
+`solers-es/chispa-copias` (30 días). Cómo se hace y cómo se restaura (probado): su `LEEME.md`.
+El Worker no tiene ningún token para eso: la hace el MacBook de Stalin con su sesión de wrangler.
 
 | Fichero | Qué es |
 |---|---|

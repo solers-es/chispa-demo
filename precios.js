@@ -32,8 +32,8 @@
       {
         id: 'pro', nombre: 'Pro', precio: 79, etiqueta: 'Lo más completo', destacado: true,
         en: { nombre: 'Pro', etiqueta: 'Most complete' },
-        incluye: ['Todo lo de Básico +', 'Todas las redes (Instagram, Facebook, TikTok, YouTube, Google)', '90 publicaciones al mes', '20 imágenes IA al día', 'Anuncios preparados', 'Respuestas a comentarios y reseñas', 'Hasta 3 usuarios'],
-        incluyeEn: ['Everything in Basic +', 'All networks (Instagram, Facebook, TikTok, YouTube, Google)', '90 posts a month', '20 AI images a day', 'Ready-made ads', 'Replies to comments and reviews', 'Up to 3 users'],
+        incluye: ['Todo lo de Básico +', 'Todas las redes (Instagram, Facebook, TikTok, YouTube, Google)', '90 publicaciones al mes', '20 imágenes IA al día', 'Anuncios preparados', 'Respuestas a comentarios y reseñas', 'Estudio para creadores: miniseries y guiones con IA', 'Hasta 3 usuarios'],
+        incluyeEn: ['Everything in Basic +', 'All networks (Instagram, Facebook, TikTok, YouTube, Google)', '90 posts a month', '20 AI images a day', 'Ready-made ads', 'Replies to comments and reviews', 'Creator studio: AI mini-series and scripts', 'Up to 3 users'],
         limites: { publicacionesMes: 90, redes: 4, imagenesDia: 20, usuarios: 3 }
       },
       {

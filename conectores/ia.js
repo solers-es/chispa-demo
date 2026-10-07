@@ -256,6 +256,50 @@ export async function escribir(env, negocio, q) {
   const j = sacarJson(await llm(env, negocio, sis, usr, 600));
   return { titulo: String(j.titulo || "").slice(0, 80), texto: String(j.texto || ""), hashtags: Array.isArray(j.hashtags) ? j.hashtags.slice(0, 8) : [], idioma: lc, aviso: avisoIdioma([lc]) };
 }
+/* ---------------- ESTUDIO PARA CREADORES (miniseries y guiones) ----------------
+   Para canales de contenido (creadores, agencias) y para cualquier negocio que quiera vídeos
+   por capítulos. No promete visitas ni dinero: escribe el plan; grabar y publicar es del creador. */
+export const PLATAFORMAS = {
+  tiktok: { nombre: "TikTok", dur: "21-45 s", objetivo: "that people watch it to the end and rewatch it" },
+  reels: { nombre: "Instagram Reels", dur: "30-90 s", objetivo: "that people share it by direct message" },
+  shorts: { nombre: "YouTube Shorts", dur: "15-50 s", objetivo: "that people do not swipe away and watch it entirely" },
+};
+const plataforma = (p) => (PLATAFORMAS[String(p || "").toLowerCase()] ? String(p).toLowerCase() : "tiktok");
+const quienEs = (q) => (q.negocio ? q.negocio + (q.sector ? " (" + q.sector + ")" : "") + (q.ciudad ? " in " + q.ciudad : "") : "a content creator");
+const REGLAS_CREADOR = "Rules: original and varied (never a copy of another creator), no invented facts, statistics, prices, dates or quotes; if the topic needs facts, write them as things the creator must check; no medical, legal or financial promises; no clickbait that the video does not deliver.";
+export async function serie(env, negocio, q) {
+  const tema = String(q.tema || q.nicho || "").trim();
+  if (tema.length < 3) throw new FalloIA("Dime el tema o el nicho de la serie");
+  const lc = idioma(q.idioma), pl = plataforma(q.plataforma), P = PLATAFORMAS[pl];
+  const n = Math.min(Math.max(parseInt(q.episodios, 10) || 5, 3), 8);
+  const sis = "You are a showrunner of short vertical video series for " + quienEs(q) + ". You plan mini-series where every episode ends with a cliffhanger that makes people watch the next one. " + REGLAS_CREADOR + " Write EVERYTHING in " + nombreEn(lc) + " (" + lc + "). Answer ONLY with valid JSON, no markdown.";
+  const usr = "Topic / niche: " + tema.slice(0, 400) + (q.publico ? "\nAudience: " + String(q.publico).slice(0, 200) : "") + "\nPlatform: " + P.nombre + " (" + P.dur + ")\nEpisodes: " + n +
+    '\nJSON: {"titulo":"series title, max 6 words","premisa":"one sentence","episodios":[{"titulo":"max 9 words","gancho":"first spoken line, max 15 words","guion":"3-5 short spoken lines separated by \\n","cliffhanger":"last line that leads to the next episode (for the last episode: the payoff)","texto_pantalla":"max 6 words"}],"hashtags":["#x"]}. Exactly ' + n + " episodes. Use \\n for line breaks inside strings.";
+  const j = sacarJson(await llm(env, negocio, sis, usr, 2200));
+  const eps = (Array.isArray(j.episodios) ? j.episodios : []).filter((e) => e && e.titulo).slice(0, n).map((e) => ({
+    titulo: String(e.titulo).slice(0, 120), gancho: String(e.gancho || "").slice(0, 200), guion: String(e.guion || "").slice(0, 1200),
+    cliffhanger: String(e.cliffhanger || "").slice(0, 300), texto_pantalla: String(e.texto_pantalla || "").slice(0, 60),
+  }));
+  if (eps.length < 2) throw new FalloIA("La IA no devolvió los episodios; prueba otra vez", 502);
+  return { titulo: String(j.titulo || tema).slice(0, 80), premisa: String(j.premisa || "").slice(0, 300), episodios: eps, hashtags: Array.isArray(j.hashtags) ? j.hashtags.slice(0, 6).map(String) : [], plataforma: pl, idioma: lc, aviso: avisoIdioma([lc]), modelo: MODELOS.texto };
+}
+export async function guion(env, negocio, q) {
+  const tema = String(q.tema || q.texto || "").trim();
+  if (tema.length < 3) throw new FalloIA("Dime de qué va el vídeo");
+  const lc = idioma(q.idioma), pl = plataforma(q.plataforma), P = PLATAFORMAS[pl];
+  const sis = "You write short vertical video scripts for " + quienEs(q) + ". Optimised for " + P.nombre + ": " + P.dur + ", the goal is " + P.objetivo + ". Hook in the first 2 seconds that also works without sound, a cut every 1.5-3 seconds, a micro-hook before each third, a payoff that loops to the start, and a call to action that is NOT 'like and subscribe'. " + REGLAS_CREADOR + " Write EVERYTHING in " + nombreEn(lc) + " (" + lc + "). Answer ONLY with valid JSON, no markdown.";
+  const usr = "Video topic: " + tema.slice(0, 600) + (q.variante ? "\nWrite a DIFFERENT version from the usual one (variant " + (parseInt(q.variante, 10) || 2) + ")." : "") +
+    '\nJSON: {"titulo":"max 8 words","gancho":"spoken hook, max 15 words","texto_pantalla":"on-screen text for the first frame, max 6 words","escenas":[{"dice":"spoken line","se_ve":"what is on screen"}],"remate":"payoff line","cta":"call to action","descripcion":"caption for the post, 1-2 lines","hashtags":["#x"],"duracion":"approx seconds"}. 4-7 escenas.';
+  const j = sacarJson(await llm(env, negocio, sis, usr, 1400));
+  const escenas = (Array.isArray(j.escenas) ? j.escenas : []).filter((e) => e && (e.dice || e.se_ve)).slice(0, 8).map((e) => ({ dice: String(e.dice || "").slice(0, 300), se_ve: String(e.se_ve || "").slice(0, 200) }));
+  if (!j.gancho || !escenas.length) throw new FalloIA("La IA no devolvió el guion completo; prueba otra vez", 502);
+  return {
+    titulo: String(j.titulo || tema).slice(0, 90), gancho: String(j.gancho).slice(0, 200), texto_pantalla: String(j.texto_pantalla || "").slice(0, 60), escenas,
+    remate: String(j.remate || "").slice(0, 300), cta: String(j.cta || "").slice(0, 200), descripcion: String(j.descripcion || "").slice(0, 400),
+    hashtags: Array.isArray(j.hashtags) ? j.hashtags.slice(0, 6).map(String) : [], duracion: String(j.duracion || P.dur).slice(0, 20), plataforma: pl, idioma: lc, aviso: avisoIdioma([lc]), modelo: MODELOS.texto,
+  };
+}
+
 /* textos: [string]; idiomas: ["en","de"] → {traducciones: {en: [..], de: [..]}} */
 export async function traducir(env, negocio, q) {
   const textos = (Array.isArray(q.textos) ? q.textos : [q.texto]).map((t) => String(t || "")).filter(Boolean).slice(0, 8);

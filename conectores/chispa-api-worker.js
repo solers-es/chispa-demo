@@ -58,7 +58,7 @@
      --- IA (Workers AI, plan gratuito; ver conectores/ia.js) ---
      POST   /ia/imagen {texto,titulo,sector,prompt?,cantidad?}  → {urls:[…/medio/ID.jpg]}
      POST   /ia/voz {texto, idioma}        → {audio (data:), palabras:[{t,i,f}], duracion}
-     POST   /ia/texto {accion: escribir|reaprovechar|traducir, …}
+     POST   /ia/texto {accion: escribir|reaprovechar|traducir|serie|guion, …}  (serie y guion: Estudio para creadores, Pro y Agencia)
      POST   /ia/video                      HUECO: 501 hasta elegir proveedor (docs/VIDEO-IA.md)
      GET    /ia/uso                        lo gastado hoy y los límites
      GET    /medio/:id.jpg                 público: imagen generada (las redes la descargan)
@@ -71,7 +71,7 @@ import { publicarEn, estadisticas } from "./redes.js";
 import * as IA from "./ia.js";
 import { crearApiPublica } from "./api-publica.js";
 // Bandeja, estadísticas, anuncios y automatizaciones (trabajador J): todo en panel-real.js
-import { ESQUEMA_PANEL, rutasPanel, rutasAdminPanel, cronPanel } from "./panel-real.js";
+import { ESQUEMA_PANEL, rutasPanel, rutasAdminPanel, cronPanel, exigirFuncion } from "./panel-real.js";
 import { rutaChat } from "./chat.js"; // chat de la portada con IA (público y con topes)
 // Alta sola, prueba, planes, límites y pago (trabajador H): todo en su módulo
 import { rutasPublicas, rutasConSesion, antesDeRuta, asegurarTablasSuscripciones, puedePublicar } from "./suscripciones.js";
@@ -588,7 +588,11 @@ async function atender(req, env) {
       if (c.accion === "reaprovechar") return IA.reaprovechar(env, s.negocio, q);
       if (c.accion === "traducir") return IA.traducir(env, s.negocio, q);
       if (c.accion === "escribir") return IA.escribir(env, s.negocio, q);
-      throw new Fallo("accion: escribir | reaprovechar | traducir");
+      if (c.accion === "serie" || c.accion === "guion") {
+        await exigirFuncion(env, Fallo, s.negocio, "estudio"); // Estudio para creadores: Pro y Agencia (precios.js)
+        return c.accion === "serie" ? IA.serie(env, s.negocio, q) : IA.guion(env, s.negocio, q);
+      }
+      throw new Fallo("accion: escribir | reaprovechar | traducir | serie | guion");
     }
     throw new Fallo("No existe", 404);
   }

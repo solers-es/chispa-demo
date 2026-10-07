@@ -28,8 +28,10 @@
      · campo trampa «web» (invisible: si viene relleno, es un robot)
      · Cloudflare Turnstile (captcha gratuito) SI se ponen TURNSTILE_SITIO (var) y
        TURNSTILE_SECRETO (secreto). Sin ellos, funciona con lo anterior.
-     · El correo NO se verifica todavía (hace falta un proveedor de correo): se guarda
-       y se marca «sin verificar». Ver docs/VENDER-CHISPA.md.
+     · Correo: si hay proveedor (RESEND_API_KEY + CORREO_REMITENTE), al darse de alta se
+       manda un correo con su código y un enlace para VERIFICAR el correo (7 días, un uso):
+       GET /correo/verificar?t=…  ·  POST /cuenta/correo/reenviar (dueño, 1 cada 10 min).
+       Sin proveedor: se guarda «sin verificar» y la página lo dice (trámite T7).
 
    Pago (Stripe), APAGADO hasta que existan los secretos:
      STRIPE_SECRET_KEY        secreto  sk_live_… / sk_test_…
@@ -56,6 +58,7 @@ export const ESQUEMA_SUSCRIPCIONES = [
   "CREATE TABLE IF NOT EXISTS alta_retos (huella TEXT PRIMARY KEY, cuando INTEGER NOT NULL)",
   "CREATE TABLE IF NOT EXISTS stripe_eventos (id TEXT PRIMARY KEY, tipo TEXT, recibido INTEGER NOT NULL)",
   "CREATE TABLE IF NOT EXISTS uso (negocio TEXT NOT NULL, clave TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (negocio, clave))",
+  "CREATE TABLE IF NOT EXISTS correo_tokens (huella TEXT PRIMARY KEY, negocio TEXT NOT NULL, correo TEXT NOT NULL, caduca INTEGER NOT NULL, creado INTEGER NOT NULL)",
 ];
 
 const ahora = () => Date.now();
@@ -235,7 +238,51 @@ async function alta(req, env, h) {
   await env.DB.prepare("UPDATE alta_intentos SET ok = 1 WHERE rowid = (SELECT rowid FROM alta_intentos WHERE ip = ? ORDER BY cuando DESC LIMIT 1)").bind(ipH).run();
   const codigo = await h.guardarCodigo(env, id, "dueno", { nota: "alta sola" });
   const sesion = await h.crearSesion(env, id, "dueno");
-  return { negocio: id, nombre, codigo, sesion, rol: "dueno", esAdministrador: true, plan: p.id, nombrePlan: p.nombre, estado: "prueba", pruebaHasta: hasta, diasPrueba: PRECIOS.DIAS_PRUEBA, sector, idioma, pago: { encendido: pagoEncendido(env) } };
+  let correoEnviado = false;
+  try { correoEnviado = await correoDeVerificacion(env, h, id, nombre, correo, codigo); } catch (e) { correoEnviado = false; } // el alta no falla por el correo
+  return { negocio: id, nombre, codigo, sesion, correoEnviado, rol: "dueno", esAdministrador: true, plan: p.id, nombrePlan: p.nombre, estado: "prueba", pruebaHasta: hasta, diasPrueba: PRECIOS.DIAS_PRUEBA, sector, idioma, pago: { encendido: pagoEncendido(env) } };
+}
+
+/* ---------------- correo: verificar y mandar el código ---------------- */
+export function correoActivo(env) { return !!(env.RESEND_API_KEY && env.CORREO_REMITENTE); }
+async function mandarCorreo(env, para, asunto, texto) {
+  const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: "Bearer " + env.RESEND_API_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ from: env.CORREO_REMITENTE, to: [para], subject: asunto, text: texto }) });
+  if (!r.ok) throw new Error("El proveedor de correo respondió " + r.status);
+}
+async function correoDeVerificacion(env, h, negocio, nombre, correo, codigo) {
+  if (!correoActivo(env)) return false;
+  const t = azarTexto(32);
+  await env.DB.prepare("DELETE FROM correo_tokens WHERE negocio = ?").bind(negocio).run();
+  await env.DB.prepare("INSERT INTO correo_tokens (huella, negocio, correo, caduca, creado) VALUES (?, ?, ?, ?, ?)").bind(await h.huella(env, "correo:" + t), negocio, correo, ahora() + 7 * DIA, ahora()).run();
+  const base = (env.URL_BASE || "").replace(/\/$/, ""), panel = env.PANEL_URL || "";
+  const L = ["Hola,", "", "Gracias por probar Chispa con " + nombre + ".", "", "Confirma que este es tu correo (el enlace vale 7 días):", base + "/correo/verificar?t=" + t, ""];
+  if (codigo) L.push("Tu código de acceso (guárdalo, sirve para entrar desde cualquier aparato):", codigo, "Negocio: " + negocio, "Entrar: " + panel + "#conectar", "");
+  L.push("Si no te has dado de alta tú, no hagas nada: sin confirmar, no te volveremos a escribir salvo para avisarte del fin de la prueba.", "", "Chispa · Solers");
+  await mandarCorreo(env, correo, "Chispa · confirma tu correo", L.join("\n"));
+  return true;
+}
+const pagina = (titulo, texto, panel) => new Response('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + titulo + '</title></head><body style="font-family:system-ui,sans-serif;background:#0b0d12;color:#e9edf4;display:grid;place-items:center;min-height:90vh;margin:0;padding:16px"><div style="max-width:420px;text-align:center"><div style="font-size:42px">⚡</div><h1 style="font-size:22px">' + titulo + '</h1><p style="color:#aeb8ca">' + texto + '</p>' + (panel ? '<p><a style="color:#ffcc33" href="' + panel + '">Ir a Chispa</a></p>' : "") + "</div></body></html>", { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+async function verificarCorreo(env, h, url) {
+  const t = String(url.searchParams.get("t") || "");
+  const panel = env.PANEL_URL || "";
+  if (!/^[a-z0-9]{20,64}$/.test(t)) return pagina("Enlace no válido", "Este enlace de confirmación no es correcto.", panel);
+  const hu = await h.huella(env, "correo:" + t);
+  const f = await env.DB.prepare("SELECT negocio, correo, caduca FROM correo_tokens WHERE huella = ?").bind(hu).first();
+  if (!f || f.caduca < ahora()) return pagina("Enlace caducado", "Pide otro desde Chispa: «Mi plan» → «Reenviar».", panel);
+  await env.DB.prepare("UPDATE cuentas SET correo_verificado = 1, actualizado = ? WHERE negocio = ? AND correo = ?").bind(ahora(), f.negocio, f.correo).run();
+  await env.DB.prepare("DELETE FROM correo_tokens WHERE negocio = ?").bind(f.negocio).run();
+  return pagina("Correo confirmado ✓", "Ya está. Te escribiremos aquí solo lo importante (fin de la prueba, resumen si lo activas).", panel);
+}
+async function reenviarCorreo(env, h, s) {
+  if (s.rol !== "dueno") throw new h.Fallo("Solo el dueño puede hacerlo", 403);
+  const c = await env.DB.prepare("SELECT correo, correo_verificado FROM cuentas WHERE negocio = ?").bind(s.negocio).first();
+  if (!c || !c.correo) throw new h.Fallo("Esta cuenta no tiene correo", 400);
+  if (c.correo_verificado) return { ok: true, yaVerificado: true };
+  if (!correoActivo(env)) throw new h.Fallo("El envío de correos todavía no está activado en Chispa", 503, { motivo: "sin-proveedor" });
+  const u = await env.DB.prepare("SELECT creado FROM correo_tokens WHERE negocio = ?").bind(s.negocio).first();
+  if (u && ahora() - u.creado < 10 * 60e3) throw new h.Fallo("Ya te lo hemos mandado hace poco: mira en tu correo (y en «spam») y vuelve a intentarlo en 10 minutos", 429);
+  await correoDeVerificacion(env, h, s.negocio, s.nombre || s.negocio, c.correo, null);
+  return { ok: true, enviado: true, correo: c.correo };
 }
 
 /* ---------------- Stripe ---------------- */
@@ -382,10 +429,15 @@ async function editarCliente(env, h, id, c) {
 }
 async function borrarNegocio(env, h, id) {
   if (id === "el-paraiso") throw new h.Fallo("El Paraíso no se borra", 403);
-  for (const t of ["negocios:id", "codigos:negocio", "sesiones:negocio", "estado:negocio", "conexiones:negocio", "oauth_estados:negocio", "agenda:negocio", "cuentas:negocio", "uso:negocio"]) {
-    const [tabla, col] = t.split(":");
-    await env.DB.prepare("DELETE FROM " + tabla + " WHERE " + col + " = ?").bind(id).run();
+  // TODO lo del negocio (RGPD: la baja borra de verdad). Antes se quedaban bandeja (comentarios y
+  // mensajes de sus clientes), estadísticas, anuncios, reglas, avisos, claves de API e imágenes.
+  const TABLAS = ["codigos", "sesiones", "estado", "conexiones", "oauth_estados", "agenda", "uso", "bandeja", "metricas_dia", "anuncios", "reglas",
+    "avisos", "auto_registro", "ajustes_j", "api_claves", "uso_ia", "medios_ia", "correo_tokens", "cuentas"];
+  for (const tabla of TABLAS) {
+    try { await env.DB.prepare("DELETE FROM " + tabla + " WHERE negocio = ?").bind(id).run(); }
+    catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; } // tabla que aún no se ha creado en esta base
   }
+  await env.DB.prepare("DELETE FROM negocios WHERE id = ?").bind(id).run();
   return { ok: true, borrado: id };
 }
 
@@ -399,8 +451,9 @@ export async function asegurarTablasSuscripciones(env) {
 /* Rutas sin sesión. Devuelve undefined si no es suya. */
 export async function rutasPublicas(req, env, h, m, ruta) {
   if (m === "GET" && ruta === "/planes") return { planes: PRECIOS.planes, diasPrueba: PRECIOS.DIAS_PRUEBA, iva: PRECIOS.iva, ivaIncluido: PRECIOS.ivaIncluido, pago: { encendido: pagoEncendido(env) }, turnstile: env.TURNSTILE_SITIO || null, dificultad: DIFICULTAD, versionLegal: LEGAL_VERSION };
-  if (!["/alta/reto", "/alta", "/stripe/webhook"].includes(ruta) && !ruta.startsWith("/admin/clientes") && !/^\/admin\/negocios\/[^/]+$/.test(ruta)) return undefined;
+  if (!["/alta/reto", "/alta", "/stripe/webhook", "/correo/verificar"].includes(ruta) && !ruta.startsWith("/admin/clientes") && !/^\/admin\/negocios\/[^/]+$/.test(ruta)) return undefined;
   await asegurarTablasSuscripciones(env);
+  if (m === "GET" && ruta === "/correo/verificar") return verificarCorreo(env, h, new URL(req.url));
   if (m === "GET" && ruta === "/alta/reto") return { ...(await retoNuevo(env)), turnstile: env.TURNSTILE_SITIO || null };
   if (m === "POST" && ruta === "/alta") return alta(req, env, h);
   if (m === "POST" && ruta === "/stripe/webhook") return webhook(req, env, h);
@@ -415,12 +468,13 @@ export async function rutasPublicas(req, env, h, m, ruta) {
 }
 /* Rutas con sesión. Devuelve undefined si no es suya. */
 export async function rutasConSesion(req, env, h, s, m, ruta) {
-  if (!["/cuenta", "/cuenta/baja", "/pago/checkout", "/pago/portal"].includes(ruta)) return undefined;
+  if (!["/cuenta", "/cuenta/baja", "/pago/checkout", "/pago/portal", "/cuenta/correo/reenviar"].includes(ruta)) return undefined;
   await asegurarTablasSuscripciones(env);
   if (m === "GET" && ruta === "/cuenta") {
     const c = await cuentaDe(env, s.negocio);
-    return { ...c, uso: c.interno ? null : await uso(env, s.negocio, c), pago: { encendido: pagoEncendido(env) }, diasPrueba: PRECIOS.DIAS_PRUEBA };
+    return { ...c, uso: c.interno ? null : await uso(env, s.negocio, c), pago: { encendido: pagoEncendido(env) }, correoActivo: correoActivo(env), diasPrueba: PRECIOS.DIAS_PRUEBA };
   }
+  if (m === "POST" && ruta === "/cuenta/correo/reenviar") return reenviarCorreo(env, h, s);
   if (m === "POST" && ruta === "/pago/checkout") return checkout(env, h, s, await h.leerJson(req).catch(() => ({})));
   if (m === "POST" && ruta === "/pago/portal") return portal(env, h, s);
   if (m === "POST" && ruta === "/cuenta/baja") return baja(env, h, s, await h.leerJson(req).catch(() => ({})));

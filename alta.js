@@ -226,7 +226,8 @@
       '<div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn g" style="flex:1" onclick="ChispaAlta._copiar()">📋 Copiar</button>' +
       '<button class="btn g" style="flex:1" onclick="ChispaAlta._mail()">✉️ Enviármelo al correo</button></div>' +
       '<div class="card" style="margin-top:14px;font-size:13px;color:var(--tx2)">' + (pago ? '💳 Durante la prueba no se cobra nada. Antes de que acabe podrás elegir pagar con tarjeta en «💳 Mi plan».' :
-        '🧪 <b>Modo prueba sin cobro:</b> el pago con tarjeta todavía no está activado, así que no se te cobrará nada. Antes de que termine la prueba te escribimos a <b>' + esc(correo) + '</b> para seguir.') + '</div>' +
+        '🧪 <b>Modo prueba sin cobro:</b> el pago con tarjeta todavía no está activado, así que no se te cobrará nada. Antes de que termine la prueba te escribimos a <b>' + esc(correo) + '</b> para seguir.') +
+        (j.correoEnviado ? '<br>✉️ Te hemos mandado un correo a <b>' + esc(correo) + '</b> con tu código y un enlace para confirmar tu correo.' : '') + '</div>' +
       (adminAqui ? '<div class="cc-aviso" style="margin-top:12px">Este navegador está en <b>modo Solers</b>: no te meto aquí para no mezclar tus clientes. Abre este enlace en otro navegador o en el móvil del cliente:<input class="inp" readonly style="margin-top:6px" onclick="this.select()" value="' + esc(enlaceCliente(j)) + '"></div>' :
         '<button class="btn pp" style="width:100%;margin-top:14px;min-height:50px;font-size:16px" onclick="ChispaAlta.entrar()">Entrar en mi Chispa ›</button>') +
       '</div>';
@@ -308,9 +309,13 @@
       '<div class="card"><b>Baja y datos</b><p style="color:var(--tx2);font-size:13px;margin:6px 0">Sin permanencia. ' + (c.tieneStripe ? 'Desde «Gestionar pago» cambias la tarjeta, descargas facturas o te das de baja.' : 'Puedes darte de baja cuando quieras.') + ' Al borrar la cuenta se eliminan tu negocio, tus publicaciones y tus conexiones con las redes.</p>' +
       '<div class="row" style="gap:8px;flex-wrap:wrap">' + (c.tieneStripe && pago ? '<button class="btn g sm" style="flex:none" onclick="ChispaAlta._portal()">⚙️ Gestionar pago y facturas</button>' : '') +
       '<button class="btn g sm" style="flex:none" onclick="ChispaAlta._baja()">🗑️ Darme de baja y borrar mis datos</button></div></div>' +
-      '<p style="font-size:12px;color:var(--tx3)">Negocio <b>' + esc(c.negocio) + '</b> · correo ' + esc(c.correo || '') + (c.correoVerificado ? '' : ' (sin verificar)') + '</p>';
+      '<p style="font-size:12px;color:var(--tx3)">Negocio <b>' + esc(c.negocio) + '</b> · correo ' + esc(c.correo || '') + (c.correoVerificado ? ' ✓' : ' (sin verificar)' +
+        (c.correoActivo && c.correo ? ' <a href="javascript:void 0" onclick="ChispaAlta._reenviar()">Reenviar el correo de confirmación</a>' : '')) + '</p>';
     return h;
   }
+  API._reenviar = function () {
+    llamar('POST', '/cuenta/correo/reenviar', {}).then(function (j) { aviso(j.yaVerificado ? 'Tu correo ya está confirmado ✓' : '✉️ Te lo hemos mandado a ' + j.correo + ' (mira también en «spam»)'); }, function (e) { aviso(e.message); });
+  };
   API._pagar = function (plan) {
     llamar('POST', '/pago/checkout', { plan: plan }).then(function (j) { location.href = j.url; }, function (e) {
       if (e.datos && e.datos.modoPrueba) {
