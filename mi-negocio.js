@@ -643,7 +643,13 @@
   }
   function mnHecho(id, si) { S.conexiones[id] = !!si; guardar(); panel('conectar'); toast(si ? 'Marcado como hecho ✓' : 'Desmarcado'); }
   function mnAbrir(u) { irA(u); }
-  function conectarCuentas() { try { cerrarModal(); } catch (e) {} vista('panel'); panel('conectar'); }
+  function conectarCuentas(red) {
+    try { cerrarModal(); } catch (e) {}
+    vista('panel'); panel('conectar');
+    var id = typeof red === 'string' ? red : (red && (red.id || red.red)) || '';
+    id = ({ ig: 'instagram', igf: 'instagram', igs: 'instagram', fb: 'facebook', tt: 'tiktok', yt: 'youtube', wa: 'whatsapp', gbp: 'google' })[id] || id;
+    setTimeout(function () { var c = id && $('cx_' + id); if (c) c.scrollIntoView({ behavior: 'smooth' }); }, 60);
+  }
 
   /* ---------- pestañas: Mi negocio + Conexiones ---------- */
   if (!TABS.some(function (t) { return t.id === 'conectar'; })) {
