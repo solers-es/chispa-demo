@@ -1,0 +1,80 @@
+/* Chispa · bandeja, día a día, anuncios y automatizaciones (chispa-panel.js) */
+.cp-acc{display:flex;gap:8px;flex-wrap:wrap}
+.cp-modo{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--tx2);margin-bottom:12px;line-height:1.5}
+.cp-modo .btn{margin-left:4px}
+.cp-modo.ok{border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.07)}
+.cp-modo.demo{border-color:rgba(255,204,51,.35);background:rgba(255,204,51,.06)}
+.cp-modo.err{border-color:rgba(251,113,133,.5);background:rgba(251,113,133,.08);color:var(--tx)}
+.cp-redes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cp-red{font-size:11.5px;border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--tx3)}
+.cp-red.on{color:var(--verde);border-color:rgba(52,211,153,.4)}
+.cp-fil{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.cp-fil button{border:1px solid var(--line);background:var(--panel2);color:var(--tx2);border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.cp-fil button span{opacity:.7;font-weight:600;margin-left:3px}
+.cp-fil button.on{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border-color:#8b5cf6}
+.cp-fil2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:560px){.cp-fil2{grid-template-columns:1fr 1fr}.cp-fil2 select:last-child{grid-column:1/-1}}
+.cp-it,.cp-an{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px}
+.cp-it.neg{border-color:rgba(251,113,133,.45)}
+.cp-it.hecho{opacity:.86}
+.cp-ith{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13.5px}
+.cp-chipred{font-size:11px;font-weight:800;border-radius:20px;padding:2px 8px;background:var(--panel2);border:1px solid var(--line)}
+.cp-chipred.ig{color:#f472b6}.cp-chipred.fb{color:#60a5fa}.cp-chipred.gbp{color:#34d399}.cp-chipred.yt{color:#f87171}.cp-chipred.tt{color:#67e8f9}
+.cp-tipo{font-size:11.5px;color:var(--tx3)}
+.cp-cuando{margin-left:auto;font-size:11.5px;color:var(--tx3);font-weight:400}
+.cp-st{color:var(--amber);letter-spacing:1px;font-size:13px}
+.cp-ej{font-size:10px;font-weight:800;letter-spacing:.4px;color:#1a1200;background:var(--amber);border-radius:6px;padding:1px 6px}
+.cp-ctx{font-size:12px;color:var(--tx3);margin-top:4px}
+.cp-tx{margin:8px 0;font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.cp-hilo{display:flex;flex-direction:column;gap:5px;margin:8px 0}
+.cp-hilo div{max-width:85%;background:var(--panel2);border-radius:12px 12px 12px 4px;padding:6px 10px;font-size:13.5px;overflow-wrap:anywhere}
+.cp-hilo div.yo{align-self:flex-end;background:rgba(139,92,246,.18);border-radius:12px 12px 4px 12px}
+.cp-et{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:4px 0 8px}
+.cp-tag{font-size:11.5px;border-radius:20px;padding:2px 8px;background:rgba(139,92,246,.12);color:var(--purple2);border:1px solid rgba(139,92,246,.3)}
+.cp-tagb{font-size:11.5px;border:1px dashed var(--line);background:none;color:var(--tx3);border-radius:20px;padding:2px 8px;cursor:pointer}
+.cp-prop,.cp-ok{border-radius:11px;padding:9px 11px;font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.cp-prop{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3)}
+.cp-ok{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.3)}
+.cp-prop .lbl,.cp-ok .lbl{font-size:11px;font-weight:800;color:var(--tx3);margin-bottom:3px;white-space:normal}
+.cp-acts{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.cp-acts .btn{text-align:center}
+.cp-nota{font-size:12.5px;color:var(--tx3);margin:8px 0;line-height:1.5}
+.cp-chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--tx2);margin-top:10px}
+.cp-chk input{width:auto;margin-top:3px}
+.cp-etsel{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 10px}
+.cp-etsel label,.cp-chks label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--tx2)}
+.cp-etsel input,.cp-chks input{width:auto}
+.cp-chks{display:flex;gap:12px;flex-wrap:wrap;padding:6px 0}
+/* día a día */
+.cp-dia h3{font-size:16px}
+.cp-kpis{grid-template-columns:repeat(3,1fr)}
+@media(max-width:700px){.cp-kpis{grid-template-columns:1fr 1fr}}
+.cp-kpi{text-align:left;font:inherit;color:inherit;cursor:pointer}
+.cp-kpi.on{border-color:var(--purple);box-shadow:0 0 0 1px var(--purple) inset}
+.cp-kpi .n{font-size:22px;font-weight:800}
+.cp-up{color:var(--verde)!important}.cp-down{color:var(--rojo)!important}
+.cp-chbox{position:relative;height:240px}
+.cp-cons{display:grid;gap:8px}
+.cp-con{border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:13.5px;color:var(--tx2)}
+.cp-con b{color:var(--tx);display:block;margin-bottom:2px}
+.cp-con.bien{border-color:rgba(52,211,153,.35)}.cp-con.ojo{border-color:rgba(251,113,133,.4)}.cp-con.idea{border-color:rgba(255,204,51,.35)}
+/* anuncios */
+.cp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cp-grid .cp-full{grid-column:1/-1}
+@media(max-width:560px){.cp-grid{grid-template-columns:1fr}}
+.cp-edad{display:flex;align-items:center;gap:6px}
+.cp-total{margin-top:12px;font-size:14px;color:var(--tx2);background:var(--panel2);border-radius:10px;padding:9px 12px}
+.cp-est{font-size:11.5px;font-weight:800;border-radius:20px;padding:2px 9px;border:1px solid var(--line);color:var(--tx2)}
+.cp-est.ok{color:var(--verde);border-color:rgba(52,211,153,.4)}.cp-est.amb{color:var(--amber);border-color:rgba(255,204,51,.35)}.cp-est.err{color:var(--rojo);border-color:rgba(251,113,133,.45)}
+.cp-res{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.cp-res div{background:var(--panel2);border-radius:10px;padding:7px;text-align:center}
+.cp-res b{display:block;font-size:16px}.cp-res span{font-size:11px;color:var(--tx3)}
+@media(max-width:420px){.cp-res{grid-template-columns:1fr 1fr}}
+/* automatizaciones */
+.cp-av{border-top:1px solid var(--line);padding:7px 0;font-size:13.5px}
+.cp-av summary{cursor:pointer;color:var(--tx2)}
+.cp-av.nuevo summary{color:var(--tx);font-weight:700}
+.cp-av div{margin-top:6px;color:var(--tx2);font-size:13px;line-height:1.5}
+.cp-log{font-size:12.5px;color:var(--tx2);padding:4px 0;border-top:1px solid var(--line)}
+.cp-log span{color:var(--tx3)}
+.cp-regla .au-x{display:block}

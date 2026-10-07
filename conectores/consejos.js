@@ -116,7 +116,7 @@ export function serieEjemplo(dias = 28, hoy = Date.now()) {
   const filas = [];
   let s = 20261007;
   const azar = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
-  const fuerza = [0.8, 0.7, 0.75, 0.85, 1.25, 1.45, 1.1]; // dom..sáb: viernes y sábado fuertes
+  const fuerza = [0.95, 0.7, 0.75, 0.8, 0.95, 1.3, 1.45]; // dom..sáb: viernes y sábado fuertes
   let segIg = 1206 - dias * 2, segFb = 890 - dias;
   for (let i = dias; i >= 1; i--) {
     const t = hoy - i * 864e5, d = new Date(t).getUTCDay(), k = fuerza[d] * (0.85 + azar() * 0.3) * (1 + (dias - i) * 0.006);

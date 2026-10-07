@@ -1142,5 +1142,9 @@ else if(_h.indexOf("panel")>=0){vista("panel");}
 <script src="tour.js"></script>
 <!-- IA de verdad (imagen, voz y subtítulos, idiomas, reaprovechar, claves de API): trabajador G -->
 <script src="chispa-ia.js"></script>
+<!-- Bandeja real, estadísticas día a día, anuncios y automatizaciones del servidor (trabajador J).
+     Es un módulo: se ejecuta después de todo lo anterior y envuelve panel() el último. -->
+<link rel="stylesheet" href="chispa-panel.css">
+<script type="module" src="chispa-panel.js"></script>
 </body>
 </html>
