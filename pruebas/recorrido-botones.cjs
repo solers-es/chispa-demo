@@ -7,7 +7,7 @@
    ventana, cambia la pantalla, avisa, navega, abre pestaña o descarga.
    Apunta: errores de programa, botones que no hacen nada y avisos que
    prometen sin hacer («próximamente», «(demo)»).
-   Uso: PUERTO_API=8848 PUERTO_WEB=8845 NODE_PATH=<…> node pruebas/recorrido-botones.cjs [ordenador|iphone]
+   Uso: PUERTO_API=8848 PUERTO_WEB=8845 NODE_PATH=<…> node pruebas/recorrido-botones.cjs [ordenador|iphone] [servidor]
    ===================================================================== */
 const { chromium, devices } = require('playwright-core');
 const { arrancar } = require('./servidor-simulador.cjs');
@@ -25,7 +25,9 @@ const { arrancar } = require('./servidor-simulador.cjs');
   pg.on('dialog', (d) => d.dismiss().catch(() => {}));
   let popups = 0; ctx.on('page', (p) => { if (p !== pg) { popups++; p.close().catch(() => {}); } });
   let descargas = 0; pg.on('download', () => descargas++);
-  await pg.goto(s.web + '/index.html', { waitUntil: 'load' });
+  // con «servidor» como 2.º argumento: como un visitante SIN código con el servidor encendido (CHISPA_SERVIDOR)
+  const PAGINA = s.web + '/index.html' + (process.argv[3] === 'servidor' ? '?servidor=' + encodeURIComponent(s.base) : '');
+  await pg.goto(PAGINA, { waitUntil: 'load' });
   await pg.waitForTimeout(1500);
   await pg.evaluate(() => { try { localStorage.setItem('chispa_tour_visto', '1'); } catch (e) {} });
 
@@ -60,7 +62,7 @@ const { arrancar } = require('./servidor-simulador.cjs');
       if (/pr[oó]ximamente|\(demo\)/i.test(tostada)) promesas.push((t || v) + ' › «' + nombre + '» → ' + tostada);
       const hizo = desp.html !== antes.html || desp.modal !== antes.modal || tostada || desp.url !== antes.url || popups > pop || descargas > des || desp.ovs !== antes.ovs || desp.scroll !== antes.scroll;
       if (!hizo) muertos.push((t || v) + ' › «' + nombre + '»');
-      if (pg.url().indexOf(s.web) !== 0) { await pg.goto(s.web + '/index.html', { waitUntil: 'load' }); await pg.waitForTimeout(800); }
+      if (pg.url().indexOf(s.web) !== 0) { await pg.goto(PAGINA, { waitUntil: 'load' }); await pg.waitForTimeout(800); }
     }
   }
   console.log('Pantallas: ' + pantallas.length + ' · botones pulsados: ' + pulsados);

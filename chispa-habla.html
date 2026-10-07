@@ -213,7 +213,13 @@ function responder(t){
   if(has('gracias','thanks','thank','danke','merci','gràcies'))return T.gracias;
   return T.def;
 }
-function procesar(texto){if(!texto)return;bubble(texto,'me');setTimeout(function(){say(responder(texto));},250);}
+// Cerebro: la IA del servidor de Chispa (POST /chat, público y con topes); si no contesta, las frases preparadas
+var CHISPA_SERVIDOR=window.CHISPA_SERVIDOR||'https://chispa-api.solers.workers.dev',HISTORIAL=[];
+function procesar(texto){if(!texto)return;bubble(texto,'me');HISTORIAL.push({yo:true,texto:texto+(LANG!=='es'?' (answer in '+L[LANG].code+')':'')});
+  var hecho=false,reserva=setTimeout(function(){if(!hecho){hecho=true;say(responder(texto));}},9000);
+  fetch(CHISPA_SERVIDOR+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensajes:HISTORIAL.slice(-8)})})
+    .then(function(r){return r.ok?r.json():Promise.reject();}).then(function(j){if(hecho)return;hecho=true;clearTimeout(reserva);HISTORIAL.push({yo:false,texto:j.texto});say(j.texto);})
+    .catch(function(){if(hecho)return;hecho=true;clearTimeout(reserva);say(responder(texto));});}
 
 // ---- idioma ----
 function setLang(l){

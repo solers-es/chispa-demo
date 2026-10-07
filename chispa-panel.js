@@ -160,6 +160,7 @@ import { resumen, serieEjemplo, REDES_M, NOMBRE_CAMPO } from "./conectores/conse
     if (el && BAND) { const i = BAND.elementos.findIndex((x) => x.id === el.id); if (i >= 0) BAND.elementos[i] = el; }
     cargarBandeja(); pintar("bandeja");
   }
+  window.cpVerResenas = () => { F.tipo = "resena"; F.estado = "todos"; BAND = null; window.panel("bandeja"); };
   window.cpFiltro = (k, v) => { F[k] = v; if (enServidor()) { BAND = BAND ? { ...BAND, elementos: [] } : null; cargarBandeja(); } pintar("bandeja"); };
   window.cpRecoger = () => { aviso("Mirando tus redes…"); pedir("POST", "/bandeja/recoger").then((j) => { aviso(j.nuevos ? "📥 " + j.nuevos + " nuevo(s)" : "No hay nada nuevo"); BAND = null; cargarBandeja(); }, fallo); };
   window.cpReiniciarEjemplos = () => { demo().bandeja = ejemplosBandeja(); guardarDemo(); pintar("bandeja"); aviso("Ejemplos como al principio"); };
@@ -492,6 +493,11 @@ import { resumen, serieEjemplo, REDES_M, NOMBRE_CAMPO } from "./conectores/conse
     window.scrollTo(0, y);
   }
   window.panel = function (tab) {
+    if (tab === "resenas" && enServidor()) { // con cuenta, las reseñas de Google las lee y contesta el servidor (bandeja)
+      const r = panelAntes.apply(this, arguments), m = $("main"), hd = m && m.querySelector(".hd");
+      if (hd) hd.insertAdjacentHTML("afterend", '<div class="cp-modo ok">☁️ Con tu cuenta, las reseñas de tu ficha de Google las lee y las contesta el servidor, también con la app cerrada. Están en «Comentarios y DMs». <button class="btn pp sm" onclick="cpVerResenas()">Ver mis reseñas</button></div>');
+      return r;
+    }
     if (!MIAS.includes(tab)) return panelAntes.apply(this, arguments);
     if (tab === "stats") { // la vista es de chispa-agenda.js: se añade «Día a día» arriba
       const r = panelAntes.apply(this, arguments);
