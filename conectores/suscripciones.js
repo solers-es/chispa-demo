@@ -96,7 +96,8 @@ async function uso(env, negocio, cta) {
   const mes = mesDe(ahora()), ini = Date.parse(mes + "-01T00:00:00Z"), fin = Date.parse(new Date(new Date(ini).setUTCMonth(new Date(ini).getUTCMonth() + 1)).toISOString());
   const pub = await env.DB.prepare("SELECT COUNT(*) AS n FROM agenda WHERE negocio = ? AND cuando >= ? AND cuando < ?").bind(negocio, ini, fin).first();
   const red = await env.DB.prepare("SELECT COUNT(*) AS n FROM conexiones WHERE negocio = ?").bind(negocio).first();
-  const img = await env.DB.prepare("SELECT n FROM uso WHERE negocio = ? AND clave = ?").bind(negocio, "img:" + diaDe(ahora())).first();
+  // imágenes IA: el contador es el de conectores/ia.js (tabla uso_ia de G), para no contar dos veces
+  let img = null; try { img = await env.DB.prepare("SELECT veces AS n FROM uso_ia WHERE dia = ? AND negocio = ? AND tipo = 'imagen'").bind(diaDe(ahora()), negocio).first(); } catch (e) {}
   const usu = await usuarios(env, negocio);
   return { publicacionesMes: pub ? pub.n : 0, redes: red ? red.n : 0, imagenesDia: img ? img.n : 0, usuarios: usu };
 }
@@ -128,12 +129,6 @@ export async function comprobarLimite(env, Fallo, negocio, tipo, suma = 1) {
   if (lim != null && u[tipo] + suma > lim) throw new Fallo(MSG[tipo](lim), 429, { motivo: "limite", limite: tipo, maximo: lim, usado: u[tipo], plan: c.plan });
   return c;
 }
-/* Para el módulo de imágenes IA (G): comprueba y apunta una imagen del día */
-export async function gastarImagen(env, Fallo, negocio, n = 1) {
-  await comprobarLimite(env, Fallo, negocio, "imagenesDia", n);
-  await env.DB.prepare("INSERT INTO uso (negocio, clave, n) VALUES (?, ?, ?) ON CONFLICT (negocio, clave) DO UPDATE SET n = n + excluded.n").bind(negocio, "img:" + diaDe(ahora()), n).run();
-}
-
 /* Se llama ANTES de atender una ruta con sesión: aplica los límites del plan */
 export async function antesDeRuta(req, env, h, s, m, ruta, partes) {
   const { Fallo } = h;
@@ -141,8 +136,15 @@ export async function antesDeRuta(req, env, h, s, m, ruta, partes) {
     let it = {}; try { it = await req.clone().json(); } catch (e) {}
     const viejo = it.id ? await env.DB.prepare("SELECT 1 AS x FROM agenda WHERE negocio = ? AND id = ?").bind(s.negocio, String(it.id)).first() : null;
     await comprobarLimite(env, Fallo, s.negocio, viejo ? null : "publicacionesMes");
-  } else if (m === "POST" && ruta === "/publicar") {
-    await comprobarLimite(env, Fallo, s.negocio, null);
+  } else if (m === "POST" && (ruta === "/v1/publicaciones" || ruta === "/v1/programar")) {
+    let it = {}; try { it = await req.clone().json(); } catch (e) {}
+    const viejo = it.id ? await env.DB.prepare("SELECT 1 AS x FROM agenda WHERE negocio = ? AND id = ?").bind(s.negocio, String(it.id)).first() : null;
+    await comprobarLimite(env, Fallo, s.negocio, viejo ? null : "publicacionesMes");
+  } else if (m === "POST" && (ruta === "/ia/imagen" || ruta === "/v1/imagen")) {
+    let q = {}; try { q = await req.clone().json(); } catch (e) {}
+    await comprobarLimite(env, Fallo, s.negocio, "imagenesDia", Math.min(Math.max(parseInt(q.cantidad) || 1, 1), 3));
+  } else if (m === "POST" && (ruta === "/publicar" || /^\/v1\/publicaciones\/[^/]+\/publicar$/.test(ruta) || partes[0] === "ia" || /^\/v1\/(voz|texto|reaprovechar|traducir)$/.test(ruta))) {
+    await comprobarLimite(env, Fallo, s.negocio, null); // prueba terminada, cancelada o impago: no se publica ni se gasta IA
   } else if (m === "POST" && partes[0] === "conectar" && partes.length === 2) {
     const ya = await env.DB.prepare("SELECT 1 AS x FROM conexiones WHERE negocio = ? AND red = ?").bind(s.negocio, partes[1]).first();
     await comprobarLimite(env, Fallo, s.negocio, ya ? null : "redes");

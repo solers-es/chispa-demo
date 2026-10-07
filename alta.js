@@ -35,6 +35,9 @@
   function aviso(m) { try { window.toast(m); } catch (e) {} }
   function fecha(t) { try { return new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return ''; } }
 
+  var IDIOMAS = { es: 'Español', en: 'English', fr: 'Français', de: 'Deutsch', it: 'Italiano', pt: 'Português', nl: 'Nederlands', ca: 'Català', ar: 'العربية', zh: '中文', ja: '日本語', ru: 'Русский' };
+  function nombreIdioma(c) { return IDIOMAS[c] || IDIOMAS[String(c).slice(0, 2)] || c; }
+
   /* ---------- servidor ---------- */
   var ALTA = lsJson(LS_ALTA);
   (function () { try { var p = new URLSearchParams(location.search).get('servidor'); if (p && p !== 'no' && (/^https:\/\//.test(p) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/.test(p))) ls('chispa_servidor', p.replace(/\/$/, '')); } catch (e) {} })();
@@ -55,7 +58,7 @@
     var R = esReg();
     if (ALTA && R && R.cliente === ALTA.negocio) {
       if (!window.CHISPA_SERVIDOR) window.CHISPA_SERVIDOR = ALTA.servidor;
-      if (!ALTA.preparado && window.S && S.negocio) { // primera vez dentro: su idioma y sin la ciudad de El Paraíso
+      if (!ALTA.preparado && window.S && S.negocio && S.negocio._cuenta === ALTA.negocio) { // primera vez dentro: su idioma y sin la ciudad de El Paraíso
         S.negocio.idioma = { codigo: ALTA.idioma || 'es', nombre: nombreIdioma(ALTA.idioma || 'es') };
         if (S.negocio.ciudad === 'Palma de Mallorca') S.negocio.ciudad = '';
         S.negocio.correo = ALTA.correo || '';
@@ -66,8 +69,6 @@
   })();
   function esClienteServidor() { var R = esReg(); return !!(ALTA && R && R.cliente === ALTA.negocio); }
 
-  var IDIOMAS = { es: 'Español', en: 'English', fr: 'Français', de: 'Deutsch', it: 'Italiano', pt: 'Português', nl: 'Nederlands', ca: 'Català', ar: 'العربية', zh: '中文', ja: '日本語', ru: 'Русский' };
-  function nombreIdioma(c) { return IDIOMAS[c] || IDIOMAS[String(c).slice(0, 2)] || c; }
 
   /* ---------- estilos ---------- */
   var css = document.createElement('style');

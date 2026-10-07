@@ -214,6 +214,15 @@ function resolver(reto, dif) {
   r = await pedir('GET', '/cuenta', undefined, B2.sesion); assert.equal(r.st, 401);
   paso('borrar un negocio de prueba lo quita todo (y El Paraíso no se deja borrar)');
 
+  // --- imágenes IA por plan (contador de conectores/ia.js) ---
+  ipFalsa = '10.0.0.6';
+  const D = (await altaBuena({ correo: 'd@ejemplo.com' })).j;
+  for (let i = 0; i < 5; i++) { r = await pedir('POST', '/ia/imagen', { texto: 'Corte de pelo ' + i, sector: 'peluqueria' }, D.sesion); assert.equal(r.st, 200, JSON.stringify(r.j)); }
+  r = await pedir('POST', '/ia/imagen', { texto: 'otra', sector: 'peluqueria' }, D.sesion);
+  assert.equal(r.st, 429); assert.equal(r.j.limite, 'imagenesDia');
+  r = await pedir('GET', '/cuenta', undefined, D.sesion); assert.equal(r.j.uso.imagenesDia, 5);
+  paso('Básico: 5 imágenes IA al día; la sexta se para y /cuenta lo cuenta');
+
   // --- baja del propio cliente ---
   ipFalsa = '10.0.0.5';
   const C = (await altaBuena({ correo: 'c@ejemplo.com' })).j;
