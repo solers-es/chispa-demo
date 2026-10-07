@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chispa · Vídeos explicativos</title>
+<meta name="description" content="Vídeo explicativo de Chispa para dueños de negocio, y corte corto para redes.">
+<link rel="icon" type="image/png" href="../icono-192.png">
+<style>
+  :root{--bg:#0b0d12;--panel:#141821;--line:#232a38;--tx:#e9edf4;--tx2:#a3adbf;--grad:linear-gradient(135deg,#a78bfa,#ffcc33)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 -apple-system,"Segoe UI",system-ui,sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 16px 60px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .bolt{width:40px;height:40px;border-radius:12px;background:var(--grad);display:grid;place-items:center;color:#1a1200;font-size:22px}
+  h1{margin:0;font-size:26px;letter-spacing:-.4px}
+  h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--tx2);margin:2px 0 0;font-size:14.5px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:22px}
+  .card h2{margin:0 0 4px;font-size:20px}
+  .card p{margin:0 0 14px;color:var(--tx2);font-size:14.5px}
+  video{width:100%;border-radius:12px;background:#000;display:block}
+  .enl{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .enl a{color:var(--tx);text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
+  .enl a:hover{border-color:#a78bfa}
+  .corto{max-width:760px}
+  footer{margin-top:30px;color:var(--tx2);font-size:13px}
+  footer a{color:#a78bfa}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="bolt">⚡</div>
+    <div><h1><span>Chispa</span> · vídeos explicativos</h1>
+    <p class="sub">Para enseñar a un cliente qué hace Chispa, punto por punto. Ejemplo: El Paraíso, bar restaurante de Palma.</p></div>
+  </header>
+
+  <section class="card">
+    <h2>Vídeo explicativo completo</h2>
+    <p id="dLargo">7 minutos · todas las funciones, una a una, con voz y subtítulos en español (1920×1080).</p>
+    <video controls preload="metadata" playsinline poster="chispa-explicativo-portada.jpg">
+      <source src="chispa-explicativo.mp4" type="video/mp4">
+    </video>
+    <div class="enl">
+      <a href="chispa-explicativo.mp4" download>⬇ Descargar vídeo</a>
+      <a href="chispa-explicativo.srt" download>Subtítulos (.srt)</a>
+      <a href="GUION.md">Guion por escenas</a>
+    </div>
+  </section>
+
+  <section class="card corto">
+    <h2>Corte corto para redes</h2>
+    <p id="dCorto">1 minuto y medio · para Instagram, Facebook o WhatsApp (1920×1080).</p>
+    <video controls preload="metadata" playsinline poster="chispa-corto-portada.jpg">
+      <source src="chispa-corto-redes.mp4" type="video/mp4">
+    </video>
+    <div class="enl">
+      <a href="chispa-corto-redes.mp4" download>⬇ Descargar vídeo</a>
+      <a href="chispa-corto-redes.srt" download>Subtítulos (.srt)</a>
+    </div>
+  </section>
+
+  <footer>Chispa es una herramienta de Solers · <a href="../">Abrir Chispa</a></footer>
+</div>
+</body>
+</html>

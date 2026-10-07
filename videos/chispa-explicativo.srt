@@ -1,0 +1,412 @@
+1
+00:00:00,402 --> 00:00:01,311
+Esto es Chispa:
+
+2
+00:00:01,311 --> 00:00:06,281
+el asistente que lleva las redes sociales de tu negocio mientras tú atiendes a tus
+
+3
+00:00:06,281 --> 00:00:06,826
+clientes.
+
+4
+00:00:07,177 --> 00:00:11,327
+En los próximos minutos te enseño, paso a paso, todo lo que hace.
+
+5
+00:00:11,327 --> 00:00:14,775
+El ejemplo es El Paraíso, un bar restaurante de Palma.
+
+6
+00:00:17,282 --> 00:00:21,064
+Chispa es para el dueño de un negocio que no tiene tiempo, ni ganas,
+
+7
+00:00:21,064 --> 00:00:22,510
+de pelearse con Instagram.
+
+8
+00:00:22,860 --> 00:00:27,336
+Escribe tus publicaciones, les pone imagen, las programa a la mejor hora,
+
+9
+00:00:27,336 --> 00:00:30,954
+te ayuda a contestar a tus clientes y te dice qué funciona.
+
+10
+00:00:31,304 --> 00:00:35,199
+Y no hace falta saber nada de redes: se lo pides con tus palabras,
+
+11
+00:00:35,199 --> 00:00:37,206
+como se lo pedirías a un empleado.
+
+12
+00:00:39,459 --> 00:00:43,887
+Este es el panel de tu negocio. A la izquierda, todas las secciones.
+
+13
+00:00:43,887 --> 00:00:45,645
+Empezamos por el Asistente.
+
+14
+00:00:45,994 --> 00:00:50,654
+Le escribes la idea en una frase. Por ejemplo: paella de marisco este domingo.
+
+15
+00:00:51,004 --> 00:00:55,322
+Pulsas «Que Chispa lo escriba», y en un momento tienes varias versiones,
+
+16
+00:00:55,322 --> 00:00:58,140
+cada una con su texto, sus etiquetas y su foto.
+
+17
+00:00:58,491 --> 00:01:02,269
+Cada versión usa un enfoque distinto: una va directa al grano,
+
+18
+00:01:02,269 --> 00:01:07,083
+otra empuja con una oferta, y otra hace una pregunta para que la gente comente.
+
+19
+00:01:07,433 --> 00:01:11,156
+Y si prefieres hablar, abajo a la derecha está «Pídeselo a Chispa».
+
+20
+00:01:11,156 --> 00:01:15,379
+Le dices «programa la semana» o «¿cuál es la mejor hora?», con tus palabras.
+
+21
+00:01:15,731 --> 00:01:18,759
+Y te contesta con la respuesta pensada para tu negocio.
+
+22
+00:01:21,866 --> 00:01:24,211
+Ahora miramos una publicación de cerca.
+
+23
+00:01:24,563 --> 00:01:29,314
+La foto no está quieta: tiene un movimiento suave y el titular entra animado,
+
+24
+00:01:29,314 --> 00:01:33,880
+como un vídeo corto. Se puede descargar como imagen o como vídeo vertical.
+
+25
+00:01:34,229 --> 00:01:37,729
+Arriba lleva el sello de tu marca, con tu logo y tu nombre.
+
+26
+00:01:37,729 --> 00:01:39,331
+Sale en todas las imágenes.
+
+27
+00:01:39,713 --> 00:01:43,555
+Debajo van los botones que tu cliente puede pulsar: Reservar,
+
+28
+00:01:43,555 --> 00:01:47,524
+Ver carta o Cómo llegar. Usan los enlaces de tu propio negocio.
+
+29
+00:01:47,875 --> 00:01:51,766
+¿No te convence la foto? Pides otra versión. ¿Tienes una tuya?
+
+30
+00:01:51,766 --> 00:01:54,151
+La subes desde el móvil, foto o vídeo.
+
+31
+00:01:54,501 --> 00:02:00,015
+Y con «Editar» lo cambias todo: el texto, el titular, los botones, la fecha,
+
+32
+00:02:00,015 --> 00:02:03,353
+y el formato: post, carrusel, historia o reel.
+
+33
+00:02:06,069 --> 00:02:08,821
+Cuando te gusta, pulsas «Así lo ve tu cliente».
+
+34
+00:02:09,171 --> 00:02:13,444
+Ves la misma publicación tal como saldrá en cada sitio: Instagram,
+
+35
+00:02:13,444 --> 00:02:18,365
+con sus historias y sus reels, TikTok, Facebook, WhatsApp, Google y YouTube.
+
+36
+00:02:18,717 --> 00:02:22,943
+Así no hay sorpresas: compruebas que se lee bien antes de que nadie la vea.
+
+37
+00:02:23,293 --> 00:02:28,204
+Y para publicar, eliges las redes y pulsas un botón. Mira la demostración.
+
+38
+00:02:28,553 --> 00:02:32,368
+Chispa marca Instagram, TikTok, Facebook y tu ficha de Google,
+
+39
+00:02:32,368 --> 00:02:34,830
+y te enseña la vista previa de cada una.
+
+40
+00:02:35,474 --> 00:02:39,592
+Una cosa clara: en esta demostración no se sube nada de verdad. Hoy,
+
+41
+00:02:39,592 --> 00:02:43,710
+Chispa te deja cada publicación preparada para subirla con un toque.
+
+42
+00:02:44,060 --> 00:02:48,570
+Cuando conectes tus cuentas, y cada red dé su permiso, se publica sola.
+
+43
+00:02:52,969 --> 00:02:56,494
+Todo lo que preparas va al calendario. Cada color es una red,
+
+44
+00:02:56,494 --> 00:03:00,423
+y cada publicación dice si está en borrador, programada o publicada.
+
+45
+00:03:00,773 --> 00:03:04,832
+Las casillas con brillo son las mejores horas para un restaurante en Palma.
+
+46
+00:03:05,183 --> 00:03:06,958
+Con «Planificar mi semana»,
+
+47
+00:03:06,958 --> 00:03:12,018
+Chispa reparte tus publicaciones en esas horas y te explica por qué: el menú,
+
+48
+00:03:12,018 --> 00:03:16,816
+a las once y media; los planes de noche, a las seis y media; y los reels,
+
+49
+00:03:16,816 --> 00:03:18,065
+a las ocho y media.
+
+50
+00:03:18,414 --> 00:03:21,768
+También entiende franjas y promociones. Le puedes decir:
+
+51
+00:03:21,768 --> 00:03:26,321
+«pon una promo el viernes de seis a once de la noche, con cuatro historias»,
+
+52
+00:03:26,321 --> 00:03:27,579
+y lo reparte él solo.
+
+53
+00:03:27,929 --> 00:03:32,438
+Las publicaciones se arrastran de un día a otro, y lo puedes ver por semana,
+
+54
+00:03:32,438 --> 00:03:36,295
+por mes o en lista. Y si quieres, te avisa a la hora de publicar.
+
+55
+00:03:38,550 --> 00:03:43,016
+En Reseñas, Chispa junta las opiniones de Google, TripAdvisor y TheFork,
+
+56
+00:03:43,016 --> 00:03:45,560
+y te propone una respuesta para cada una.
+
+57
+00:03:45,910 --> 00:03:49,376
+Contesta en el tono de tu negocio y en el idioma del cliente:
+
+58
+00:03:49,376 --> 00:03:51,932
+si te escriben en inglés, responde en inglés.
+
+59
+00:03:52,282 --> 00:03:56,428
+Pulsas «Responder» y listo. Si no te convence, pides otra versión,
+
+60
+00:03:56,428 --> 00:03:57,685
+o la cambias a mano.
+
+61
+00:04:00,264 --> 00:04:04,306
+Las buenas se pueden contestar solas. Las negativas, nunca:
+
+62
+00:04:04,306 --> 00:04:07,663
+Chispa te avisa para que las mires tú, con calma.
+
+63
+00:04:08,013 --> 00:04:12,046
+Lo que ves aquí son reseñas de ejemplo. Al conectar tu ficha de Google,
+
+64
+00:04:12,046 --> 00:04:13,920
+Chispa trabaja con las de verdad.
+
+65
+00:04:16,175 --> 00:04:20,238
+Lo mismo con los comentarios y los mensajes privados de Instagram y Facebook.
+
+66
+00:04:20,589 --> 00:04:24,243
+Chispa prepara la respuesta: si alguien pregunta el horario,
+
+67
+00:04:24,243 --> 00:04:28,079
+o quiere reservar para ocho, ya tienes la contestación escrita.
+
+68
+00:04:28,429 --> 00:04:32,822
+Pero no sale nada sin tu visto bueno. La apruebas con un clic, o la cambias.
+
+69
+00:04:35,529 --> 00:04:39,034
+En Automatizaciones enciendes lo que quieres que Chispa haga sola.
+
+70
+00:04:39,384 --> 00:04:44,502
+Proponer respuesta a cada reseña, contestar solas las de cuatro y cinco estrellas,
+
+71
+00:04:44,502 --> 00:04:48,434
+avisarte de las negativas, publicar el menú del día a las once,
+
+72
+00:04:48,434 --> 00:04:51,554
+o recordar a tus clientes su reserva por WhatsApp.
+
+73
+00:04:51,904 --> 00:04:55,886
+Cada una dice con sinceridad qué funciona ya y qué permiso falta.
+
+74
+00:04:55,886 --> 00:05:00,419
+Si falta una conexión, la dejas encendida, y empieza sola cuando conectes.
+
+75
+00:05:02,674 --> 00:05:06,634
+En Anuncios eliges qué quieres conseguir, por ejemplo más reservas,
+
+76
+00:05:06,634 --> 00:05:09,649
+a quién va dirigido y cuánto quieres gastar al día.
+
+77
+00:05:09,998 --> 00:05:12,876
+Chispa prepara el texto del anuncio con sus botones,
+
+78
+00:05:12,876 --> 00:05:14,758
+y te calcula lo que gastas al mes.
+
+79
+00:05:15,712 --> 00:05:19,040
+Lo dejas listo para lanzarlo desde tu cuenta de anuncios de Meta.
+
+80
+00:05:21,745 --> 00:05:26,436
+En Estadísticas ves lo que pasa en tus redes. Los datos de Instagram son reales:
+
+81
+00:05:26,436 --> 00:05:29,485
+El Paraíso tiene hoy mil doscientos seis seguidores.
+
+82
+00:05:29,834 --> 00:05:33,463
+Lo que lleva la etiqueta «ejemplo» es para enseñarte el panel.
+
+83
+00:05:33,463 --> 00:05:35,980
+Cuando conectes las redes, se rellena solo.
+
+84
+00:05:36,330 --> 00:05:40,743
+Y lo más útil son los consejos: Chispa te dice a qué hora te ven más,
+
+85
+00:05:40,743 --> 00:05:44,068
+qué formato funciona mejor y cuántas veces publicar.
+
+86
+00:05:46,321 --> 00:05:50,334
+En Mi negocio están tus datos: el nombre, la dirección, tu web,
+
+87
+00:05:50,334 --> 00:05:51,863
+tu carta y tus reservas.
+
+88
+00:05:52,213 --> 00:05:55,732
+Estos datos los usan todos los botones de Chispa. «Reservar»
+
+89
+00:05:55,732 --> 00:05:59,838
+lleva a tu página de reservas, «Ver carta» a tu carta, y «Cómo llegar»
+
+90
+00:05:59,838 --> 00:06:00,835
+abre Google Maps.
+
+91
+00:06:01,185 --> 00:06:05,762
+También lleva tu ficha de Google, que es lo primero que ve quien te busca:
+
+92
+00:06:05,762 --> 00:06:09,967
+novedades, ofertas, horario y fotos, en cuanto Google dé el permiso.
+
+93
+00:06:10,319 --> 00:06:14,410
+Y para rellenarlo no hace falta escribir nada: pegas cualquier enlace,
+
+94
+00:06:14,410 --> 00:06:16,222
+y Chispa lo coloca en su sitio.
+
+95
+00:06:18,476 --> 00:06:23,932
+Por último, Conexiones: una guía de cinco minutos para unir tu ficha de Google,
+
+96
+00:06:23,932 --> 00:06:27,246
+Instagram, Facebook, TikTok, YouTube y WhatsApp.
+
+97
+00:06:27,597 --> 00:06:32,540
+Se hace una sola vez. A partir de ahí, Chispa usa tus enlaces en cada publicación,
+
+98
+00:06:32,540 --> 00:06:36,879
+y queda lista para publicar sola en cuanto cada red apruebe la conexión.
+
+99
+00:06:38,734 --> 00:06:40,798
+Lo has visto con un bar restaurante,
+
+100
+00:06:40,798 --> 00:06:44,639
+pero Chispa está pensada para cualquier negocio de cara al público:
+
+101
+00:06:44,639 --> 00:06:48,480
+en Mi negocio eliges tu sector y el tono con el que quieres hablar.
+
+102
+00:06:48,831 --> 00:06:51,568
+Tú atiendes tu negocio; Chispa llena tus redes.
+
+103
+00:06:51,917 --> 00:06:55,084
+¿Lo probamos con el tuyo? Pídenos una demostración.
+
