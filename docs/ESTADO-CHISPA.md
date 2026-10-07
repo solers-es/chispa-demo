@@ -171,6 +171,12 @@ Resultado (07/10/2026, mañana):
 
 ## 5 · Fallos conocidos y límites (sin adornos)
 
+- **Arreglado esta noche:** la web pública **no se actualizaba desde las ≈ 02:00** (GitHub Pages pasaba
+  los ficheros por Jekyll y `docs/API-CHISPA.md`, con expresiones `{{ … }}` de n8n, rompía la
+  publicación). Con `.nojekyll` se publica tal cual. Desde las 06:00 la web enseña todo lo de G, H, la
+  visita guiada y lo de este documento. Efecto secundario: los `.md` de `docs/` se ven como texto en
+  github.io; para leerlos bonitos, en GitHub (enlaces de arriba).
+
 - **Nada se ha probado contra las redes de verdad** (Meta, TikTok, YouTube, Google Ads): no hay app
   aprobada. Las llamadas siguen la documentación oficial y están probadas con un simulador que imita
   sus respuestas. El primer día con permisos hay que mirar con calma la primera respuesta real de cada una.
