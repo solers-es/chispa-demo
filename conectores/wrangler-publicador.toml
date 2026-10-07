@@ -1,0 +1,22 @@
+# Chispa · servidor de publicación automática (ver publicador-worker.js)
+name = "chispa-publicador"
+main = "publicador-worker.js"
+compatibility_date = "2026-10-01"
+
+# Cada 5 minutos publica lo que ya toca
+[triggers]
+crons = ["*/5 * * * *"]
+
+# Agenda de publicaciones (npx wrangler kv namespace create AGENDA)
+[[kv_namespaces]]
+binding = "AGENDA"
+id = "PEGA_AQUI_EL_ID_DEL_KV"
+
+# Fotos y vídeos que las redes descargan (deben ser públicos)
+[[r2_buckets]]
+binding = "MEDIOS"
+bucket_name = "chispa-medios"
+
+[vars]
+RESERVAS_URL = "https://el-paraiso-eight.vercel.app/reservas.html"
+# Los tokens van como secretos: npx wrangler secret put META_TOKEN -c conectores/wrangler-publicador.toml

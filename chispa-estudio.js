@@ -86,8 +86,8 @@ var DEF_PARAISO={reserva:"https://el-paraiso-eight.vercel.app/reservas.html",
   tiktok:"https://www.tiktok.com/@elparaisomallorca29",instagram:"https://instagram.com/elparaisobarrestaurante",facebook:"https://www.facebook.com/share/1cxhh2vr9X/"};
 function nombreFB(){return esParaiso()?"El Paraíso · Bar Restaurante":(N().nombre||"");}
 function esParaiso(){return /para[ií]so/i.test(N().nombre||"");}
-function enlace(tipo){var n=N(),v=n[tipo];if(v)return v;return esParaiso()?(DEF_PARAISO[tipo]||""):"";}
-function ctasPorDefecto(){var c=[{t:"📅 Reservar",tipo:"reserva",url:""},{t:"🌐 Ver web",tipo:"web",url:""}];if(esParaiso())c.push({t:"⭐ Club Paraíso",tipo:"club",url:""});return c;}
+function enlace(tipo){try{if(typeof window.chispaEnlace==="function"){var b=window.chispaEnlace(tipo);if(b)return b;}}catch(e){}var n=N(),v=n[tipo];if(v)return v;return esParaiso()?(DEF_PARAISO[tipo]||""):"";}
+function ctasPorDefecto(){var c=[{t:"📅 Reservar",tipo:"reserva",url:""},{t:"📖 Ver carta",tipo:"carta",url:""},{t:"📍 Cómo llegar",tipo:"google",url:""},{t:"🌐 Ver web",tipo:"web",url:""}];if(esParaiso())c.push({t:"⭐ Club Paraíso",tipo:"club",url:""});return c;}
 
 /* ---------- logo y marca de agua ---------- */
 var LOGO={url:"",urlOsc:"",img:null};
@@ -289,6 +289,7 @@ window.cmGuardarCampo=function(el){var i=+el.getAttribute("data-i"),k=el.getAttr
 window.cmCta=function(i,k){var c=window._posts[i].ctas[k];if(!c)return;
   var u=c.url||enlace(c.tipo);
   if(u){window.open(/^https?:|^tel:|^mailto:/.test(u)?u:"https://"+u,"_blank","noopener");return;}
+  if(typeof abrirCta==="function"){abrirCta(c.tipo);return;}
   toast("Pon el enlace de este botón");cmEditar(i,"ctas");};
 window.cmEditar=function(i,foco){
   var p=window._posts[i];
@@ -320,7 +321,7 @@ window.cmGuardarEdicion=function(i){
   var p=window._posts[i],v=function(id){var e=$(id);return e?e.value:"";};
   var fmt=v("cmeFmt"),cambioFmt=fmt!==p.formato;
   p.txt=v("cmeTxt").trim();p.tags=v("cmeTags").trim();p.titulo=v("cmeTit").trim();p.kicker=v("cmeKick").trim();p.sinTexto=$("cmeSin").checked;
-  p.ctas=[{t:v("cmeB0").trim()||"📅 Reservar",tipo:"reserva",url:v("cmeU0").trim()},{t:v("cmeB1").trim()||"🌐 Ver web",tipo:"web",url:v("cmeU1").trim()}];
+  var resto=(p.ctas||[]).slice(2);p.ctas=[{t:v("cmeB0").trim()||"📅 Reservar",tipo:(p.ctas[0]||{}).tipo||"reserva",url:v("cmeU0").trim()},{t:v("cmeB1").trim()||"📖 Ver carta",tipo:(p.ctas[1]||{}).tipo||"carta",url:v("cmeU1").trim()}].concat(resto);
   p.fecha=v("cmeFecha");p.formato=fmt;
   if($("cmeLi"))p.logoInt={on:$("cmeLi").checked,pos:v("cmeLiPos"),modo:v("cmeLiModo"),op:+v("cmeLiOp"),tam:+v("cmeLiT")};
   cerrarModal();
@@ -646,6 +647,9 @@ function prepararArchivo(p,vert){
 window.cmEnviar=function(id){
   var p=window._posts[PUB.i],r=red(id),st=$("cmSt_"+id),texto=textoCompleto(p),n=N();
   var set=function(t,ok){if(st){st.textContent=t;st.className="st"+(ok?" ok":"");}};
+  // Google: lo hace el conector de la ficha del trabajador B (API oficial o, sin conexión, abre la ficha con el texto copiado)
+  if(id==="gbp"&&window.ChispaFicha&&ChispaFicha.enviarDesdePublicar){try{var rr=ChispaFicha.enviarDesdePublicar(p);PUB.hecho[id]="Enviado a tu ficha de Google";set("✓ Enviado a tu ficha de Google",true);
+    if(rr&&rr.then)rr.then(function(){},function(e){set("Google: "+(e&&e.message||"no se pudo"));});}catch(e){set("Google: "+e.message);}return;}
   // 1) Publicación directa por API oficial, si nuestro servidor tiene la cuenta conectada
   var PD=window.CHISPA_PUBLICADOR;
   if(PD&&PD.url&&p.media&&!(PD._fallo&&PD._fallo[id])&&(!PD.conectada||PD.conectada(id))){
