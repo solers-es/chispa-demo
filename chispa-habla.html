@@ -110,6 +110,7 @@
 </div>
 
 <div id="toast"></div>
+<script src="precios.js"></script>
 <script>
 var chat=document.getElementById('chat'), avatar=document.getElementById('avatar'),
     micBtn=document.getElementById('mic'), hint=document.getElementById('hint');
@@ -120,7 +121,7 @@ var rec=null, listening=false, voiceFor={}, spoke=false, greeted=false, LANG='es
 var L={
  es:{code:'es-ES',sub:'El robot de IA que lleva el marketing de tu negocio. Pregúntale lo que quieras — y <b>ponle tu cara</b>.',hint:'Toca el botón y habla, o escríbeme abajo.',write:'Escríbeme lo que quieras…',face:'📷 Poner mi cara',mic:'🎤 TOCA PARA HABLAR',
    greet:'¡Hola! Soy Chispa, el robot que lleva el marketing de tu negocio. Pregúntame lo que quieras, o ponme tu cara con el botón de arriba.',
-   precio:'Tengo tres planes: Básico por 29 euros al mes, Pro por 59 y Equipo por 99. ¿Quieres una prueba?',
+   precio:'Tengo tres planes: Básico por 39 euros al mes, Pro por 79 y Agencia por 149. ¿Quieres una prueba?',
    nosabe:'¡Tranquilo! Para eso estoy yo. Tú me dices qué vendes y yo me encargo de todo. ¿Qué vendes?',
    probar:'¡Perfecto! Solo necesito el nombre de tu negocio y un par de fotos. En menos de un minuto te hago el primer vídeo.',
    publicar:'Publico en Instagram, Facebook y TikTok por ti, a la mejor hora. Tú solo apruebas.',
@@ -132,7 +133,7 @@ var L={
    def:'Cuéntame más. Puedo crearte posts, imágenes y vídeos y publicarlos por ti. ¿Qué quieres hacer?'},
  en:{code:'en-US',sub:'The AI robot that runs your business marketing. Ask it anything — and <b>put your face on it</b>.',hint:'Tap the button and speak, or write to me below.',write:'Write me anything…',face:'📷 Add my face',mic:'🎤 TAP TO SPEAK',
    greet:'Hi! I am Chispa, the AI robot that runs your business marketing. Ask me anything, or add your face with the button above.',
-   precio:'I have three plans: Basic at 29 euros a month, Pro at 59 and Team at 99. Want a trial?',
+   precio:'I have three plans: Basic at 39 euros a month, Pro at 79 and Agency at 149. Want a trial?',
    nosabe:'No worries! That is exactly what I am for. Tell me what you sell and I handle everything. What do you sell?',
    probar:'Great! I just need your business name and a couple of photos. In under a minute I make your first video.',
    publicar:'I post on Instagram, Facebook and TikTok for you, at the best time. You just approve.',
@@ -144,7 +145,7 @@ var L={
    def:'Tell me more. I can create posts, images and videos and publish them for you. What would you like to do?'},
  de:{code:'de-DE',sub:'Der KI-Roboter für das Marketing deines Geschäfts. Frag mich alles — und <b>gib mir dein Gesicht</b>.',hint:'Tippe und sprich, oder schreib mir unten.',write:'Schreib mir etwas…',face:'📷 Mein Gesicht',mic:'🎤 TIPPEN ZUM SPRECHEN',
    greet:'Hallo! Ich bin Chispa, der KI-Roboter für dein Marketing. Frag mich alles, oder gib mir dein Gesicht mit dem Knopf oben.',
-   precio:'Ich habe drei Pakete: Basis für 29 Euro im Monat, Pro für 59 und Team für 99. Möchtest du einen Test?',
+   precio:'Ich habe drei Pakete: Basis für 39 Euro im Monat, Pro für 79 und Agentur für 149. Möchtest du einen Test?',
    nosabe:'Keine Sorge! Genau dafür bin ich da. Sag mir, was du verkaufst, und ich kümmere mich um alles. Was verkaufst du?',
    probar:'Perfekt! Ich brauche nur deinen Firmennamen und ein paar Fotos. In unter einer Minute mache ich dein erstes Video.',
    publicar:'Ich poste für dich auf Instagram, Facebook und TikTok, zur besten Zeit. Du bestätigst nur.',
@@ -156,7 +157,7 @@ var L={
    def:'Erzähl mir mehr. Ich kann Beiträge, Bilder und Videos erstellen und für dich posten. Was möchtest du tun?'},
  fr:{code:'fr-FR',sub:'Le robot IA qui gère le marketing de ton entreprise. Demande-lui tout — et <b>mets ton visage</b>.',hint:'Touche et parle, ou écris-moi en bas.',write:'Écris-moi ce que tu veux…',face:'📷 Mon visage',mic:'🎤 TOUCHE POUR PARLER',
    greet:'Bonjour ! Je suis Chispa, le robot IA qui gère ton marketing. Demande-moi tout, ou mets ton visage avec le bouton en haut.',
-   precio:'J ai trois forfaits : Basique à 29 euros par mois, Pro à 59 et Équipe à 99. Tu veux un essai ?',
+   precio:'J ai trois forfaits : Basique à 39 euros par mois, Pro à 79 et Agence à 149. Tu veux un essai ?',
    nosabe:'Pas de souci ! C est exactement pour ça que je suis là. Dis-moi ce que tu vends et je m occupe de tout. Que vends-tu ?',
    probar:'Parfait ! J ai juste besoin du nom de ton entreprise et de quelques photos. En moins d une minute je fais ta première vidéo.',
    publicar:'Je publie sur Instagram, Facebook et TikTok pour toi, au meilleur moment. Tu valides, c est tout.',
@@ -168,7 +169,7 @@ var L={
    def:'Dis-m en plus. Je peux créer des posts, images et vidéos et les publier pour toi. Que veux-tu faire ?'},
  ca:{code:'ca-ES',sub:'El robot d IA que porta el màrqueting del teu negoci. Pregunta-li el que vulguis — i <b>posa-li la teva cara</b>.',hint:'Toca el botó i parla, o escriu-me a sota.',write:'Escriu-me el que vulguis…',face:'📷 Posa la meva cara',mic:'🎤 TOCA PER PARLAR',
    greet:'Hola! Soc en Chispa, el robot que porta el màrqueting del teu negoci. Pregunta-m el que vulguis, o posa-m la teva cara amb el botó de dalt.',
-   precio:'Tinc tres plans: Bàsic per 29 euros al mes, Pro per 59 i Equip per 99. Vols una prova?',
+   precio:'Tinc tres plans: Bàsic per 39 euros al mes, Pro per 79 i Agència per 149. Vols una prova?',
    nosabe:'Tranquil! Per això hi soc jo. Digue-m què véns i jo m encarrego de tot. Què véns?',
    probar:'Perfecte! Només necessito el nom del teu negoci i un parell de fotos. En menys d un minut et faig el primer vídeo.',
    publicar:'Publico a Instagram, Facebook i TikTok per tu, a la millor hora. Tu només aproves.',
@@ -245,11 +246,19 @@ function setupVoz(){
   rec.onresult=function(e){procesar(e.results[0][0].transcript);};
   micBtn.addEventListener('click',function(){greet();if(listening){try{rec.stop()}catch(e){}}else{try{speechSynthesis.cancel();rec.start()}catch(e){mostrarTexto()}}});
 }
+// precios: SIEMPRE de precios.js (una sola tabla)
+(function(){var P=window.ChispaPrecios;if(!P)return;var b=P.plan('basico').precio,p=P.plan('pro').precio,a=P.plan('agencia').precio,d=P.DIAS_PRUEBA;
+ var T={es:'Tengo tres planes: Básico por '+b+' euros al mes, Pro por '+p+' y Agencia por '+a+', más IVA. Pruebas '+d+' días gratis. ¿Empezamos?',
+  en:'I have three plans: Basic at '+b+' euros a month, Pro at '+p+' and Agency at '+a+', plus VAT. '+d+'-day free trial. Shall we start?',
+  de:'Ich habe drei Pakete: Basis für '+b+' Euro im Monat, Pro für '+p+' und Agentur für '+a+', zuzüglich MwSt. '+d+' Tage gratis testen. Los geht\'s?',
+  fr:'J ai trois forfaits : Basique à '+b+' euros par mois, Pro à '+p+' et Agence à '+a+', hors TVA. '+d+' jours d essai gratuit. On commence ?',
+  ca:'Tinc tres plans: Bàsic per '+b+' euros al mes, Pro per '+p+' i Agència per '+a+', més IVA. Prova '+d+' dies gratis. Comencem?'};
+ for(var k in T)if(L[k])L[k].precio=T[k];})();
 function mostrarTexto(){document.getElementById('rowText').style.display='flex';}
 document.getElementById('send').addEventListener('click',enviarTexto);
 document.getElementById('txt').addEventListener('keydown',function(e){if(e.key==='Enter')enviarTexto();});
 function enviarTexto(){greet();var i=document.getElementById('txt');var v=i.value.trim();if(!v)return;i.value='';procesar(v);}
-document.getElementById('cta').addEventListener('click',function(){greet();toast('✨ Chispa — 29 €/mes');say(L[LANG].probar);});
+document.getElementById('cta').addEventListener('click',function(){greet();toast('✨ Chispa — desde '+(window.ChispaPrecios?ChispaPrecios.desde():39)+' €/mes + IVA · '+(window.ChispaPrecios?ChispaPrecios.DIAS_PRUEBA:14)+' días gratis');say(L[LANG].probar);setTimeout(function(){location.href='index.html#alta';},2500);});
 
 if(SR){setupVoz();}else{micBtn.textContent='⌨️';hint.textContent='Tu móvil no deja hablar por voz en el navegador (Safari/iPhone), pero Chispa SÍ te contesta por voz. Escríbele aquí abajo 👇';micBtn.addEventListener('click',function(){greet();mostrarTexto();document.getElementById('txt').focus();});mostrarTexto();}
 

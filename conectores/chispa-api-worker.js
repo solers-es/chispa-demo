@@ -54,8 +54,11 @@
      POST   /programar · DELETE /programar/:id · GET /agenda · POST /subir · POST /publicar · GET /estadisticas
      POST   /admin/negocios {id, nombre}   (X-Chispa-Admin) → {codigo} del dueño
      GET    /admin/negocios                (X-Chispa-Admin) → lista
+     Alta sola, /planes, /cuenta, /pago/*, /stripe/webhook, /admin/clientes: ver suscripciones.js
    ===================================================================== */
 import { publicarEn, estadisticas } from "./redes.js";
+// Alta sola, prueba, planes, límites y pago (trabajador H): todo en su módulo
+import { rutasPublicas, rutasConSesion, antesDeRuta, asegurarTablasSuscripciones, puedePublicar } from "./suscripciones.js";
 
 const VERSION = "1";
 const MAX_ESTADO = 1_500_000; // D1 admite filas de hasta 2 MB
@@ -153,7 +156,7 @@ function cabecerasCors(req, env) {
   return {
     "Access-Control-Allow-Origin": ok.includes(o) ? o : ok[0],
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Chispa-Clave, X-Chispa-Admin",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Chispa-Clave, X-Chispa-Admin, Stripe-Signature",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
   };
@@ -494,6 +497,10 @@ async function atender(req, env) {
 
   if (m === "GET" && ruta === "/salud") return { ok: true, version: VERSION, redes: Object.keys(REDES).filter((r) => (r === "meta" ? env.META_APP_ID : r === "tiktok" ? env.TIKTOK_CLIENT_KEY : env.GOOGLE_CLIENT_ID)) };
   await asegurarTablas(env);
+  await asegurarTablasSuscripciones(env);
+  const ayuda = { Fallo, huella, guardarCodigo, crearSesion, leerJson, soloAdmin };
+  const publica = await rutasPublicas(req, env, ayuda, m, ruta);
+  if (publica !== undefined) return publica;
   if (m === "GET" && ruta === "/oauth/vuelta") return vueltaOAuth(req, env);
   if (m === "POST" && ruta === "/sesion") return entrar(env, await leerJson(req));
 
@@ -510,6 +517,9 @@ async function atender(req, env) {
   }
 
   const s = await sesionDe(req, env);
+  const deCuenta = await rutasConSesion(req, env, ayuda, s, m, ruta);
+  if (deCuenta !== undefined) return deCuenta;
+  await antesDeRuta(req, env, ayuda, s, m, ruta, partes); // límites del plan (lanza 402/429)
   if (m === "GET" && ruta === "/yo") return { negocio: s.negocio, nombre: s.nombre, rol: s.rol, esAdministrador: s.esAdministrador };
   if (m === "DELETE" && ruta === "/sesion") { await env.DB.prepare("DELETE FROM sesiones WHERE huella = ?").bind(await huella(env, "s:" + s.token)).run(); return { ok: true }; }
   if (m === "DELETE" && ruta === "/sesiones") { soloDueno(s); await env.DB.prepare("DELETE FROM sesiones WHERE negocio = ?").bind(s.negocio).run(); return { ok: true }; }
@@ -584,6 +594,7 @@ export default {
     const caches = {};
     for (const f of results || []) {
       const it = JSON.parse(f.datos);
+      if (!(await puedePublicar(env, f.negocio))) continue; // prueba terminada, cancelada o impago
       await publicarItem(env, f.negocio, it, (caches[f.negocio] = caches[f.negocio] || {}));
     }
   },
