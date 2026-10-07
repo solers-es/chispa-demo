@@ -319,3 +319,13 @@ a.pv-ggb{display:block}
 .cm-scene .li{position:absolute;height:auto;pointer-events:none;filter:blur(.2px)}
 .cm-li{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg2)}
 @media (prefers-reduced-motion:reduce){.cm-scene .kbw{animation:none!important}}
+
+/* ---------- sello de marca visible ---------- */
+.cm-scene .sello{position:absolute;z-index:4;display:flex;align-items:center;gap:2.6cqw;color:#fff;pointer-events:none;animation:cmIn .7s cubic-bezier(.2,.7,.2,1) .15s both}
+.cm-scene .sello img,.cm-scene .sello i{width:13cqw;height:13cqw;border-radius:50%;object-fit:cover;background:#000;border:.45cqw solid rgba(255,255,255,.85);box-shadow:0 .6cqw 3cqw rgba(0,0,0,.45);flex:none;display:grid;place-items:center;font-style:normal;font-size:6cqw}
+.cm-scene .sello b{display:block;font:600 4.6cqw/1.05 Fraunces,Georgia,serif;text-shadow:0 .3cqw 2.4cqw rgba(0,0,0,.6)}
+.cm-scene .sello small{display:block;margin-top:.8cqw;font:700 2.4cqw/1 Inter,system-ui,sans-serif;letter-spacing:.3cqw;text-transform:uppercase;opacity:.9;text-shadow:0 .3cqw 2cqw rgba(0,0,0,.6)}
+.cm-scene .s-tl{top:4.5cqw;left:4.5cqw}.cm-scene .s-tr{top:4.5cqw;right:4.5cqw;flex-direction:row-reverse;text-align:right}
+.cm-scene .s-bl{bottom:4.5cqw;left:4.5cqw}.cm-scene .s-br{bottom:4.5cqw;right:4.5cqw;flex-direction:row-reverse;text-align:right}
+.cm-scene.V .s-tl,.cm-scene.V .s-tr{top:16cqw}.cm-scene.V .s-bl,.cm-scene.V .s-br{bottom:30cqw}
+.cm-scene .s-tr~.of{display:none}

@@ -95,13 +95,20 @@ function esLogoNuestro(u){return /^marca\/elparaiso-logo/.test(u||"");}
 function logoOscUrl(){var n=N();if(n.logoOscuroUrl||LOGO.urlOsc)return n.logoOscuroUrl||LOGO.urlOsc;if(esParaiso()&&(!n.logoUrl||esLogoNuestro(n.logoUrl)))return "marca/elparaiso-logo-negro-160.jpg";return n.logoUrl||"";}
 function logoIntUrl(){var n=N();if(LOGO.url)return LOGO.url;if(n.logoUrl&&!esLogoNuestro(n.logoUrl))return n.logoUrl;return esParaiso()?"marca/elparaiso-logo-integrado.png":"";}
 function logoUrl(){return logoIntUrl();}
-function logoListo(){cargarLogo();var im=LOGO.img;if(!im||im.complete)return Promise.resolve();return new Promise(function(ok){im.onload=ok;im.onerror=ok;setTimeout(ok,3000);});}
+function oscImg(){var u=logoOscUrl();if(!u)return null;u=u.replace("-160.jpg",".jpg");if(!LOGO.osc||LOGO.osc._u!==u){var im=new Image();im._u=u;im.src=u;LOGO.osc=im;}return LOGO.osc;}
+function logoListo(){cargarLogo();var o=oscImg();var esperar=function(im){if(!im||im.complete)return Promise.resolve();return new Promise(function(ok){im.onload=ok;im.onerror=ok;setTimeout(ok,3000);});};return Promise.all([esperar(o),esperar2()]);}
+function esperar2(){cargarLogo();var im=LOGO.img;if(!im||im.complete)return Promise.resolve();return new Promise(function(ok){im.onload=ok;im.onerror=ok;setTimeout(ok,3000);});}
 function cargarLogo(){var u=logoIntUrl();if(!u){LOGO.img=null;return;}if(LOGO.img&&LOGO.img._u===u)return;var im=new Image();im._u=u;im.src=u;LOGO.img=im;}
 function logoHtml(){var o=logoOscUrl();if(o)return '<img class="cm-lg osc" src="'+esc(o)+'" alt="'+esc(N().nombre||"logo")+'">';var u=logoUrl();return u?'<img class="cm-lg" src="'+esc(u.replace("elparaiso-logo.png","elparaiso-logo-160.png"))+'" alt="'+esc(N().nombre||"logo")+'">':esc(N().logo||"🍽️");}
 /* logo integrado en la foto (no es marca de agua): translúcido, fundido con la imagen y moviéndose con el zoom */
-function logoInt(p,V){var d={on:true,pos:V?"tr":"br",op:45,modo:"screen",tam:V?26:22},o=(p&&p.logoInt)||{};for(var k in o)d[k]=o[k];if(!logoUrl())d.on=false;return d;}
+function logoInt(p,V){var d={on:false,pos:V?"tr":"br",op:45,modo:"screen",tam:V?26:22},o=(p&&p.logoInt)||{};for(var k in o)d[k]=o[k];if(!logoUrl())d.on=false;return d;}
 function liCaja(L,V){var m=5,t=V?9:5,b=V?20:5;return (L.pos.charAt(1)==="r"?"right:"+m+"%;":"left:"+m+"%;")+(L.pos.charAt(0)==="b"?"bottom:"+b+"%;":"top:"+t+"%;");}
 function liHtml(p,V){var L=logoInt(p,V);if(!L.on)return "";return '<img class="li" src="'+esc(logoIntUrl())+'" alt="" style="'+liCaja(L,V)+'width:'+L.tam+'%;opacity:'+(L.op/100)+';mix-blend-mode:'+L.modo+'">';}
+/* SELLO DE MARCA visible (Stalin 07/10): logo negro en círculo + «El Paraíso» + «Bar Restaurante · Palma» */
+function selloDe(p){var d={on:true,pos:"tl"},o=(p&&p.sello)||{};for(var k in o)d[k]=o[k];if(!logoOscUrl()&&!N().nombre)d.on=false;return d;}
+function selloTextos(){var n=N();if(esParaiso())return ["El Paraíso","Bar Restaurante · Palma"];return [n.nombre||"",((n.sector||"").split("·")[0].trim()+(n.ciudad?" · "+n.ciudad.split(",")[0]:"")).replace(/^ · /,"")];}
+function selloHtml(p,V){var S2=selloDe(p);if(!S2.on)return "";var t=selloTextos(),o=logoOscUrl();
+  return '<div class="sello s-'+S2.pos+'">'+(o?'<img src="'+esc(o.replace("-160.jpg",".jpg"))+'" alt="">':'<i>'+esc(N().logo||"🍽️")+'</i>')+'<div><b>'+esc(t[0])+'</b>'+(t[1]?'<small>'+esc(t[1])+'</small>':'')+'</div></div>';}
 /* Stalin (07/10): nada de marcas de agua. El logo va solo en el avatar y en las cabeceras. */
 function marca(){return {on:false,pos:"tl",tam:18};}
 function marcaHtml(V){var m=marca();if(!m.on)return "";var u=logoUrl();
@@ -182,7 +189,7 @@ function escena(p,opt){
   var tit=(m.slides&&p.slide>0)?(p.slide===1?"Hecho cada día":"Reserva tu mesa"):p.titulo;
   var words=(tit||"").split(/\s+/).filter(Boolean).map(function(w,k){return '<span style="--d:'+(0.45+k*0.12).toFixed(2)+'s">'+esc(w)+'</span>';}).join("");
   var kb="k"+((p.foto||0)%4);
-  var media='<div class="kbw'+(m.esVideo?'':' '+kb)+'">'+(m.esVideo?'<video class="kbi" src="'+esc(src)+'" autoplay muted loop playsinline></video>':'<img class="kbi" src="'+esc(src)+'" alt="'+esc(p.titulo)+'"'+(m.tipo==="propia"?'':' crossorigin="anonymous"')+'>')+liHtml(p,V)+'</div>';
+  var media='<div class="kbw'+(m.esVideo?'':' '+kb)+'">'+(m.esVideo?'<video class="kbi" src="'+esc(src)+'" autoplay muted loop playsinline></video>':'<img class="kbi" src="'+esc(src)+'" alt="'+esc(p.titulo)+'"'+(m.tipo==="propia"?'':' crossorigin="anonymous"')+'>')+liHtml(p,V)+'</div>'+selloHtml(p,V);
   var kick=(p.kicker||"").replace("{neg}",n.nombre||"");
   return '<div class="cm-scene L'+(p.L||0)+(V?" V":"")+(p.sinTexto?" sinTexto":"")+'">'+media+
     '<div class="sh"></div><div class="gl"></div>'+(m.esVideo?'':'<div class="sw"></div>')+
@@ -301,11 +308,8 @@ window.cmEditar=function(i,foco){
     f("cmeTags","Hashtags",p.tags,"#paella #Palma")+
     '<div class="row">'+'<div>'+f("cmeTit","Título sobre la imagen",p.titulo,"Paella de bogavante")+'</div><div>'+f("cmeKick","Frase pequeña de arriba",p.kicker,"Este domingo")+'</div></div>'+
     '<label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px;color:var(--tx2)"><input type="checkbox" id="cmeSin" style="width:auto" '+(p.sinTexto?"checked":"")+'> Imagen limpia, sin texto encima</label>'+
-    (function(){var L=logoInt(p,vertical(p));return '<div class="cm-li"><label style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--tx2)"><input type="checkbox" id="cmeLi" style="width:auto"'+(L.on?" checked":"")+'> Logo integrado en la foto (suave, se funde con la imagen)</label>'+
-      '<div class="row"><div><label class="lb" style="margin-top:8px">Posición</label><select id="cmeLiPos">'+[["br","Abajo derecha"],["bl","Abajo izquierda"],["tr","Arriba derecha"],["tl","Arriba izquierda"]].map(function(o){return '<option value="'+o[0]+'"'+(L.pos===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select></div>'+
-      '<div><label class="lb" style="margin-top:8px">Cómo se funde</label><select id="cmeLiModo">'+[["soft-light","Suave"],["overlay","Contraste"],["screen","Luminoso"],["normal","Normal"]].map(function(o){return '<option value="'+o[0]+'"'+(L.modo===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select></div></div>'+
-      '<label class="lb" style="margin-top:8px">Intensidad: <span id="cmeLiOpV">'+L.op+'</span> %</label><input type="range" id="cmeLiOp" min="10" max="60" value="'+L.op+'" style="width:100%" oninput="document.getElementById(\'cmeLiOpV\').textContent=this.value">'+
-      '<label class="lb" style="margin-top:6px">Tamaño: <span id="cmeLiTV">'+L.tam+'</span> %</label><input type="range" id="cmeLiT" min="12" max="40" value="'+L.tam+'" style="width:100%" oninput="document.getElementById(\'cmeLiTV\').textContent=this.value"></div>';})()+
+    (function(){var L=selloDe(p);return '<div class="cm-li"><label style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--tx2)"><input type="checkbox" id="cmeSe" style="width:auto"'+(L.on?" checked":"")+'> Sello de marca en la imagen (logo + «'+esc(selloTextos()[0])+'»)</label>'+
+      '<label class="lb" style="margin-top:8px">Esquina</label><select id="cmeSePos">'+[["tl","Arriba izquierda"],["tr","Arriba derecha"],["bl","Abajo izquierda"],["br","Abajo derecha"]].map(function(o){return '<option value="'+o[0]+'"'+(L.pos===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select></div>';})()+
     '<div class="row">'+'<div>'+f("cmeB0","Botón 1",c0.t,"📅 Reservar")+'</div><div>'+f("cmeU0","Enlace del botón 1",c0.url,"Vacío = el de Mi negocio")+'</div></div>'+
     '<div class="row">'+'<div>'+f("cmeB1","Botón 2",c1.t,"🌐 Ver web")+'</div><div>'+f("cmeU1","Enlace del botón 2",c1.url,"Vacío = el de Mi negocio")+'</div></div>'+
     '<div class="row"><div>'+f("cmeFecha","Fecha y hora de publicación",p.fecha,"","datetime-local")+'</div><div><label class="lb" style="margin-top:10px">Formato</label><select id="cmeFmt">'+
@@ -324,7 +328,7 @@ window.cmGuardarEdicion=function(i){
   p.txt=v("cmeTxt").trim();p.tags=v("cmeTags").trim();p.titulo=v("cmeTit").trim();p.kicker=v("cmeKick").trim();p.sinTexto=$("cmeSin").checked;
   var resto=(p.ctas||[]).slice(2);p.ctas=[{t:v("cmeB0").trim()||"📅 Reservar",tipo:(p.ctas[0]||{}).tipo||"reserva",url:v("cmeU0").trim()},{t:v("cmeB1").trim()||"📖 Ver carta",tipo:(p.ctas[1]||{}).tipo||"carta",url:v("cmeU1").trim()}].concat(resto);
   p.fecha=v("cmeFecha");p.formato=fmt;
-  if($("cmeLi"))p.logoInt={on:$("cmeLi").checked,pos:v("cmeLiPos"),modo:v("cmeLiModo"),op:+v("cmeLiOp"),tam:+v("cmeLiT")};
+  if($("cmeSe"))p.sello={on:$("cmeSe").checked,pos:v("cmeSePos")};
   cerrarModal();
   if(cambioFmt&&p.media&&p.media.tipo!=="propia"){p.media=null;repintar(i);crearImagenIA(i);}else repintar(i);
   toast("Publicación guardada ✓");
@@ -425,6 +429,18 @@ function dibujar(x,W,H,p,fuente,t,dur){
     else{x.font="700 "+(3.6*u)+"px Inter, sans-serif";x.textBaseline="middle";x.fillStyle="#fff";var der=(MA.pos==="tr"||MA.pos==="br");x.textAlign=der?"right":"left";
       x.fillText(((n.logo||"")+" "+(n.nombre||"")).trim(),der?W-mx:mx,ly+sz/2);x.textAlign="left";}}
   x.globalAlpha=1;
+  var SL=selloDe(p);
+  if(SL.on){var a5=ease(t/0.7),li=LOGO.osc&&LOGO.osc.complete&&LOGO.osc.naturalWidth?LOGO.osc:null,tx2=selloTextos();
+    var R=6.5*u,mxs=4.5*u,top=(V?16:4.5)*u,bot=(V?30:4.5)*u,der=SL.pos.charAt(1)==="r",abajo=SL.pos.charAt(0)==="b";
+    x.save();x.globalAlpha=a5;x.font="600 "+(4.6*u)+"px Fraunces, Georgia, serif";var w1=x.measureText(tx2[0]).width;x.font="700 "+(2.4*u)+"px Inter, sans-serif";var w2=x.measureText((tx2[1]||"").toUpperCase()).width+(tx2[1]||"").length*.3*u;
+    var cxC=der?W-mxs-R:mxs+R,cy=abajo?H-bot-R:top+R,bx2=cxC-R,txX=der?cxC-R-2.6*u:cxC+R+2.6*u;
+    x.shadowColor="rgba(0,0,0,.45)";x.shadowBlur=3*u;x.beginPath();x.arc(bx2+R,cy,R,0,7);x.fillStyle="#000";x.fill();x.shadowBlur=0;
+    if(li){x.save();x.beginPath();x.arc(bx2+R,cy,R-.3*u,0,7);x.clip();x.drawImage(li,bx2,cy-R,2*R,2*R);x.restore();}
+    x.lineWidth=.45*u;x.strokeStyle="rgba(255,255,255,.85)";x.beginPath();x.arc(bx2+R,cy,R,0,7);x.stroke();
+    x.shadowColor="rgba(0,0,0,.6)";x.shadowBlur=2.4*u;x.fillStyle="#fff";x.textBaseline="alphabetic";x.textAlign=der?"right":"left";
+    var tx0=txX;x.font="600 "+(4.6*u)+"px Fraunces, Georgia, serif";x.fillText(tx2[0],tx0,cy+(tx2[1]?-.2*u:1.6*u));
+    if(tx2[1]){x.font="700 "+(2.4*u)+"px Inter, sans-serif";if("letterSpacing" in x)x.letterSpacing=(.3*u)+"px";x.fillStyle="rgba(255,255,255,.88)";x.fillText(tx2[1].toUpperCase(),tx0,cy+3.4*u);if("letterSpacing" in x)x.letterSpacing="0px";}
+    x.restore();}
   if(p.sinTexto)return;
   // oferta
   if(n.oferta){var ao=ease((t-1.9)/0.5);if(ao>0){x.save();x.globalAlpha=ao;x.font="800 "+(3.6*u)+"px Inter, sans-serif";var ot="🔥 "+n.oferta,ow=x.measureText(ot).width+6.4*u;x.translate(W-5*u-ow/2,(V?20:8)*u);x.rotate(.05);x.scale(.6+.4*ao,.6+.4*ao);var go=x.createLinearGradient(-ow/2,0,ow/2,0);go.addColorStop(0,"#fb7185");go.addColorStop(1,"#ffb020");x.fillStyle=go;rr(x,-ow/2,-3.6*u,ow,7.2*u,3.6*u);x.fill();x.fillStyle="#2a0b0b";x.textAlign="center";x.fillText(ot,0,.2*u);x.restore();}}
