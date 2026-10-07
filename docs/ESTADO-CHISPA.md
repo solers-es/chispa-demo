@@ -1,13 +1,14 @@
-# Estado de Chispa · 07/10/2026 (por la mañana)
+# Estado de Chispa · 07/10/2026 (mañana, revisado por el trabajador K)
 
-> **Para Stalin, en una línea:** lo que es **programar** está hecho y probado: **≈ 85 % de todo el código**
-> (≈ 89 % sin el «Estudio de contenido», que espera una decisión tuya). Lo poco que falta de código depende
-> de una decisión o de un trámite (proveedor de vídeo IA, permisos). Lo que queda para venderla son
-> **trámites**: CIF, Stripe, permisos de las redes, abogado, dominio y correo. Abajo, cada uno con sus
-> pasos exactos.
+> **Para Stalin, en una línea:** lo que es **programar** está hecho y probado: **≈ 99 % del código**.
+> Lo único de código que queda es el **vídeo 100 % generado por IA** (≈ 1 h), y no se puede escribir
+> hasta que elijas proveedor y pongas tarjeta (decisión D1). Todo lo demás son **trámites** (CIF,
+> Stripe, permisos de las redes, abogado, dominio, correo) y **decisiones** tuyas. Abajo, cada uno con
+> sus pasos exactos y quién lo hace.
 
 - App: <https://solers-es.github.io/chispa-demo/> (móvil y ordenador, se instala como app)
-- Servidor: <https://chispa-api.solers.workers.dev/salud> (Cloudflare, gratis; base D1 en Europa)
+- Servidor: <https://chispa-api.solers.workers.dev/salud> (Cloudflare, gratis; base D1 en Europa) — desplegado hoy con lo de K, `/salud` ok
+- Copias de la base: repositorio **privado** `solers-es/chispa-copias` (diarias, cifradas, 30 días)
 - Repositorio: `solers-es/chispa-demo` (público: no hay claves dentro)
 - Medido sobre `main` el 07/10/2026, con las pruebas de la sección 4 en verde.
 
@@ -15,37 +16,70 @@
 
 ## 1 · Nivel por áreas (solo PROGRAMACIÓN)
 
-«Antes» es el informe privado `chispa-analisis-2026-10-07` (02:50 de esta noche), que medía «producto
-cobrable» y mezclaba código y trámites. «Ahora» mide **solo el código**: 100 % = no queda nada que
-programar; lo que no se puede probar sin un permiso de la red se cuenta como hecho **solo si está
-probado con el simulador** y se dice.
+«J» es lo que medía el trabajador J esta mañana; «K» es después de este repaso. **100 % = no queda
+nada que programar.** Aparte se dice si está **probado contra la red de verdad**: casi nada lo está,
+porque faltan los permisos de cada red (trámite T5). Hasta entonces está probado con un simulador que
+imita sus respuestas. Ojo: el primer día con permisos puede salir algún ajuste pequeño de código al ver
+la primera respuesta real de cada red (riesgo, no tarea pendiente).
 
-| Área | Antes | Ahora | Qué hay | Qué falta de código (si falta) |
+| Área | J | K | ¿Probado con la red real? | Qué falta (y de qué tipo) |
 |---|---|---|---|---|
-| Diseño, portada y app instalable | 85 % | **95 %** | Un solo precio (39/79/149 + IVA, `precios.js`), textos legales enlazados, chat con IA de verdad, sin promesas viejas | Pasar a dominio propio cuando exista (cambiar 2 líneas) |
-| Crear publicaciones (texto, imagen, vídeo) | 55 % | **90 %** | Texto e imagen con IA de verdad (Workers AI: Llama 3.3 y FLUX), vídeo con fotos + voz + subtítulos, otros idiomas, reaprovechar contenido largo, **cortar un vídeo largo en clips verticales** | Vídeo 100 % generado por IA: el hueco `POST /ia/video` está hecho; falta **elegir proveedor** (decisión) y escribir su llamada (≈ 1 h) |
-| Calendario y publicación automática | 40 % | **90 %** | Franjas, día entero, promo para llenar, órdenes en lenguaje normal; el servidor publica solo cada 5 min en Instagram, Facebook, TikTok, YouTube y Google | Nada. Sin probar contra las redes de verdad hasta tener los permisos |
-| Reseñas | 50 % | **90 %** | El servidor lee las de Google y las contesta (a mano, o solas las de 4-5★); las de 1-3★ nunca solas, aviso. Respuesta sugerida en el idioma del cliente | TripAdvisor y TheFork no tienen API para contestar: se copia y se abre su panel (no es código) |
-| Ficha de Google (novedades, horario, fotos) | 35 % | **85 %** | Conector en el servidor; publica novedades desde el calendario | Nada. Espera la aprobación de Google (caso 5-5969000041337) |
-| Mi negocio y Conexiones | 60 % | **90 %** | Datos reales, sectores, conexión OAuth UNA vez en el servidor (tokens cifrados) para todos los aparatos | Nada |
-| **Comentarios y mensajes (bandeja)** | 20 % | **90 %** | Instagram y Facebook (comentarios y mensajes), Google (reseñas), YouTube (comentarios): leer, contestar, respuesta privada, etiquetas automáticas y a mano, estados (sin responder, respondido, archivado, spam), filtros. El servidor mira cada 15 min | TikTok no deja leer comentarios a apps normales; WhatsApp necesita WhatsApp Business (trámite) |
-| **Estadísticas** | 20 % | **90 %** | Recogida diaria por el cron (Instagram, Facebook, Google, YouTube, TikTok), guardado por día, gráfica «Día a día», totales de 7 días frente a los 7 anteriores y **consejos con los datos propios**. Sin conexión: EJEMPLO marcado | Nada |
-| **Anuncios** | 15 % | **85 %** | Meta: campaña + público local (radio y edad) + creatividad + anuncio, **en pausa**; el dueño la activa; resultados (impresiones, clics, gasto). Google: campaña **preparada** con las operaciones exactas de Google Ads | Google Ads se envía solo cuando haya token de desarrollador (trámite); sin probar contra Meta de verdad |
-| **Automatizaciones** | 15 % | **90 %** | En el servidor con la app cerrada: palabra clave en comentario → mensaje privado con enlace; reseña nueva → respuesta sugerida o automática según nota; recordatorio de publicar; resumen semanal (correo si hay proveedor; si no, aviso en la app); aviso de fin de prueba | Correo: falta el proveedor (trámite). WhatsApp: trámite |
-| Chat y «Habla con Chispa» | 30 % | **95 %** | El chat de la portada y «Habla con Chispa» contestan con IA de verdad (Llama 3.3 en el servidor, con topes por visitante y por día) y «Habla» lo dice con la voz del servidor (español, inglés y francés); si no hay cupo, frases preparadas y voz del navegador | Alemán y catalán siguen con la voz del navegador (el modelo de voz gratuito no los tiene) |
-| Estudio de contenido (canales, miniseries) | 30 % | 30 % | Herramienta interna de ideas | **Decisión** de Stalin: ¿se vende o se queda interna? Si se vende, hay que conectarla al servidor |
-| Cuentas, varios negocios, sectores, modo Solers | 5 % | **85 %** | Alta sola, código de acceso, sesiones, roles dueño/equipo, 8 sectores, «Mis clientes», «Altas y pagos» con avisos | Verificación del correo del alta: necesita proveedor de correo (trámite) |
-| Cobro, seguridad y RGPD | 0 % | **80 %** | Stripe programado y **apagado**, límites por plan en el servidor (también Anuncios y Respuestas solo en Pro y Agencia), tokens cifrados AES-GCM, baja y borrado de datos, textos legales | Encender Stripe (trámite); copia de la base fuera de Cloudflare (D1 guarda sola 7 días de historia en el plan gratuito, 30 en el de pago; exportar: `npx wrangler d1 export chispa --remote`, ≈ 1 h para programarla) |
-| **Chispa entera (media de las 14 áreas)** | ≈ 35 % (cobrable) | **≈ 85 % del código** · ≈ 89 % sin el Estudio | | |
+| Diseño, portada y app instalable | 95 % | **100 %** | — | Dominio propio: trámite T6 (cambiar 2 líneas al tenerlo) |
+| Crear publicaciones (texto, imagen, vídeo) | 90 % | **95 %** | Sí (IA de Cloudflare) | **Vídeo 100 % IA**: hueco `POST /ia/video` hecho; ≈ 1 h de código cuando se decida proveedor (**decisión D1**) |
+| Calendario y publicación automática | 90 % | **100 %** | No (T5) | Nada de código |
+| Reseñas | 90 % | **100 %** | No (Google, caso abierto) | TripAdvisor y TheFork no tienen API para contestar (no es código: se copia y se abre su panel) |
+| Ficha de Google | 85 % | **100 %** | No (T5) | Espera la aprobación de Google (caso 5-5969000041337) |
+| Mi negocio y Conexiones | 90 % | **100 %** | Google sí; resto T5 | Nada |
+| Comentarios y mensajes (bandeja) | 90 % | **100 %** | No (T5) | TikTok no deja leer comentarios a apps normales; WhatsApp: decisión D3 |
+| Estadísticas | 90 % | **100 %** | No (T5) | Nada |
+| Anuncios | 85 % | **100 %** | No (T5) | Google Ads se envía solo al poner el token de desarrollador (trámite T5) |
+| Automatizaciones | 90 % | **100 %** | No (T5) | El correo sale solo al poner el proveedor (trámite T7) |
+| Chat y «Habla con Chispa» | 95 % | **100 %** | Sí | Alemán y catalán con la voz del navegador: no hay voz gratuita en el servidor (si se quiere, es una voz de pago = decisión) |
+| **Estudio para creadores** (antes «Estudio de contenido») | 30 % | **100 %** | Sí (IA real, probado 1 vez) | Nada. Ver sección 1 bis |
+| Cuentas, varios negocios, sectores, modo Solers | 85 % | **100 %** | — | **Verificación del correo hecha** (K): se enciende sola con el proveedor (T7) |
+| Cobro, seguridad y RGPD | 80 % | **100 %** | Stripe no (T4) | **Copia de la base fuera de Cloudflare hecha** (K). **La baja ya borra TODO** (K). Encender Stripe: trámite T4 |
+| **Chispa entera (media de las 14 áreas)** | ≈ 85 % | **≈ 99 %** | | Solo el vídeo IA (decisión D1) |
 
-Cómo se ha medido «ahora»: recorrido automático de **todas las pantallas y botones** (sección 4), las
-pruebas del servidor y del navegador en verde, y leyendo el código de cada área. Lo que no se ha
-podido probar contra las redes de verdad (porque no hay permisos) está dicho en cada fila.
+### 1 bis · Lo que hizo K hoy (todo en `main` y el servidor desplegado)
 
-### Lo que NO es trámite y queda de código (dicho claro)
-1. **Vídeo generado por IA**: ≈ 1 h cuando Stalin elija proveedor (recomendado Google Veo 3.1 Lite, ≈ 0,40 $ por clip de 8 s; ver `docs/VIDEO-IA.md`). Sin la decisión y la clave no se puede escribir ni probar.
-2. **Copia de la base fuera de Cloudflare** con un guion programado: ≈ 1 h (hoy D1 guarda 7 días de historia sola).
-3. **Estudio de contenido**: depende de la decisión de si se vende.
+1. **Copia de seguridad gratuita de la base** (era «≈ 1 h de código»):
+   - Cada día a las **04:17** el MacBook de Stalin (launchd `es.solers.chispa-copia`) exporta la base
+     con su sesión de wrangler, comprueba que se puede volver a cargar, la **cifra** (AES-256 con
+     `COPIA_CLAVE`, que está SOLO en `~/herramientas/chispa-servidor-claves.txt`, permisos 600), la
+     descifra para comprobarla y la sube a **`solers-es/chispa-copias` (privado)**. Guarda **30 días**
+     y borra lo más viejo también de la historia de GitHub (RGPD). Si falla, aviso en la pantalla del Mac.
+   - **Restaurar, probado** en una base D1 local: 23 tablas con las mismas filas y las imágenes enteras.
+     D1 no acepta sentencias de más de 100 KB (las imágenes pasan de eso): `trocear.py` lo resuelve.
+     Pasos en el `LEEME.md` de `chispa-copias` (y Time Travel de Cloudflare para los últimos 7 días).
+   - No hay ningún token nuevo en el Worker.
+2. **Estudio de contenido → «Estudio para creadores», vendible.** J lo dejó al 30 % esperando la
+   decisión «¿se vende o se queda interno?». Respuesta de Stalin: **todo va para vender**. Hecho:
+   - **Miniserie y Guion con IA de verdad** (servidor: `POST /ia/texto` con `accion: "serie" | "guion"`,
+     Llama 3.3), para **cualquier tema**, en el **idioma** que se elija (por defecto el del negocio), con
+     el **sector** y el nombre del negocio, para TikTok, Reels o Shorts. Reglas dentro del encargo a la
+     IA: no inventar datos, cifras ni citas, nada de promesas médicas, legales o de dinero.
+     Probado una vez contra el servidor real (serie de 3 episodios en español y guion en inglés).
+   - **«Pasar al calendario»**: los episodios entran en el **calendario real** (el que publica el
+     servidor) como **borrador** con fecha y hora propuestas y su red. Borrador porque falta el vídeo:
+     nada se publica sin vídeo. Lista en «En el calendario» con «Abrir» y «Quitar».
+   - **Portada con el sello de marca** de cada episodio o guion (imagen IA o foto libre) para descargar.
+   - **Canales**: los de muestra salen marcados **EJEMPLO** y se quitan con un toque.
+   - **Sin promesas falsas**: «Monetizar» quita las cifras sin fuente (RPM, 100-500 $…) y los textos
+     internos («promocionar Brigada y GestorOS», «foso»); deja solo los requisitos oficiales de YouTube
+     con enlace a la fuente y avisos de comprobarlo en cada red.
+   - **Plan**: Pro y Agencia (`precios.js` lo promete y el servidor lo exige: `FUNCIONES.estudio`).
+     En Básico se ve todo con plantillas de EJEMPLO y la IA contesta «viene en Pro y Agencia».
+   - Sin servidor (visitante): plantillas marcadas EJEMPLO, sin gastar IA.
+   - Ficheros: `chispa-creadores.js` (sustituye las vistas del Estudio de `index.html`),
+     `conectores/ia.js` (`serie`, `guion`), `conectores/panel-real.js` (`exigirFuncion`).
+3. **Verificación del correo del alta** (antes «necesita proveedor»): ya programada. Con proveedor, al
+   darse de alta llega un correo con **su código y un enlace para confirmar** (7 días, un uso, el
+   token se guarda solo como huella); «Mi plan» enseña «Reenviar» (1 cada 10 min). Si el proveedor
+   falla, el alta sale bien igual. Se enciende sola al hacer el trámite T7.
+4. **Fallo de RGPD arreglado**: la baja («Darme de baja y borrar mis datos») borraba 9 tablas y dejaba
+   en la base la bandeja (comentarios y mensajes de los clientes del negocio), estadísticas, anuncios,
+   reglas, avisos, claves de API e imágenes. Ahora borra **las 19**, comprobado tabla por tabla.
+5. En el móvil, el botón flotante «Ver cómo funciona» tapaba el último botón de la pantalla: hueco abajo.
 
 ---
 
@@ -109,8 +143,11 @@ estadísticas y los anuncios). Resumen:
 Para: verificar el correo del alta, mandar el código, el resumen semanal y el aviso de fin de prueba
 por correo. Con **Resend** (o Cloudflare Email): verificar el dominio, crear la clave y ponerla:
 `wrangler secret put RESEND_API_KEY` y en `[vars]` `CORREO_REMITENTE = "Chispa <hola@chispa.solers.es>"`.
-El resumen semanal ya lo usa solo en cuanto existan esas dos cosas. Mientras tanto, todo llega como
-aviso dentro de la app y en «Altas y pagos» del modo Solers.
+**Todo el código ya está** (K): en cuanto existan esas dos cosas, sin tocar nada más, el alta manda el
+correo con el código y el enlace para confirmar el correo, «Mi plan» enseña «Reenviar», y salen por
+correo el resumen semanal y el aviso de fin de prueba. Para probarlo: darse de alta con un correo
+propio en `#alta` y pulsar el enlace. Mientras tanto, todo llega como aviso dentro de la app y en
+«Altas y pagos» del modo Solers.
 
 ### T8 · Pasar las cuentas a `admin@solers.es` · ⏱ 30 min
 - **Cloudflare** (hoy en `elparaisobarrestaurante1968@gmail.com`; Alex ya es administrador): invitar a
@@ -123,12 +160,24 @@ aviso dentro de la app y en «Altas y pagos» del modo Solers.
 ### T9 · Turnstile («No soy un robot» en el alta, opcional) · ⏱ 5 min
 `docs/VENDER-CHISPA.md` → «I». La sesión de wrangler de este Mac no tiene permiso de Turnstile.
 
-### T10 · Decisiones de Stalin (no son trámites con nadie, pero bloquean algo)
-- **Proveedor de vídeo con IA** (`docs/VIDEO-IA.md`): recomendado Veo 3.1 Lite (≈ 0,40 $/clip). Hace
-  falta activar la facturación del proyecto de Google Cloud.
-- **Número de WhatsApp Business** para recordatorios de reserva (WhatsApp Business Platform: empresa
-  verificada, número propio y plantilla aprobada por Meta).
-- **Estudio de contenido**: ¿producto o herramienta interna?
+### T10 · Guardar la clave de las copias en un sitio seguro · ⏱ 2 min · Stalin
+`COPIA_CLAVE` está **solo** en `~/herramientas/chispa-servidor-claves.txt` del MacBook. Si el Mac se
+pierde, las copias de `solers-es/chispa-copias` no se pueden abrir. Copiarla al gestor de contraseñas
+(o en papel, guardado). Y dejar el MacBook encendido o que despierte de noche: si está apagado varios
+días no hay copia esos días (Cloudflare guarda 7 días de Time Travel aparte).
+
+---
+
+## 2 bis · DECISIONES de Stalin (no son trámites con nadie, pero bloquean algo)
+
+| # | Decisión | Qué bloquea | Qué pasa al decidir |
+|---|---|---|---|
+| D1 | **Proveedor de vídeo con IA** (`docs/VIDEO-IA.md`): recomendado Google Veo 3.1 Lite (≈ 0,40 $ por clip de 8 s) | El vídeo 100 % generado por IA (lo único de código que queda) | Stalin activa la facturación del proyecto de Google Cloud «Chispa El Paraiso» y crea la clave; un Claude la pone con `wrangler secret put` y escribe la llamada en `generarVideo` de `conectores/ia.js` (≈ 1 h) |
+| D2 | **Precio final** (hoy 39/79/149 € + IVA) y **qué plan lleva el Estudio para creadores** (K lo ha puesto en Pro y Agencia) | Vender con el precio bueno | Se cambia en `precios.js` (y `FUNCIONES.estudio` en `conectores/panel-real.js` si el Estudio cambia de plan) + `legal/terminos.html`; regrabar los vídeos (T3) |
+| D3 | **Número de WhatsApp Business** para recordatorios y bandeja de WhatsApp | WhatsApp en la bandeja y en automatizaciones | WhatsApp Business Platform: empresa verificada (T1), número propio y plantillas aprobadas por Meta; luego ≈ ½ día de código |
+| D4 | **Voz de pago para alemán y catalán** (opcional) | Que «Habla con Chispa» y los vídeos tengan voz del servidor en esos idiomas (hoy, voz del navegador y subtítulos) | Elegir proveedor (p. ej. ElevenLabs o Google TTS) y clave; ≈ 1 h de código |
+
+(La decisión «Estudio de contenido: ¿producto o herramienta interna?» ya está tomada: **producto**.)
 
 ---
 
@@ -148,7 +197,8 @@ Desde esta revisión `index.html` lleva `window.CHISPA_SERVIDOR = "https://chisp
 
 ```bash
 export NODE_PATH=/Users/usuario/Proyectos/chispa-f-pruebas/node_modules   # sql.js y playwright-core
-node pruebas/servidor-todas.cjs        # servidor: 22 + 35 + 35 + 39 comprobaciones (F, H, G, J)
+node pruebas/servidor-todas.cjs        # servidor: 22 + 35 + 35 + 39 + 10 + 6 comprobaciones (F, H, G, J, K)
+node pruebas/navegador-todas.cjs       # navegador: 11 + 13 + 16 + 10 + 5 + 11 (… y el Estudio para creadores de K)
 node pruebas/panel-navegador.cjs       # bandeja, día a día, anuncios y reglas: ordenador + iPhone, sin y con servidor
 node pruebas/clips-navegador.cjs       # cortar un vídeo largo en clips
 node pruebas/recorrido-botones.cjs     # TODAS las pantallas y botones: errores, botones muertos y avisos que prometen
@@ -156,9 +206,14 @@ node pruebas/alta-navegador.cjs        # alta sola (H)
 ```
 (Los puertos se cambian con `PUERTO_API` y `PUERTO_WEB` si hay otro simulador abierto.)
 
-Resultado (07/10/2026, mañana):
-- Servidor: **22 + 35 + 35 + 39 = 131 comprobaciones en verde** (`servidor-todas.cjs`).
-- Navegador: **11 + 13 + 16 + 10 + 5 = 55 en verde** (`navegador-todas.cjs`), más las del calendario de D (30 + 8).
+Resultado (07/10/2026, repaso de K):
+- Servidor: **22 + 35 + 35 + 39 + 10 + 6 = 147 comprobaciones en verde** (`servidor-todas.cjs`; nuevas:
+  `creadores-api.cjs` y `correo-api.cjs`).
+- Navegador: **11 + 13 + 16 + 10 + 5 + 11 = 66 en verde** (`navegador-todas.cjs`; nueva:
+  `creadores-navegador.cjs`, ordenador sin servidor + iPhone con servidor + plan Básico), más las del calendario de D (30 + 8).
+- Recorrido de botones de K (ordenador, sin servidor): 17 pantallas, **289 botones**, **0 errores, 0 avisos que prometen**.
+- IA real del Estudio probada **una vez** contra el servidor desplegado (serie y guion) y `/salud` una vez.
+- Copia de la base: hecha a mano y por launchd, subida y comprobada en GitHub; restauración probada en D1 local.
 - **Recorrido de TODOS los botones**: 17 pantallas, **294 botones** pulsados en ordenador (sin servidor) y
   **347 en iPhone** como visitante con el servidor encendido: **0 errores de programa, 0 avisos que prometan
   sin hacer** (se quitaron «Piloto automático (demo)», «la voz real se conecta con ElevenLabs», «plan Equipo»
@@ -186,4 +241,10 @@ Resultado (07/10/2026, mañana):
   las que sí lleguen (al menos seguidores) y no se rompe.
 - **TikTok**: estadísticas sí (seguidores y vistas de los últimos 20 vídeos), comentarios no.
 - **Reseñas de TripAdvisor y TheFork**: no tienen API para contestar; Chispa redacta, copia y abre su panel.
-- Los **vídeos explicativos** grabados tienen los precios viejos (regrabar tras T3).
+- Los **vídeos explicativos** grabados tienen los precios viejos (regrabar tras T3) y no enseñan el
+  Estudio para creadores.
+- **Copias**: dependen de que el MacBook de Stalin esté encendido a las 04:17 (si dormía, launchd la hace
+  al despertar). La exportación deja la base ocupada unos segundos (de noche, sin efecto visible).
+- **Estudio para creadores**: escribe el plan y los guiones; **no graba** los vídeos. Los episodios
+  entran como borrador hasta que se sube el vídeo. La IA (Llama 3.3) puede equivocarse en datos: el
+  encargo le prohíbe inventarlos y la pantalla pide revisar antes de publicar.
