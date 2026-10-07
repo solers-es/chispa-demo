@@ -24,18 +24,20 @@
     logoUrl: 'marca/elparaiso-logo.png',
     web: 'https://el-paraiso-eight.vercel.app/links',
     club: 'https://el-paraiso-eight.vercel.app',
-    reserva: 'https://api.whatsapp.com/send?phone=34689980202&text=Hola%2C+quiero+reservar+una+mesa+en+El+Paraiso',
+    reserva: 'https://el-paraiso-eight.vercel.app/reservas.html',   // su propio sistema de reservas
+    carta: 'https://el-paraiso-eight.vercel.app/carta.html',
+    eventos: 'https://el-paraiso-eight.vercel.app/eventos.html',
     telefono: '971 37 90 28',
     whatsapp: '689 98 02 02',        // móvil: el botón «Reserva por wasap» de los clientes
     whatsappApi: '971 37 90 28',     // fijo del local: el número de la API de WhatsApp de Chispa (decisión de Stalin)
     instagram: 'https://instagram.com/elparaisobarrestaurante',
-    facebook: 'https://www.facebook.com/people/El-Paraiso-Bar-Restaurante-Mallorca/',
+    facebook: 'https://www.facebook.com/share/1cxhh2vr9X/',
     tiktok: 'https://www.tiktok.com/@elparaisomallorca29',
     youtube: '',
-    google: 'https://www.google.com/maps/place/?q=place_id:ChIJl-sOCm2TlxIRwxpJzz76Phg',
+    google: 'https://share.google/4cyY3OFMTiTD0rcMG',
     resenas: 'https://g.page/r/CcMaSc8--j4YEBM/review'
   };
-  var CAMPOS = ['nombre', 'sector', 'ciudad', 'direccion', 'logoUrl', 'web', 'club', 'reserva', 'telefono', 'whatsapp', 'whatsappApi',
+  var CAMPOS = ['nombre', 'sector', 'ciudad', 'direccion', 'logoUrl', 'web', 'club', 'reserva', 'carta', 'eventos', 'telefono', 'whatsapp', 'whatsappApi',
     'instagram', 'facebook', 'tiktok', 'youtube', 'google', 'resenas'];
 
   /* Rellena lo que falte con los datos de El Paraíso, una sola vez y sin pisar
@@ -49,7 +51,7 @@
         if (esParaiso && !n[k]) n[k] = PARAISO[k];
       });
       if (esParaiso && n.nombre === 'El Paraíso') n.nombre = PARAISO.nombre;
-      n._datosB = 2;
+      n._datosB = 3;
       guardar();
     }
     if (n._datosB < 2 && /para[ií]so/i.test(n.nombre || '')) {
@@ -59,6 +61,14 @@
         whatsapp: ['971 37 90 28'], sector: ['Restaurante · cocina caribeña y mediterránea', 'Restaurante'] };
       CAMPOS.forEach(function (k) { if (!n[k] || (viejos[k] && viejos[k].indexOf(n[k]) >= 0)) n[k] = PARAISO[k]; });
       n._datosB = 2; guardar();
+    }
+    if (n._datosB < 3 && /para[ií]so/i.test(n.nombre || '')) {
+      // 07/10/2026 (2): reservas con su propio sistema, carta, eventos, Facebook y ficha de Google exactos
+      var v3 = { reserva: ['https://api.whatsapp.com/send?phone=34689980202&text=Hola%2C+quiero+reservar+una+mesa+en+El+Paraiso'],
+        facebook: ['https://www.facebook.com/people/El-Paraiso-Bar-Restaurante-Mallorca/'],
+        google: ['https://www.google.com/maps/place/?q=place_id:ChIJl-sOCm2TlxIRwxpJzz76Phg'] };
+      CAMPOS.forEach(function (k) { if (!n[k] || (v3[k] && v3[k].indexOf(n[k]) >= 0)) n[k] = PARAISO[k]; });
+      n._datosB = 3; guardar();
     }
     CAMPOS.forEach(function (k) { if (n[k] === undefined) n[k] = ''; });
     S.conexiones = S.conexiones || {};
@@ -81,6 +91,8 @@
   /* Cada campo: cómo se normaliza y qué dominios valen. Devuelve {v, ok, msg}. */
   var REGLAS = {
     web: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser una dirección web (https://…)' }; },
+    carta: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser un enlace (https://…)' }; },
+    eventos: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser un enlace (https://…)' }; },
     club: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser un enlace (https://…)' }; },
     whatsappApi: function (s) { var d = soloDigitos(s); return { v: (s || '').trim(), ok: !s || d.replace('+', '').length >= 9, msg: 'Pon el número (9 cifras o con +34)' }; },
     reserva: function (s) { s = conHttps(s); return { v: s, ok: !s || urlValida(s), msg: 'Tiene que ser un enlace (TheFork, tu web de reservas…)' }; },
@@ -162,10 +174,12 @@
       case 'reserva': return n.reserva || '';
       case 'web': return n.web || '';
       case 'club': return n.club || '';
+      case 'carta': return n.carta || '';
+      case 'eventos': return n.eventos || '';
       case 'tel': return n.telefono ? 'tel:' + telE164(n.telefono) : '';
       case 'whatsapp': {
         if (!n.whatsapp) return '';
-        var txt = encodeURIComponent('¡Hola! Quería reservar mesa en ' + (n.nombre || 'vuestro local') + ' 🙂');
+        var txt = encodeURIComponent('Hola, quiero reservar una mesa en ' + (n.nombre || 'vuestro local'));
         return 'https://wa.me/' + telE164(n.whatsapp).replace('+', '') + '?text=' + txt;
       }
       case 'instagram': case 'facebook': case 'tiktok': case 'youtube': case 'google': case 'resenas':
@@ -174,8 +188,8 @@
     }
     return '';
   }
-  var CAMPO_DE = { club: 'club', reserva: 'reserva', web: 'web', tel: 'telefono', whatsapp: 'whatsapp', instagram: 'instagram', facebook: 'facebook', tiktok: 'tiktok', youtube: 'youtube', google: 'google', resenas: 'resenas' };
-  var NOMBRE_DE = { club: 'el enlace del club', reserva: 'el enlace de reservas', web: 'tu web', tel: 'tu teléfono', whatsapp: 'tu WhatsApp', instagram: 'tu Instagram', facebook: 'tu Facebook', tiktok: 'tu TikTok', youtube: 'tu YouTube', google: 'tu ficha de Google', resenas: 'el enlace de reseñas' };
+  var CAMPO_DE = { carta: 'carta', eventos: 'eventos', mapa: 'google', club: 'club', reserva: 'reserva', web: 'web', tel: 'telefono', whatsapp: 'whatsapp', instagram: 'instagram', facebook: 'facebook', tiktok: 'tiktok', youtube: 'youtube', google: 'google', resenas: 'resenas' };
+  var NOMBRE_DE = { carta: 'el enlace de la carta', eventos: 'el enlace de eventos', club: 'el enlace del club', reserva: 'el enlace de reservas', web: 'tu web', tel: 'tu teléfono', whatsapp: 'tu WhatsApp', instagram: 'tu Instagram', facebook: 'tu Facebook', tiktok: 'tu TikTok', youtube: 'tu YouTube', google: 'tu ficha de Google', resenas: 'el enlace de reseñas' };
 
   function irA(url) {
     if (!url) return false;
@@ -186,8 +200,12 @@
       return true;
     }
     var w = null;
-    try { w = window.open(url, '_blank', 'noopener'); } catch (e) {}
-    if (!w) location.href = url; // si el navegador bloquea la ventana, se abre aquí mismo
+    // pestaña nueva (sin 'noopener' en el tercer parámetro: con él window.open devuelve null y no se sabría si se abrió)
+    try { w = window.open(url, '_blank'); if (w) { try { w.opener = null; } catch (e) {} } } catch (e) {}
+    if (!w) { // ventana bloqueada: enlace de verdad con target=_blank
+      var a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.style.display = 'none';
+      document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500);
+    }
     return true;
   }
   /* Si falta el dato, en vez de un aviso que no lleva a nada, abre «Mi negocio»
@@ -209,7 +227,9 @@
     var n = S.negocio, h = '<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px">';
     h += '<button class="btn pp" style="flex:none" onclick="abrirCta(\'reserva\')">📅 Reservar</button>';
     h += '<button class="btn g" style="flex:none" onclick="abrirCta(\'web\')">🌐 Ver web</button>';
-    if (n.whatsapp) h += '<button class="btn g" style="flex:none" onclick="abrirCta(\'whatsapp\')">💬 WhatsApp</button>';
+    if (n.carta) h += '<button class="btn g" style="flex:none" onclick="abrirCta(\'carta\')">📖 Ver carta</button>';
+    if (n.whatsapp) h += '<button class="btn g" style="flex:none" onclick="abrirCta(\'whatsapp\')">💬 Reservar por WhatsApp</button>';
+    if (n.google) h += '<button class="btn g" style="flex:none" onclick="abrirCta(\'google\')">📍 Cómo llegar</button>';
     if (n.telefono) h += '<button class="btn g" style="flex:none" onclick="abrirCta(\'tel\')">📞 Llamar</button>';
     return h + '</div>';
   }
@@ -267,6 +287,9 @@
       '<div style="min-width:0"><div style="font-weight:800;font-size:17px">' + esc(n.nombre || 'Tu negocio') + '</div>' +
       '<div style="font-size:12.5px;color:var(--tx3)">' + esc(n.direccion || n.ciudad || '') + '</div>' +
       '<div style="margin-top:6px;height:7px;background:var(--bg2);border-radius:9px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:var(--grad)"></div></div>' +
+      '<div class="row" style="gap:6px;margin:8px 0 4px">' +
+      [['reserva', '📅 Reservar'], ['web', '🌐 Web'], ['carta', '📖 Ver carta'], ['eventos', '🎉 Eventos'], ['google', '📍 Cómo llegar / Ver en Google'], ['whatsapp', '💬 WhatsApp']]
+        .map(function (b) { return '<button class="btn g sm" style="flex:none" onclick="abrirCta(\'' + b[0] + '\')">' + b[1] + '</button>'; }).join('') + '</div>' +
       '<div style="font-size:11.5px;color:var(--tx3);margin-top:3px">Ficha completa al ' + pct + ' % · estos datos los usan TODOS los botones de Chispa (Reservar, Ver web, WhatsApp, Llamar…)</div></div></div></div>' +
 
       fichaGoogleHtml() +
@@ -298,6 +321,8 @@
       '<div class="card"><h3>📅 Reservas y contacto</h3><div class="mn-grid">' +
       campo('reserva', 'Enlace de reservas', 'https://… (TheFork, tu web de reservas…)', { ir: 1 }) +
       campo('web', 'Web', 'https://tunegocio.com', { ir: 1 }) +
+      campo('carta', 'Carta', 'https://tunegocio.com/carta', { ir: 1 }) +
+      campo('eventos', 'Eventos', 'https://tunegocio.com/eventos', { ir: 1 }) +
       campo('telefono', 'Teléfono', '971 00 00 00', { ir: 1, tipo: 'tel' }) +
       campo('whatsapp', 'WhatsApp de reservas (el que escriben los clientes)', '600 00 00 00', { ir: 1, tipo: 'tel' }) +
       campo('club', 'Club de clientes / fidelización', 'https://…', { ir: 1 }) +
@@ -321,7 +346,7 @@
       '<div style="margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:11px;background:rgba(139,92,246,.06)"><div class="row" style="align-items:center;justify-content:space-between;gap:10px"><div><div style="font-weight:700">🤖 Piloto automático</div><div style="font-size:12px;color:var(--tx3)">Chispa crea y programa tu semana sola. Publicará por ti en cuanto conectes tus cuentas.</div></div><button class="btn ' + (n.piloto ? 'pp' : 'g') + ' sm" style="flex:none" onclick="togglePiloto()">' + (n.piloto ? '✓ Activado' : 'Activar') + '</button></div></div></div>' +
 
       '<button class="btn pp" style="width:100%" onclick="guardarAjustes()">💾 Guardar cambios</button>' +
-      '<div class="row" style="margin-top:10px;gap:8px"><button class="btn g sm" style="flex:none" onclick="mnRestaurarParaiso()">↺ Poner los datos de El Paraíso</button>' +
+      '<div class="row" style="margin-top:10px;gap:8px;padding-bottom:80px"><button class="btn g sm" style="flex:none" onclick="mnRestaurarParaiso()">↺ Poner los datos de El Paraíso</button>' +
       '<button class="btn g sm" style="flex:none" onclick="resetTodo()">↺ Reiniciar demo</button></div>';
   }
 
@@ -347,7 +372,8 @@
       '<button class="btn g sm" style="flex:none" onclick="mnFichaVer(\'mnHorario\')">🕒 Horario</button>' +
       '<button class="btn g sm" style="flex:none" onclick="mnFichaVer(\'mnFotos\')">📸 Fotos</button>' +
       '<button class="btn g sm" style="flex:none" onclick="mnFichaVer(\'mnNovedad\')">📝 Publicar novedad</button>' +
-      '<button class="btn g sm" style="flex:none" onclick="abrirCta(\'google\')">Ver mi ficha ↗</button></div>' +
+      '<button class="btn g sm" style="flex:none" onclick="abrirCta(\'google\')">📍 Cómo llegar / Ver en Google ↗</button>' +
+      '<button class="btn g sm" style="flex:none" onclick="abrirCta(\'resenas\')">⭐ Pedir reseña ↗</button></div>' +
       '<details id="mnHorario" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">🕒 Horario de la ficha</summary>' +
       '<div style="margin-top:8px">' + dias.map(function (d, i) {
         var x = h[i] || {};
