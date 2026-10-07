@@ -218,7 +218,7 @@ function decirConAudio(txt,url){bubble(txt,'bot');try{speechSynthesis.cancel();}
   var a=new Audio(url);a.onplay=function(){spoke=true;avatar.classList.add('speaking');};a.onended=a.onerror=function(){avatar.classList.remove('speaking');};
   a.play().catch(function(){avatar.classList.remove('speaking');try{var u=new SpeechSynthesisUtterance(txt);u.lang=L[LANG].code;if(voiceFor[LANG])u.voice=voiceFor[LANG];speechSynthesis.speak(u);}catch(e){}});}
 // Cerebro: la IA del servidor de Chispa (POST /chat, público y con topes); si no contesta, las frases preparadas
-var CHISPA_SERVIDOR=(function(){try{var l=localStorage.getItem('chispa_servidor');if(l&&l!=='no')return l;}catch(e){}return window.CHISPA_SERVIDOR||'https://chispa-api.solers.workers.dev';})(),HISTORIAL=[];
+var CHISPA_SERVIDOR=(function(){try{var l=localStorage.getItem('chispa_servidor');if(l&&l!=='no')return l;}catch(e){}return window.CHISPA_SERVIDOR||'';})(),HISTORIAL=[];
 function procesar(texto){if(!texto)return;bubble(texto,'me');HISTORIAL.push({yo:true,texto:texto+(LANG!=='es'?' (answer in '+L[LANG].code+')':'')});
   var hecho=false,reserva=setTimeout(function(){if(!hecho){hecho=true;say(responder(texto));}},9000);
   fetch(CHISPA_SERVIDOR+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensajes:HISTORIAL.slice(-8),voz:L[LANG].code.slice(0,2)})})

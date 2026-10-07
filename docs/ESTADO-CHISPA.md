@@ -1,5 +1,13 @@
 # Estado de Chispa · 07/10/2026 (revisado por el trabajador K; + Plan de ofertas del trabajador L)
 
+> **08/10/2026 · Servidor APAGADO en la web.** El Worker `chispa-api` (y su base D1 `chispa`) vive en la
+> cuenta de Cloudflare de **El Paraíso** (Dominican Balearic Drinks SL), que no es de Solers. Para separar las
+> dos empresas, `CHISPA_SERVIDOR` está vacío en `index.html` (y también los valores por defecto de `alta.js` y
+> `chispa-habla.html`): **la web pública de Chispa queda solo como demostración**. El Worker `chispa-api` y sus
+> datos **no se han borrado**; se moverán a la cuenta de Cloudflare de Solers cuando la haya, y entonces se
+> vuelve a poner su dirección aquí.
+
+
 > **Para Stalin, en una línea:** lo que es **programar** está hecho y probado: **≈ 99 % del código**.
 > Lo único de código que queda es el **vídeo 100 % generado por IA** (≈ 1 h), y no se puede escribir
 > hasta que elijas proveedor y pongas tarjeta (decisión D1). Todo lo demás son **trámites** (CIF,

@@ -1130,10 +1130,11 @@ else if(_h.indexOf("panel")>=0){vista("panel");}
 <!-- Precios (una sola tabla), alta sola, prueba, pago y legal (trabajador H) -->
 <script src="precios.js"></script>
 <script src="alta.js"></script>
-<!-- Sincronización con el servidor de Chispa (trabajador F): mismo estado en todas las páginas y en el móvil.
-     ENCENDIDO el 07/10/2026 (trabajador J): el visitante sin código sigue viendo la demostración; quien entra con
-     su código en Conexiones trabaja contra el servidor. Vacío = solo demostración. La dirección no es secreta. -->
-<script>window.CHISPA_SERVIDOR=window.CHISPA_SERVIDOR||"https://chispa-api.solers.workers.dev";window.CHISPA_NEGOCIO=window.CHISPA_NEGOCIO||"el-paraiso";</script>
+<!-- Sincronización con el servidor de Chispa: mismo estado en todas las páginas y en el móvil.
+     APAGADO el 08/10/2026: el Worker chispa-api vive en la cuenta de Cloudflare de El Paraíso, que no es de Solers.
+     Hasta que Chispa tenga su propia cuenta de Cloudflare, esta web es SOLO DEMOSTRACIÓN (todo en el navegador).
+     Para volver a encenderlo: poner aquí la dirección del servidor de Solers. -->
+<script>window.CHISPA_SERVIDOR=window.CHISPA_SERVIDOR||"";window.CHISPA_NEGOCIO=window.CHISPA_NEGOCIO||"el-paraiso";</script>
 <script src="chispa-sync.js"></script>
 <!-- «Crecer»: guía de crecimiento accionable por sector e idioma (base: docs/CRECIMIENTO-ALGORITMOS.md).
      Va al final para tener ya ChispaSector (sectores.js) y la cadena de window.panel montada. -->

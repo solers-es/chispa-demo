@@ -26,7 +26,7 @@
   if (!window.ChispaPrecios) return;
   var P = window.ChispaPrecios;
   var LS_ALTA = 'chispa_cuentas_alta', LS_RESPALDO = 'chispa_cuentas_respaldo', LS_ADMIN_SRV = 'chispa_admin_servidor';
-  var POR_DEFECTO = 'https://chispa-api.solers.workers.dev';
+  var POR_DEFECTO = ''; // 08/10/2026: sin servidor hasta que Chispa tenga su cuenta de Cloudflare (solo demostración)
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return (s == null ? '' : '' + s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
