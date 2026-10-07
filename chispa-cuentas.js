@@ -204,6 +204,10 @@
     }
   }
   if (!REG) { REG = regInicial(); guardarReg(REG); }
+  // sectores nuevos (p. ej. creador de contenido): su negocio de ejemplo también en los registros que ya existían
+  if (REG && !esCliente() && SEC()) SEC().lista().filter(function (p) { return p.cambia; }).forEach(function (p) {
+    if (!REG.negocios.some(function (e) { return e.ejemplo && e.sectorId === p.id; })) { REG.negocios.push({ id: 'ej-' + p.id, nombre: p.ejemplo.nombre, sectorId: p.id, ejemplo: true, activo: true, acceso: null, creado: new Date().toISOString().slice(0, 10) }); guardarReg(REG); }
+  });
   // coherencia: el negocio cargado manda; si se reinició, se rehace el del sector
   (function () {
     var n = S.negocio || {};

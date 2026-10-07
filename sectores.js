@@ -1,7 +1,8 @@
 /* ──────────────────────────────────────────────────────────────────────────
    Chispa · TIPO DE NEGOCIO (perfiles de sector)  — trabajador E
 
-   Una entrada por sector en PERFILES. Al elegir un sector, Chispa se adapta:
+   Una entrada por sector en PERFILES (8: restaurante, peluquería, estética,
+   gimnasio, tienda, cafetería, talleres y creador de contenido). Al elegir un sector, Chispa se adapta:
      · botón principal y CTA (Reservar mesa / Pedir cita / Comprar / Pedir
        presupuesto / Apuntarme…) con el enlace que rellena el negocio
        (Booksy, Treatwell, su web, WhatsApp). Chispa NO hace agendas de citas.
@@ -25,6 +26,9 @@
      ChispaSector.semana()            → publicaciones de una semana tipo, con la forma de item de la agenda (y su foto)
      ChispaSector.horasDe(dia)        → mejores horas de ese día (0 = lunes)
      window 'chispa:sector'           → evento al cambiar de sector
+     ChispaSector.actual().idioma     → {codigo BCP-47, nombre, base, rtl, plantillas:'propias'|'ia', traduceIA}
+     ChispaSector.paraIA()            → idioma, tono, CTA, hashtags y qué textos (en español) debe escribir la IA
+     ChispaSector.idioma(cod, nombre) / ChispaSector.cta(texto) → cambian idioma y botón principal
    Sin FileReader. Todo en español.
    ────────────────────────────────────────────────────────────────────────── */
 (function () {
@@ -45,7 +49,7 @@
       iconos: ['🍽️', '🍷', '🍻', '🥘', '🍕', '🍔'],
       detectar: /restaur|\bbar\b|tasca|tabern|asador|marisquer|pizzer|tapas|gastro|bistr|chiringuito|burger|hamburgues|cocina|comida|cervecer|vinoteca|bodega/,
       tono: 'Cercano y con chispa', color: '#8b5cf6',
-      cta: { texto: 'Reservar mesa', icono: '📅', frase: 'Reserva tu mesa', enlaces: 'TheFork, tu web de reservas o WhatsApp' },
+      cta: { texto: 'Reservar mesa', icono: '📅', frase: 'Reserva tu mesa', enlaces: 'TheFork, tu web de reservas o WhatsApp', en: 'Book a table', de: 'Tisch reservieren', fr: 'Réserve ta table' },
       etq: { negocio: 'restaurante', reservas: 'reservas', reserva: 'reserva', carta: 'carta', verCarta: 'Ver carta', mesa: 'mesa', mesas: 'mesas' },
       hashtags: ['#restaurante', '#foodie', '#Palma', '#Mallorca'],
       horas: {
@@ -566,6 +570,94 @@
         ['Revisión antes del verano', 'Aire acondicionado', 'post', 'Pon a punto el aire antes del calor ❄️ Pide cita.', '#aireacondicionado #Mallorca']
       ],
       ejemplo: { nombre: 'Reformas Ejemplo', ciudad: 'Palma de Mallorca' }
+    },
+
+    {
+      id: 'creador', nombre: 'Creador de contenido', corto: 'creador de contenido', icono: '🎬', cambia: true,
+      iconos: ['🎬', '🎙️', '📸', '🎨', '🎧', '⭐'],
+      detectar: /influencer|youtuber|tiktoker|streamer|twitch|podcast|creador|creadora|content creator|creator|\bugc\b|coach|artista|ilustrador|m[uú]sico|cantante|marca personal|blogger|bloguer|instagramer|newsletter/,
+      tono: 'Divertido y gamberro', color: '#8b5cf6',
+      cta: { texto: 'Ver el enlace', icono: '🔗', frase: 'Link en la bio', pregunta: 'Te paso el enlace', whatsapp: 'Escríbeme por WhatsApp',
+        mensaje: 'Hola, te escribo por una colaboración con {neg}', enlaces: 'tu link en la bio (Linktree, Beacons, tu web), tu tienda, tu canal o un formulario de colaboraciones',
+        opciones: [['Seguir', '➕', 'Follow me', 'Folge mir', 'Suis-moi'], ['Suscribirse', '🔔', 'Subscribe', 'Abonnieren', 'Abonne-toi'], ['Ver el enlace', '🔗', 'Link in bio', 'Link in der Bio', 'Lien en bio'],
+          ['Comprar mi producto', '🛒', 'Get it now', 'Jetzt holen', 'Achète-le'], ['Reservar colaboración', '🤝', 'Work with me', 'Zusammenarbeit anfragen', 'Collabore avec moi']],
+        en: 'Link in bio', de: 'Link in der Bio', fr: 'Lien en bio' },
+      etq: { negocio: 'creador de contenido', reservas: 'colaboraciones', reserva: 'colaboración', carta: 'mis enlaces', verCarta: 'Ver mis enlaces', mesa: 'hueco', mesas: 'huecos', iconoCarta: '🗂️', menuDia: 'contenido del día' },
+      hashtags: ['#creadordecontenido', '#reels', '#detrasdecamaras', '#tips'],
+      ideas: ['Reel de gancho: el error que todos cometen', 'Serie: episodio 1 de 5', 'Detrás de cámaras de mi último vídeo', 'Colaboración con otro creador', 'Del vídeo largo a 5 clips',
+        'Lo que nadie te cuenta de mi trabajo', 'Responder al comentario más preguntado', 'Mi newsletter de esta semana', 'Lanzamiento de mi producto', 'Un día conmigo grabando'],
+      ofertas: ['Comenta «GUÍA» y te la mando por DM', '-20% en mi curso solo este finde', 'Sorteo con una marca: participa', 'Newsletter gratis: apúntate', 'Plazas abiertas para colaboraciones'],
+      plan: {
+        post: ['Carrusel: 5 consejos que guardarás 💾', 'Cita o frase de la semana', 'Lo que me preguntáis siempre', 'Presentación: quién soy y qué hago'],
+        reel: ['Gancho en 1 segundo: el error que todos cometen 🎬', 'Serie: episodio de esta semana', 'Clip del vídeo largo ✂️', 'Detrás de cámaras', 'Tendencia con mi toque'],
+        historia: ['Encuesta: ¿qué vídeo hago ahora? 📊', 'Caja de preguntas', 'Así estoy grabando hoy', 'Comenta la palabra clave y te mando el enlace'],
+        oferta: ['{of}', 'Comenta «GUÍA» y te la mando', 'Plazas para colaboraciones', 'Apúntate a mi newsletter']
+      },
+      frases: {
+        gancho: ['{idea} 👀\n\nQuédate hasta el final: lo mejor viene en el segundo 20.\n\n👉 Sígueme para la parte 2.', 'Nadie te cuenta esto: {idea} 🤯\n\nGuárdalo para luego 💾'],
+        oferta: ['{idea} 🔥\n\nComenta «LINK» y te lo mando por privado 📩', 'Solo esta semana: {idea} ⏰\n\nEl enlace, en mi bio 🔗'],
+        pregunta: ['¿{idea}? 🤔\n\nTe leo en comentarios 👇 y el mejor sale en el próximo vídeo.', '¿Te ha pasado? {idea} 👀\n\nEnvíaselo a quien necesita verlo 📤'],
+        local: ['{idea} 🎬\n\nDetrás de cámaras de {neg}: así lo hago de verdad.', 'Parte 1 de la serie: {idea} 📺\n\nActiva las notificaciones para no perderte la 2 🔔']
+      },
+      horas: {
+        mejores: [
+          { dias: [0, 1, 2, 3, 4], hora: '13:00', formato: 'reel', por: 'Pausa de la comida: mucho consumo de reels y shorts.' },
+          { dias: TODOS, hora: '20:00', formato: 'reel', por: 'Pico de la noche: el algoritmo prueba el vídeo con más gente.' },
+          { dias: [1, 3], hora: '09:00', formato: 'post', por: 'Carruseles útiles: se guardan camino del trabajo.' },
+          { dias: [6], hora: '18:00', formato: 'historia', por: 'Domingo: encuestas y cajas de preguntas para la semana.' }
+        ],
+        franjas: [
+          { nombre: 'Directo / estreno de vídeo largo', dias: [3], desde: '19:00', hasta: '21:00', tipo: 'promo' },
+          { nombre: 'Lanzamiento de producto', dias: [1, 2, 3], desde: '10:00', hasta: '22:00', tipo: 'promo' },
+          { nombre: 'Black Friday (colaboraciones de marcas)', meses: [11], tipo: 'temporada' },
+          { nombre: 'Vuelta al cole: propósitos y cursos', meses: [9, 1], tipo: 'temporada' }
+        ]
+      },
+      frecuencia: { reels: '4–5 por semana', carruseles: '2 por semana', historias: 'todos los días (3–7)', largo: '1 vídeo largo o pódcast por semana', newsletter: '1 por semana' },
+      metricas: ['Retención (cuánta gente ve hasta el final)', 'Envíos (compartidos por privado)', 'Guardados', 'Seguidores nuevos por publicación', 'Clics en el enlace de la bio', 'Comentarios con la palabra clave'],
+      formatos: ['Reels de gancho (1 s para enganchar)', 'Series por episodios', 'Detrás de cámaras', 'Colaboraciones (collab en Instagram)', 'Reaprovechar un vídeo largo en clips', 'Newsletter'],
+      imagen: {
+        busquedas: ['content creator', 'podcast studio', 'video editing', 'camera setup', 'youtube'],
+        prompt: 'Professional Instagram photo of a content creator studio: camera, ring light, microphone or video editing screen, modern, natural light, no text, no logos.',
+        temas: [
+          { id: 'podcast', re: /podcast|p[oó]dcast|micro|entrevista|audio|newsletter|voz/, fotos: ['1590602847861-f357a9332bbc', '1478737270239-2f02b77fc618', '1559523161-0fc0d8b38a7a', '1593697821252-0c9137d9fc45'] },
+          { id: 'edicion', re: /clip|edici|editar|largo|youtube|serie|episodio|cap[ií]tulo/, fotos: ['1492619375914-88005aa9e8fb', '1574717024653-61fd2cf4d44d', '1611162616475-46b635cb6868'] },
+          { id: 'set', re: /./, fotos: ['1516035069371-29a1b244cc32', '1598550476439-6847785fcea6', '1533750516457-a7f992034fec', '1492619375914-88005aa9e8fb'] }
+        ]
+      },
+      automatizaciones: [
+        'Comentan una palabra clave («GUÍA», «LINK») → Chispa manda el enlace por DM',
+        'Contestar los comentarios de la primera hora (los que más empujan el alcance)',
+        'Pedir colaboración: plantilla de mensaje a marcas y a otros creadores',
+        'Del vídeo largo, 5 clips verticales con subtítulos',
+        'Resumen semanal de retención, envíos y guardados',
+        'Newsletter semanal con lo mejor de la semana'
+      ],
+      resenas: {
+        positiva: '¡Gracias, {autor}! 🙌 Me alegra que te sirva. ¡Nos vemos en el próximo vídeo!',
+        negativa: 'Gracias por decírmelo, {autor}. Lo tengo en cuenta para el próximo; escríbeme por DM si quieres contarme más.',
+        pregunta: '¡Hola! Te lo dejo en el enlace de mi bio 🔗 Y si comentas «LINK» te lo mando por DM.'
+      },
+      mensajes: [
+        { av: '🧑', nm: 'Álvaro', red: 'comentario en Instagram', tx: 'GUÍA', sug: '¡Hecho, Álvaro! 📩 Te la acabo de mandar por DM. Cuéntame qué te parece.' },
+        { av: '🏷️', nm: 'Marca de cosmética', red: 'mensaje directo', tx: 'Hola, ¿haces colaboraciones? ¿Tienes media kit?', sug: '¡Hola! Sí 🙌 Te paso el media kit y las tarifas. ¿Qué campaña tenéis en mente y para qué fechas?' },
+        { av: '👩', nm: 'Lucía', red: 'comentario en TikTok', tx: '¿Parte 2 cuándo? 😭', sug: '¡Mañana a las 20:00, Lucía! 🔔 Sígueme para que te salga.' }
+      ],
+      resenasEj: [
+        { autor: 'Pablo N.', estrellas: 5, dias: 2, texto: 'Sus vídeos me han ayudado muchísimo. Explica claro y sin rollo.' },
+        { autor: 'Marta I.', estrellas: 5, dias: 9, texto: 'Compré su curso y vale cada euro. Responde a todas las dudas.' },
+        { autor: 'Iván C.', estrellas: 3, dias: 18, texto: 'Buen contenido pero últimamente sube menos vídeos largos.' },
+        { autor: 'Sara K.', estrellas: 4, dias: 31, texto: 'La newsletter de los domingos es lo mejor de mi semana.' }
+      ],
+      semana: [
+        ['El error que todos cometen', 'Gancho', 'reel', 'El error que todos cometen (y cómo evitarlo) 👀 Quédate hasta el final.', '#reels #tips #creadordecontenido'],
+        ['5 consejos para guardar', 'Carrusel', 'carrusel', '5 consejos que vas a querer guardar 💾', '#tips #carrusel'],
+        ['Detrás de cámaras', 'Así lo hago', 'reel', 'Lo que no se ve de mi último vídeo 🎬', '#detrasdecamaras #creador'],
+        ['Comenta GUÍA', 'Te la mando', 'post', 'Comenta «GUÍA» y te la mando gratis por DM 📩', '#guia #gratis'],
+        ['Encuesta de la semana', 'Tú decides', 'historia', '¿Qué vídeo hago ahora? Vota 📊', '#encuesta'],
+        ['Clip del pódcast', 'Episodio nuevo', 'reel', 'El mejor minuto del episodio de esta semana 🎙️', '#podcast #clips']
+      ],
+      ejemplo: { nombre: 'Creadora Ejemplo', ciudad: 'Palma de Mallorca' }
     }
   ];
   /* Pendientes a propósito (reglas de publicidad propias): */
@@ -581,7 +673,7 @@
     var t = (texto || '').toLowerCase();
     if (!t.trim()) return null;
     // primero los sectores concretos; restaurante al final («bar» sale en muchos nombres)
-    var orden = ['peluqueria', 'estetica', 'gimnasio', 'tienda', 'cafeteria', 'talleres', 'restaurante'];
+    var orden = ['peluqueria', 'estetica', 'creador', 'gimnasio', 'tienda', 'cafeteria', 'talleres', 'restaurante'];
     for (var i = 0; i < orden.length; i++) { var p = POR_ID[orden[i]]; if (p.detectar.test(t)) return p.id; }
     return null;
   }
@@ -590,7 +682,39 @@
     if (n.sectorId && POR_ID[n.sectorId]) return n.sectorId;
     return detectar(n.sector) || detectar(n.nombre) || 'restaurante';
   }
-  function actual() { return POR_ID[idActual()]; }
+  /* ---------- idioma del contenido (cualquiera: código BCP-47 + nombre) ---------- */
+  var PLANTILLAS_PROPIAS = { es: 1, en: 1, de: 1, fr: 1 };   // idiomas con plantillas escritas; el resto, la IA
+  var RTL = { ar: 1, he: 1, fa: 1, ur: 1 };
+  var IDIOMAS_RAPIDOS = ['es', 'en', 'fr', 'de', 'it', 'pt', 'nl', 'ca', 'ar', 'zh', 'ja', 'ru'];
+  function codigoValido(c) {
+    c = (c || '').trim().replace(/_/g, '-'); if (!/^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$/.test(c)) return '';
+    try { if (Intl.getCanonicalLocales) return Intl.getCanonicalLocales(c)[0]; } catch (e) { return ''; }
+    return c;
+  }
+  function nombreIdioma(c) {
+    try { if (Intl.DisplayNames) { var t = new Intl.DisplayNames(['es'], { type: 'language' }).of(c); if (t && t !== c) return capital(t); } } catch (e) {}
+    return c;
+  }
+  function idiomaDe(n) {
+    var i = (n && n.idioma && n.idioma.codigo) ? n.idioma : { codigo: 'es', nombre: 'Español' };
+    var base = i.codigo.split('-')[0].toLowerCase();
+    return { codigo: i.codigo, nombre: i.nombre || nombreIdioma(i.codigo), base: base, rtl: !!RTL[base],
+      plantillas: PLANTILLAS_PROPIAS[base] ? 'propias' : 'ia', traduceIA: base !== 'es' };
+  }
+  /* textos del perfil que están en español y los escribe la IA cuando el idioma es otro */
+  var TEXTOS_IA = ['frases', 'ideas', 'plan', 'ofertas', 'semana', 'resenas', 'mensajes', 'cta.texto', 'cta.frase', 'cta.pregunta', 'automatizaciones'];
+  function actual() {
+    var P = POR_ID[idActual()], n = N();
+    P.idioma = idiomaDe(n);
+    P.textosIA = TEXTOS_IA;
+    if (P.cta.opciones) {
+      if (!P._ctaBase) P._ctaBase = { texto: P.cta.texto, icono: P.cta.icono, en: P.cta.en, de: P.cta.de, fr: P.cta.fr };
+      var o = null; P.cta.opciones.forEach(function (x) { if (x[0] === n.ctaTexto) o = x; });
+      P.cta.texto = o ? o[0] : P._ctaBase.texto; P.cta.icono = o ? o[1] : P._ctaBase.icono;
+      P.cta.en = o ? o[2] : P._ctaBase.en; P.cta.de = o ? o[3] : P._ctaBase.de; P.cta.fr = o ? o[4] : P._ctaBase.fr;
+    }
+    return P;
+  }
   function temaDe(P, texto) {
     var t = sinT(texto), T = (P.imagen && P.imagen.temas) || [];
     for (var i = 0; i < T.length; i++) if (T[i].re.test(t) || T[i].re.test((texto || '').toLowerCase())) return T[i];
@@ -678,7 +802,7 @@
     var art = /^(peluquer|tienda|cafeter|empresa)/.test(e.negocio) ? 'una' : 'un';
     R.push([/\b([Uu])n restaurante\b/g, function (m, u) { return (u === 'U' ? capital(art) : art) + ' ' + e.negocio; }]);
     R.push([/\b[Rr]estaurante\b/g, function (m) { return caso(m, e.negocio); }]);
-    R.push([/\bmen[uú] del d[ií]a\b/gi, function (m) { return caso(m, 'oferta del día'); }]);
+    R.push([/\bmen[uú] del d[ií]a\b/gi, function (m) { return caso(m, e.menuDia || 'oferta del día'); }]);
     return R;
   }
   var SALTAR = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, SELECT: 1, OPTION: 1, CODE: 1 };
@@ -743,6 +867,14 @@
     return h + '</div>';
   };
   /* botones de las tarjetas del Estudio (sin tocar chispa-estudio.js): se corrigen justo antes de pintar */
+  /* idioma ≠ español: el Estudio escribe «Nombre, en Ciudad»; sin ciudad durante la generación no queda ese «en» español */
+  var generarAntes = window.generar;
+  if (generarAntes) window.generar = function () {
+    var P = actual(), n = N(), c = n.ciudad;
+    if (!P.idioma.traduceIA || !c) return generarAntes.apply(this, arguments);
+    n.ciudad = '';
+    try { return generarAntes.apply(this, arguments); } finally { n.ciudad = c; }
+  };
   if (ORIG.crearImagenIA) window.crearImagenIA = function (i) {
     var P = actual(), p = window._posts && window._posts[i];
     if (P.cambia && p && p.ctas) {
@@ -756,14 +888,23 @@
     if (P.cambia && p && /^(Recién hecho|De nuestra cocina|Desde 1968|¿Ya lo probaste\?)$/.test(p.kicker || '') && !(P.id === 'cafeteria' && p.kicker === 'Recién hecho')) {
       var k = ['Hoy en {neg}', 'Tu sitio en Palma', 'Esta semana', 'No te lo pierdas']; p.kicker = k[i % k.length];
     }
+    // idioma ≠ español: nada de antetítulos fijos en español sobre la imagen; el botón, en su idioma si lo hay
+    if (p && P.idioma.traduceIA && !p._idiomaHecho) {
+      p._idiomaHecho = 1; p.kicker = '{neg}';
+      var tc = P.cta[P.idioma.base];
+      if (p.ctas && p.ctas[0] && tc) p.ctas[0].t = P.cta.icono + ' ' + tc;
+      p.traducirIA = !tc;   // marca: estos botones los escribe la IA en el idioma
+    }
     return ORIG.crearImagenIA.apply(this, arguments);
   };
   window.ejemploIdea = function () {
-    var P = actual(); if (!P.cambia) return ORIG.ejemploIdea();
+    var P = actual();
+    if (P.idioma.traduceIA) setTimeout(function () { toast('💬 Idea en español: la IA la escribe en ' + P.idioma.nombre + ' (o escríbela tú en ' + P.idioma.nombre + ')'); }, 30);
+    if (!P.cambia) return ORIG.ejemploIdea();
     return P.ideas[Math.floor(Math.random() * P.ideas.length)];
   };
   window.proponerHoy = function () {
-    var P = actual(); if (!P.cambia) return ORIG.proponerHoy.apply(this, arguments);
+    var P = actual(); if (!P.cambia && !P.idioma.traduceIA) return ORIG.proponerHoy.apply(this, arguments);
     if (typeof window.generar === 'function') window.generar(window.ejemploIdea(), true);
   };
   window.ponerOferta = function () {
@@ -808,7 +949,26 @@
       '<div class="sec-res"><div><b>Botón principal:</b> ' + P.cta.icono + ' ' + esc(P.cta.texto) + ' <span style="color:var(--tx3)">(con tu enlace: ' + esc(P.cta.enlaces) + '. Chispa no lleva tu agenda: abre la tuya.)</span></div>' +
       '<div style="margin-top:8px"><b>Mejores horas para publicar</b><ul>' + horas + '</ul></div>' +
       '<div><b>Automatizaciones sugeridas</b><ul>' + P.automatizaciones.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ul></div>' +
+      (P.formatos ? '<div><b>Formatos</b><ul>' + P.formatos.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ul></div>' : '') +
+      (P.frecuencia ? '<div><b>Frecuencia</b><ul>' + Object.keys(P.frecuencia).map(function (k) { return '<li>' + esc(capital(k)) + ': ' + esc(P.frecuencia[k]) + '</li>'; }).join('') + '</ul></div>' : '') +
+      (P.metricas ? '<div><b>Métricas que importan</b><ul>' + P.metricas.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ul></div>' : '') +
       '<div><b>Hashtags:</b> ' + esc(P.hashtags.join(' ')) + ' · <b>Tono:</b> ' + esc(P.tono) + '</div></div></details>';
+  }
+  function idiomaHtml(P) {
+    var I = P.idioma;
+    return '<div class="sec-ver"><b>🌍 Idioma del contenido</b><div class="sec-p" style="margin:2px 0 6px">Cualquier idioma: código (es, it, pt-BR, zh-Hans…) y nombre. Ahora: <b>' + esc(I.nombre) + '</b> (' + esc(I.codigo) + ')' +
+      (I.traduceIA ? (I.plantillas === 'propias' ? ' · plantillas propias' : ' · las plantillas las escribe la <span class="sec-ia">IA</span>') : '') + '.</div>' +
+      '<div class="row" style="gap:6px;flex-wrap:wrap">' + IDIOMAS_RAPIDOS.map(function (c) {
+        return '<button class="btn ' + (I.codigo === c ? 'pp' : 'g') + ' sm" style="flex:none" onclick="ChispaSector.idioma(\'' + c + '\')">' + c + '</button>'; }).join('') + '</div>' +
+      '<div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap"><input class="inp" id="secLang" placeholder="Código: pl, sv, tr, pt-BR…" style="flex:1 1 120px" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+      '<input class="inp" id="secLangN" placeholder="Nombre (opcional)" style="flex:1 1 120px" autocomplete="off">' +
+      '<button class="btn g sm" style="flex:none" onclick="ChispaSector.idioma(document.getElementById(\'secLang\').value,document.getElementById(\'secLangN\').value)">Poner</button></div></div>';
+  }
+  function ctaHtml(P) {
+    if (!P.cta.opciones) return '';
+    return '<div class="sec-ver"><b>👉 Botón principal</b><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">' + P.cta.opciones.map(function (o) {
+      return '<button class="btn ' + (o[0] === P.cta.texto ? 'pp' : 'g') + ' sm" style="flex:none" onclick="ChispaSector.cta(\'' + o[0] + '\')">' + o[1] + ' ' + esc(o[0]) + '</button>'; }).join('') +
+      '</div><div class="sec-p" style="margin-top:6px">Abre tu enlace de «' + esc(P.etq.reservas) + '» de Mi negocio (' + esc(P.cta.enlaces) + ').</div></div>';
   }
   function tarjetaSector() {
     var P = actual(), adm = adminUI(), n = N(), c = C();
@@ -830,6 +990,7 @@
       h += '<div class="row" style="align-items:center;gap:10px"><span style="font-size:30px">' + P.icono + '</span><div><div style="font-weight:800">' + esc(P.nombre) + '</div>' +
         '<div class="sec-p" style="margin:0">Tu sector lo fija Solers al darte de alta. Si no es el tuyo, escríbenos.</div></div></div>';
     }
+    h += idiomaHtml(P) + ctaHtml(P);
     return h + resumenHtml(P) + '</div>';
   }
   var css = document.createElement('style');
@@ -843,6 +1004,8 @@
     '.sec-ver{margin-top:12px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px}' +
     '.sec-det{margin-top:12px}.sec-det summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--purple2)}' +
     '.sec-res{font-size:12.5px;color:var(--tx2);margin-top:8px}.sec-res ul{margin:4px 0 8px;padding-left:18px}.sec-res li{margin:3px 0}' +
+    '.sec-ia{font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;background:rgba(96,165,250,.18);color:#93c5fd;border:1px solid rgba(96,165,250,.45)}' +
+    '.sec-idi-av{font-size:12.5px;color:var(--tx2);background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.35);border-radius:12px;padding:9px 12px;margin:0 0 12px}' +
     '@media(max-width:420px){.sec-grid{grid-template-columns:1fr 1fr}.sec-b{font-size:12px;padding:8px}}';
   document.head.appendChild(css);
 
@@ -872,7 +1035,22 @@
         var oc = b.getAttribute('onclick') || ''; if (/mnRestaurarParaiso|resetTodo/.test(oc)) b.remove();
       });
     }
+    if (tab === 'asistente') idiomaAsistente(P);
     if (P.cambia) traducirNodo(document.getElementById('main'));
+  }
+  function idiomaAsistente(P) {
+    var I = P.idioma, sel = document.getElementById('contLang');
+    if (sel) {
+      if (!sel.querySelector('option[value="' + I.base + '"]')) { var o = document.createElement('option'); o.value = I.base; o.textContent = '🌍 ' + I.nombre; sel.appendChild(o); }
+      sel.value = I.base; window._lang = I.base;
+    }
+    if (!I.traduceIA || document.getElementById('secIdiAviso')) return;
+    var c = document.querySelector('#main .card'); if (!c) return;
+    var d = document.createElement('div'); d.id = 'secIdiAviso'; d.className = 'sec-idi-av'; d.setAttribute('data-sin-sector', '');
+    d.innerHTML = '🌍 Contenido en <b>' + esc(I.nombre) + '</b> (' + esc(I.codigo) + '). ' +
+      (I.plantillas === 'propias' ? 'Las plantillas de Chispa ya están escritas en ese idioma. ' : 'Chispa usa plantillas sin frases en español. ') +
+      'Lo marcado <span class="sec-ia">IA</span> (ideas, ofertas y respuestas de ejemplo, escritas en español) lo escribe la IA en ' + esc(I.nombre) + '. Mientras no esté conectada, escribe tu idea directamente en ' + esc(I.nombre) + '.';
+    c.parentNode.insertBefore(d, c.nextSibling);
   }
   window.panel = function (tab) {
     var r = ORIG.panel.apply(this, arguments);
@@ -891,6 +1069,15 @@
     } else {
       window.ANGULOS = ORIG.ANGULOS; window.ANGL_T = ORIG.ANGL_T; window.PLANPOOL = ORIG.PLANPOOL; REGLAS = [];
     }
+    // idioma del contenido: en/de/fr tienen plantillas; cualquier otro, plantillas neutras (sin español) que completa la IA
+    var I = P.idioma, T = {}, k;
+    for (k in (window.ANGL_T || {})) T[k] = window.ANGL_T[k];
+    if (I.traduceIA && !T[I.base]) {
+      var neutra = ['{idea} ✨\n\n📍 {neg}', '{idea} 🔥\n\n👉 {neg}', '{idea} 👀\n\n💬 👇', '{idea} 💛\n\n📍 {neg}'];
+      T[I.base] = neutra.map(function (v) { return { v: [v], tags: ['#{tag}', '#Palma', '#Mallorca'], ia: true }; });
+    }
+    window.ANGL_T = T;
+    window._lang = I.base;
     vigilar(P.cambia);
     try { window.dispatchEvent(new CustomEvent('chispa:sector', { detail: { id: P.id, perfil: P } })); } catch (e) {}
   }
@@ -934,7 +1121,21 @@
       var P = actual(), base = ['🍽️', '✂️', '🔧', '🏗️', '☕', '💅', '🐶', '🏠', '👗', '🥐'];
       return P.iconos.concat(base.filter(function (x) { return P.iconos.indexOf(x) < 0; })).slice(0, 12);
     },
-    pendientes: PENDIENTES.slice()
+    pendientes: PENDIENTES.slice(),
+    idiomasRapidos: IDIOMAS_RAPIDOS.slice(),
+    /* idioma del contenido del negocio abierto (lo pueden poner Solers y el cliente) */
+    idioma: function (codigo, nombre) {
+      var c = codigoValido(codigo); if (!c) { toast('Ese código de idioma no vale (ej.: it, pt-BR, zh-Hans)'); return; }
+      var n = N(); n.idioma = { codigo: c, nombre: (nombre || '').trim() || nombreIdioma(c) }; guardar();
+      aplicar(); window.panel(typeof TAB !== 'undefined' ? TAB : 'ajustes'); toast('🌍 Contenido en ' + n.idioma.nombre);
+    },
+    cta: function (texto) { var n = N(); n.ctaTexto = texto; guardar(); aplicar(); window.panel('ajustes'); toast('Botón principal: ' + texto); },
+    /* lo que necesita el motor de IA (trabajador G) para escribir en el idioma y el estilo del negocio */
+    paraIA: function () {
+      var P = actual(), n = N();
+      return { sector: P.id, idioma: P.idioma, tono: n.tono || P.tono, negocio: n.nombre, ciudad: n.ciudad, cta: { texto: P.cta.texto, frase: P.cta.frase },
+        hashtags: P.hashtags.slice(), textosIA: TEXTOS_IA.slice(), origen: 'es' };
+    }
   };
   // atajo de lectura para el calendario y el motor: ChispaSector.actual().semana sigue siendo la lista cruda;
   // la versión lista para la agenda es ChispaSector.semana().
