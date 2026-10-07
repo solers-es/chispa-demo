@@ -110,8 +110,8 @@ arriba del **Asistente** con la propuesta de hoy/mañana.
     para llenar» del calendario. Reglas de las redes de `docs/CRECIMIENTO-ALGORITMOS.md` (formato y hora
     por día). Temporada turística (Baleares). Estadísticas **reales** del negocio si hay ≥ 3 medidas.
 - **La carta**: «📖 Importar tu carta» lee el enlace (El Paraíso: la carta pública
-  `carta-paraiso.html`, 46 platos con precio; el enlace de Mi negocio, `carta.html`, es el **editor** y
-  Chispa lo dice), webs con schema.org o texto con precios; o se pega / edita a mano. **Nunca se inventa
+  `carta-paraiso.html`, 46 platos con precio; desde el 07/10 noche **Mi negocio también apunta ahí**
+  —«Ver carta», botones de publicaciones y ofertas—; `carta.html` es el **editor** y lo guardado con él se cambia solo), webs con schema.org o texto con precios; o se pega / edita a mano. **Nunca se inventa
   un precio**: sin precio sale el hueco «… €». La carta de El Paraíso **no tiene bebidas**: las bebidas
   salen como sugerencia «no está en tu carta: pon el precio tú» hasta que se añadan.
 - **Botones**: «Usar esta propuesta» (la publicación a su hora + la franja de promo con historias y
@@ -131,6 +131,40 @@ arriba del **Asistente** con la propuesta de hoy/mañana.
   `ofertas-navegador.cjs` (17).
 
 ---
+
+### 1 quater · 🚀 Llegar a gente nueva gratis + carta de clientes (07/10/2026 noche)
+
+**Carta de El Paraíso.** El enlace de «Mi negocio» apuntaba a `carta.html`, que es el **editor**. Ahora
+es `https://el-paraiso-eight.vercel.app/carta-paraiso.html` (la de los clientes; comprobado: responde
+200). Al cargar, todo lo guardado con `carta.html` (Mi negocio, botones «Ver carta» de las
+publicaciones, carta de ofertas) se cambia sin tocar nada más; `carta.html?c=…` se respeta.
+Prueba: `pruebas/carta-paraiso-navegador.cjs`.
+
+**Pestaña nueva «🚀 Llegar a gente nueva»** (`alcance.js` + `alcance.css`, se abre con `#alcance`).
+Formas **gratis** de llegar a quien no te sigue, cada una con su botón y al **calendario real como
+borrador** (con «Abrir en Publicar»). Dice claro que **«Publicidad/Patrocinado» solo existe pagando a
+Meta**, y abajo: «desde 1-2 €/día en Meta → Anuncios (se crean en pausa)».
+
+| Forma | Qué hace el botón | Lo que NO puede hacer (y se dice) |
+|---|---|---|
+| 🧪 Reels de prueba | Prepara el reel marcado `prueba` (MANUAL o «que Instagram decida»), con los pasos para activarlo en la app | — La API **sí** lo permite (`trial_params`); el servidor ya lo manda. En demostración se activa a mano |
+| 🤝 Collab | Buscador (etiqueta de Instagram, Google, TikTok, negocios vecinos en Maps), lista de candidatos con estados, propuesta lista para copiar, publicación con `collaborators` | Instagram no deja a ninguna app listar cuentas: se abren las búsquedas buenas. Collab no vale en historias |
+| 🎁 Canje | Mensaje (ya dice que va marcado como publicidad), lista legal, seguimiento (estado, comprobaciones, enlace) y compartir en historias | Guía práctica, no asesoramiento legal. Fuentes: Autocontrol (Código de influencers), Ley 13/2022 art. 94, RD 444/2024, LSSI art. 20 |
+| 📍 Ubicación y Google | 5 etiquetas locales para copiar (límite de Instagram), publicación de la ficha de Google | — |
+| 💬 Clientes y WhatsApp | Mensajes buenos de la bandeja → pedir permiso y publicación; Estado de WhatsApp; Canal (enlace validado + invitación) | Instagram no deja compartir menciones por API; WhatsApp no deja publicar estados ni canal por API |
+| 🔁 Entre tus negocios | El Paraíso ↔ **El Sazón de Quisqueya** de ejemplo (falta su @: botón «✏️ Su @»): historia + publicación con invitación de colaborador | — |
+
+Se adapta al **sector** (socios, invitación del canje: «comer para dos», «un corte y peinado»…;
+creador: canje con marcas y la marca de publi es suya) y al **idioma** (mensajes es/en/de/fr; otro idioma:
+en español con aviso). Estado en `S.alcance` (viaja con S).
+
+**Servidor:** `conectores/redes.js` manda `trial_params` (reels) y `collaborators` (hasta 3; nunca en
+historias) cuando la publicación los lleva; `chispa-agenda.js` y los dos Workers los pasan. Fuente:
+API de Instagram, IG User `/media`. Probado con el simulador (`servidor-api.cjs`), **no contra Meta**
+(falta T5) y el servidor está apagado en la web pública (ver arriba).
+
+Pruebas: `alcance-navegador.cjs` (12: ordenador, sectores, idiomas, iPhone 390 px), `carta-paraiso-navegador.cjs` (3),
+`servidor-api.cjs` 22 → 23. Navegador **9 de 9 en verde**, servidor **7 de 7 en verde**.
 
 ## 2 · TRÁMITES (lo que queda para vender), con los pasos exactos
 
