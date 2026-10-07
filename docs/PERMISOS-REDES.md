@@ -11,15 +11,15 @@
 
 | Qué | Dónde | Estado |
 |---|---|---|
-| **Política de privacidad** pública (qué datos se guardan, tokens cifrados, cómo borrarlos) | p. ej. `https://solers-es.github.io/chispa-demo/privacidad.html` | ❌ **Falta** (no hay página) |
-| **Condiciones del servicio** | `…/condiciones.html` | ❌ Falta |
-| **Instrucciones para borrar los datos** (Meta lo exige: URL o *callback*) | `…/borrar-datos.html` | ❌ Falta |
+| **Política de privacidad** (RGPD) | `https://solers-es.github.io/chispa-demo/legal/privacidad.html` | ⚠️ Escrita (trabajador H, `legal/`), falta rellenar **[CIF]** y **[domicilio]** |
+| **Condiciones del servicio** | `…/legal/terminos.html` | ⚠️ Igual: falta CIF y domicilio |
+| **Instrucciones para borrar los datos** (Meta lo exige: URL o *callback*) | apartado de derechos de `…/legal/privacidad.html` (o una página aparte) | ⚠️ Comprobar que explica cómo pedir el borrado |
 | Icono 1024×1024 de Chispa | `icono-512.png` ampliado | ⚠️ Hay de 512 |
 | Correo de contacto | `admin@solers.es` | ✓ |
 | Datos de la empresa (razón social, CIF, dirección) para verificar el negocio | — | La **sociedad nueva** de Solers (ver memoria «Chispa: titular y cuentas») |
 
-Sin las tres páginas legales no se puede enviar ninguna revisión. Conviene que las revise un
-abogado/gestoría; el texto lo puede preparar un Claude con los datos reales.
+Sin las páginas legales completas (con CIF y domicilio) no se puede enviar ninguna revisión.
+Conviene que las revise un abogado/gestoría.
 
 ---
 
@@ -96,7 +96,7 @@ de los negocios clientes) y que la cuenta gestiona la ficha de El Paraíso desde
 
 ## Orden recomendado para la sesión con Stalin (≈ 2 h)
 
-1. Páginas legales publicadas (Claude las prepara antes; Stalin las lee y aprueba).
+1. Páginas legales de `legal/` con CIF y domicilio rellenados (Stalin los da y las aprueba).
 2. Meta: verificación de empresa (lo que más tarda: empezar por aquí) → app → secretos → prueba con
    la página de El Paraíso → grabar vídeo → enviar revisión.
 3. TikTok: app → dominio → secretos → prueba en sandbox → vídeo → enviar.
