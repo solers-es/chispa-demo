@@ -1,0 +1,147 @@
+/* ============================================================================
+   Chispa · VISITA GUIADA (tour.js) — estilos
+   Overlay con foco/spotlight, burbuja morada+ámbar, botón lanzador y selector
+   de escenario. Independiente del resto: todo con prefijo .ct-
+   ============================================================================ */
+
+:root{
+  --ct-mor:#8b5cf6; --ct-mor2:#a78bfa; --ct-amb:#ffcc33; --ct-amb2:#ffb020;
+  --ct-grad:linear-gradient(135deg,#a78bfa,#ffcc33);
+  --ct-panel:#141821; --ct-line:#2b3344; --ct-tx:#e9edf4; --ct-tx2:#aeb8ca;
+}
+
+/* ---------- botón lanzador flotante ---------- */
+.ct-fab{
+  position:fixed; left:16px; bottom:18px; z-index:2147482000;
+  border:0; cursor:pointer; font-weight:800; font-size:14px;
+  color:#1a1200; background:var(--ct-grad);
+  padding:12px 18px; border-radius:40px;
+  box-shadow:0 10px 30px rgba(139,92,246,.42), 0 2px 8px rgba(0,0,0,.4);
+  display:flex; align-items:center; gap:8px;
+  animation:ct-pop .4s ease both;
+}
+.ct-fab:active{transform:translateY(1px)}
+.ct-fab .ct-play{font-size:13px}
+@media(max-width:560px){ .ct-fab{left:12px; bottom:12px; padding:11px 15px; font-size:13px} }
+
+/* el botón que vive en el index (hero) a juego */
+.ct-cta{
+  border:0; cursor:pointer; font-weight:800; border-radius:40px;
+  padding:16px 26px; font-size:17px; color:#1a1200; background:var(--ct-grad);
+  box-shadow:0 8px 26px rgba(139,92,246,.3);
+}
+.ct-cta:active{transform:translateY(1px)}
+
+/* ---------- capa oscura + recorte ---------- */
+.ct-root{ position:fixed; inset:0; z-index:2147483000; }
+.ct-root[hidden]{ display:none; }
+
+.ct-hole{
+  position:fixed; border-radius:14px; pointer-events:none;
+  box-shadow:0 0 0 99999px rgba(6,7,12,.76);
+  outline:3px solid var(--ct-amb);
+  outline-offset:2px;
+  transition:top .32s cubic-bezier(.4,0,.2,1), left .32s cubic-bezier(.4,0,.2,1),
+             width .32s cubic-bezier(.4,0,.2,1), height .32s cubic-bezier(.4,0,.2,1);
+}
+.ct-hole::after{ /* halo suave */
+  content:""; position:absolute; inset:-3px; border-radius:16px;
+  box-shadow:0 0 0 3px rgba(139,92,246,.5), 0 0 26px 6px rgba(255,204,51,.28);
+  animation:ct-glow 1.8s ease-in-out infinite;
+}
+
+/* capa que captura clics fuera de la burbuja (para que no se toque la app) */
+.ct-catch{ position:fixed; inset:0; }
+
+/* ---------- burbuja ---------- */
+.ct-bub{
+  position:fixed; z-index:2147483100; width:min(360px,calc(100vw - 24px));
+  background:linear-gradient(160deg,#1b1630,#161a24);
+  border:1px solid var(--ct-mor); border-radius:18px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,204,51,.15);
+  color:var(--ct-tx); padding:16px 16px 14px;
+  animation:ct-pop .28s ease both;
+}
+.ct-bub .ct-arrow{
+  position:absolute; width:16px; height:16px; background:#1b1630;
+  border-left:1px solid var(--ct-mor); border-top:1px solid var(--ct-mor);
+  transform:rotate(45deg); display:none;
+}
+
+.ct-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.ct-badge{
+  flex:none; font-size:11px; font-weight:800; letter-spacing:.3px;
+  color:#1a1200; background:var(--ct-grad); border-radius:30px; padding:4px 11px;
+}
+.ct-neg{ font-size:12px; color:var(--ct-mor2); font-weight:700;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ct-x{ margin-left:auto; flex:none; background:none; border:0; color:var(--ct-tx2);
+  font-size:22px; line-height:1; cursor:pointer; padding:0 2px; }
+
+.ct-bub h4{ margin:2px 0 6px; font-size:18px; font-weight:800; letter-spacing:-.3px;
+  color:#fff; line-height:1.2; }
+.ct-bub p{ margin:0; font-size:14px; line-height:1.5; color:var(--ct-tx2); }
+.ct-bub p b{ color:#fff; }
+
+/* barra de progreso por puntos */
+.ct-dots{ display:flex; gap:5px; flex-wrap:wrap; margin:12px 0 10px; }
+.ct-dots i{ width:8px; height:8px; border-radius:50%; background:#39415400; border:1px solid var(--ct-line); }
+.ct-dots i.on{ background:var(--ct-amb); border-color:var(--ct-amb); }
+.ct-dots i.done{ background:var(--ct-mor); border-color:var(--ct-mor); }
+
+.ct-foot{ display:flex; align-items:center; gap:8px; }
+.ct-count{ font-size:12px; color:var(--ct-tx2); font-weight:700; }
+.ct-spacer{ flex:1; }
+.ct-btn{
+  border:0; cursor:pointer; font-weight:800; border-radius:11px;
+  padding:10px 15px; font-size:14px; min-height:42px;
+}
+.ct-btn.g{ background:#232a38; color:var(--ct-tx); border:1px solid var(--ct-line); }
+.ct-btn.g:active{ transform:translateY(1px); }
+.ct-btn.pp{ background:var(--ct-grad); color:#1a1200; box-shadow:0 6px 18px rgba(139,92,246,.3); }
+.ct-btn.pp:active{ transform:translateY(1px); }
+.ct-btn[disabled]{ opacity:.4; cursor:default; }
+
+.ct-sub{ display:flex; align-items:center; margin-top:10px; }
+.ct-link{ background:none; border:0; color:var(--ct-mor2); font-size:12.5px;
+  font-weight:700; cursor:pointer; padding:4px 0; }
+.ct-link:hover{ text-decoration:underline; }
+
+/* ---------- selector de escenario ---------- */
+.ct-chooser{
+  position:fixed; z-index:2147483100; left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  width:min(560px,calc(100vw - 24px)); max-height:88vh; overflow:auto;
+  background:linear-gradient(160deg,#1b1630,#141822);
+  border:1px solid var(--ct-mor); border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.65);
+  padding:22px 20px 20px; color:var(--ct-tx);
+  animation:ct-fade .3s ease both;
+}
+@keyframes ct-fade{ from{opacity:0} to{opacity:1} }
+.ct-chooser .ct-x{ position:absolute; top:14px; right:16px; }
+.ct-ch-h{ text-align:center; margin-bottom:4px; }
+.ct-robot{ font-size:40px; line-height:1; }
+.ct-chooser h3{ margin:8px 0 4px; font-size:22px; font-weight:800; letter-spacing:-.4px; }
+.ct-chooser .ct-lead{ margin:0 auto 16px; font-size:13.5px; color:var(--ct-tx2);
+  max-width:400px; text-align:center; }
+.ct-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+@media(max-width:520px){ .ct-grid{ grid-template-columns:repeat(2,1fr); } }
+.ct-card{
+  border:1px solid var(--ct-line); background:#11151e; border-radius:15px;
+  padding:14px 8px; cursor:pointer; text-align:center; color:var(--ct-tx);
+  transition:transform .12s, border-color .12s, background .12s;
+}
+.ct-card:hover{ transform:translateY(-2px); border-color:var(--ct-mor); background:#171226; }
+.ct-card .e{ font-size:30px; display:block; margin-bottom:6px; }
+.ct-card .n{ display:block; font-size:13px; font-weight:800; }
+.ct-card .s{ display:block; font-size:11px; color:var(--ct-tx2); margin-top:2px; }
+.ct-card.rec{ border-color:var(--ct-amb); box-shadow:0 0 0 1px rgba(255,204,51,.35) inset; }
+.ct-note{ text-align:center; font-size:11.5px; color:var(--ct-tx2); margin-top:14px; }
+
+@keyframes ct-pop{ from{opacity:0; transform:translateY(8px) scale(.98)} to{opacity:1; transform:none} }
+.ct-chooser{ /* override pop transform origin for centered */ }
+@keyframes ct-glow{ 0%,100%{opacity:.75} 50%{opacity:1} }
+
+/* en pantallas muy bajas el chooser no centra con transform+anim: lo fijamos */
+@media(max-height:620px){ .ct-chooser{ top:8px; transform:translate(-50%,0); } }

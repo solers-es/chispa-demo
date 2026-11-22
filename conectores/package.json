@@ -1,0 +1,5 @@
+{
+  "//": "Los servidores de Chispa (Cloudflare Workers) son módulos ES. Este fichero solo sirve para que Node los cargue en las pruebas locales.",
+  "private": true,
+  "type": "module"
+}

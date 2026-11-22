@@ -1,0 +1,54 @@
+# Chispa · servidor de datos y conexiones (ver chispa-api-worker.js y docs/SERVIDOR-CHISPA.md)
+# Aquí NO van secretos: van con  npx wrangler secret put <NOMBRE> -c conectores/wrangler-api.toml
+name = "chispa-api"
+main = "chispa-api-worker.js"
+compatibility_date = "2026-10-01"
+
+# Cada 5 minutos publica lo que ya toca (de todos los negocios)
+[triggers]
+crons = ["*/5 * * * *"]
+
+# Base de datos: npx wrangler d1 create chispa   → copia aquí el database_id que te da
+# (las tablas las crea el propio servidor la primera vez)
+[[d1_databases]]
+binding = "DB"
+database_name = "chispa"
+database_id = "58a28745-8473-48e5-b64d-948146b76c9e"
+
+# IA en el propio servidor (Workers AI): imágenes, voz, subtítulos, textos y traducción.
+# Plan gratuito: 10.000 «neuronas» al día por cuenta; el servidor corta antes (conectores/ia.js).
+# Sin claves: va con la propia cuenta de Cloudflare.
+[ai]
+binding = "AI"
+
+# OPCIONAL · fotos y vídeos que las redes descargan (necesita R2 activado en la cuenta).
+# Si no lo activas, deja estas líneas comentadas: lo demás funciona igual.
+# [[r2_buckets]]
+# binding = "MEDIOS"
+# bucket_name = "chispa-medios"
+
+[vars]
+# Dirección de este servidor (la da «wrangler deploy»). Con ella se forma la
+# dirección de vuelta que hay que registrar en Google, Meta y TikTok:  <URL_BASE>/oauth/vuelta
+URL_BASE = "https://chispa-api.solers.workers.dev"
+# Adónde vuelve el navegador después de conectar una red
+PANEL_URL = "https://solers-es.github.io/chispa-demo/"
+# Páginas que pueden hablar con el servidor (separadas por comas)
+ORIGENES = "https://solers-es.github.io"
+# Google Cloud · proyecto «Chispa El Paraiso» (id hispa-el-paraiso, nº 518008968805).
+# El ID de cliente es PÚBLICO (va en la URL de Google). El SECRETO va aparte: wrangler secret put GOOGLE_CLIENT_SECRET
+GOOGLE_CLIENT_ID = "518008968805-va0k5v0m5i6k8kipflhschaqk07ki35e.apps.googleusercontent.com"
+RESERVAS_URL = "https://el-paraiso-eight.vercel.app/reservas.html"
+# Hasta que TikTok audite la app solo deja publicar en privado
+TIKTOK_PRIVACIDAD = "SELF_ONLY"
+# Si activas R2: la URL pública del bucket (r2.dev o dominio propio)
+# MEDIA_PUBLICA = "https://pub-XXXX.r2.dev"
+
+# --- Alta sola, planes y pago (conectores/suscripciones.js · docs/VENDER-CHISPA.md) ---
+# El pago está APAGADO. Para cobrar: secretos STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET
+# (wrangler secret put …) y descomentar PAGO_ENCENDIDO. Sin las tres cosas, el alta funciona sin cobrar.
+# PAGO_ENCENDIDO = "1"
+# STRIPE_TASA_IVA = "txr_…"            # IVA 21 % creado en Stripe (o STRIPE_IVA_AUTOMATICO = "1")
+# STRIPE_PRECIO_BASICO = "price_…"     # opcional: si no, el precio sale de precios.js
+# TURNSTILE_SITIO = "0x…"              # opcional: casilla «No soy un robot» (secreto: TURNSTILE_SECRETO)
+# ALTA_MAX_DIA = "200"                 # tope de altas automáticas al día

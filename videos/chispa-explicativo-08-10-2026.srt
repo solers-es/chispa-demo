@@ -1,0 +1,536 @@
+1
+00:00:00,405 --> 00:00:05,656
+Esto es Chispa: tu marketing en automático. En unos minutos te enseño, paso a paso,
+
+2
+00:00:05,656 --> 00:00:08,945
+todo lo que hace, con todo lo nuevo de esta versión.
+
+3
+00:00:09,296 --> 00:00:12,709
+Los ejemplos son El Paraíso, un bar restaurante de Palma,
+
+4
+00:00:12,709 --> 00:00:15,883
+y un café de prueba que hemos creado para este vídeo.
+
+5
+00:00:18,412 --> 00:00:23,175
+Chispa es un asistente con inteligencia artificial que lleva el marketing de tu
+
+6
+00:00:23,175 --> 00:00:26,431
+negocio: escribe tus publicaciones, crea las imágenes,
+
+7
+00:00:26,431 --> 00:00:29,506
+las programa y te ayuda a contestar a tus clientes.
+
+8
+00:00:29,858 --> 00:00:34,192
+Sirve para cualquier negocio de cara al público, un bar, una peluquería,
+
+9
+00:00:34,192 --> 00:00:38,044
+un gimnasio o una tienda, y también para creadores de contenido.
+
+10
+00:00:38,394 --> 00:00:42,179
+Y trabaja en el idioma que quieras: español, inglés, alemán,
+
+11
+00:00:42,179 --> 00:00:44,450
+francés… el que hablen tus clientes.
+
+12
+00:00:46,710 --> 00:00:51,202
+Darse de alta es cosa de un minuto. Pulsas «Empieza gratis 14 días».
+
+13
+00:00:51,552 --> 00:00:55,085
+Escribes el nombre de tu negocio, tocas a qué te dedicas,
+
+14
+00:00:55,085 --> 00:00:57,564
+y eliges el idioma de tus publicaciones.
+
+15
+00:00:58,322 --> 00:01:06,380
+Pones tu correo y eliges plan: Básico, 39 € al mes; Pro, 79 €; y Agencia, 149 €.
+
+16
+00:01:06,380 --> 00:01:07,186
+Más IVA.
+
+17
+00:01:07,538 --> 00:01:11,877
+Los 14 días de prueba son gratis, sin tarjeta y sin permanencia.
+
+18
+00:01:12,229 --> 00:01:16,504
+Pulsas «Crear mi Chispa gratis», y en unos segundos tu Chispa está lista,
+
+19
+00:01:16,504 --> 00:01:18,554
+con todo lo de tu sector ya puesto.
+
+20
+00:01:18,905 --> 00:01:23,256
+Te da un código de acceso: es tu llave para entrar desde cualquier aparato.
+
+21
+00:01:23,256 --> 00:01:26,852
+Guárdalo y no se lo enseñes a nadie; por eso aquí sale tapado.
+
+22
+00:01:29,381 --> 00:01:34,078
+En «Mi negocio» están los datos que Chispa usa en cada publicación: el nombre,
+
+23
+00:01:34,078 --> 00:01:36,849
+la dirección, la web, la carta y las reservas.
+
+24
+00:01:37,199 --> 00:01:41,887
+Para rellenarlo no hace falta escribir: pegas cualquier enlace, de tu Instagram,
+
+25
+00:01:41,887 --> 00:01:45,403
+tu web o tu ficha de Google, y Chispa lo coloca en su sitio.
+
+26
+00:01:45,752 --> 00:01:50,111
+Aquí está tu tipo de negocio. Con él, Chispa sabe qué botones poner,
+
+27
+00:01:50,111 --> 00:01:52,932
+qué ideas proponerte y a qué horas publicar.
+
+28
+00:01:53,282 --> 00:01:56,819
+Y este es el idioma de tu contenido. Puede ser cualquiera:
+
+29
+00:01:56,819 --> 00:02:00,600
+si tus clientes son turistas, Chispa les escribe en su idioma.
+
+30
+00:02:02,870 --> 00:02:07,119
+En «Conexiones» unes tus redes: Instagram y Facebook, tu ficha de Google,
+
+31
+00:02:07,119 --> 00:02:08,108
+YouTube y TikTok.
+
+32
+00:02:09,177 --> 00:02:13,665
+Tu negocio vive en el servidor de Chispa: entras una vez en cada aparato,
+
+33
+00:02:13,665 --> 00:02:17,968
+y lo que conectas vale para todos, el móvil, la tablet y el ordenador.
+
+34
+00:02:18,319 --> 00:02:23,365
+Debajo tienes una guía, paso a paso, para dejarlo todo listo en cinco minutos.
+
+35
+00:02:23,715 --> 00:02:28,140
+Y una cosa clara: cuando conectes tus cuentas y cada red dé su permiso,
+
+36
+00:02:28,140 --> 00:02:30,134
+se publica solo. Hasta entonces,
+
+37
+00:02:30,134 --> 00:02:33,810
+Chispa te lo deja todo preparado para subirlo con un toque.
+
+38
+00:02:36,335 --> 00:02:41,324
+Ahora, lo principal: crear una publicación. Le escribes la idea en una frase.
+
+39
+00:02:42,726 --> 00:02:46,177
+Pulsas «Que Chispa lo escriba», y te prepara cuatro versiones,
+
+40
+00:02:46,177 --> 00:02:48,014
+cada una con un enfoque distinto.
+
+41
+00:02:48,814 --> 00:02:53,650
+Y la imagen la crea la inteligencia artificial, de verdad: pulsas «Otra versión»,
+
+42
+00:02:53,650 --> 00:02:55,560
+y la pinta a partir de tu texto.
+
+43
+00:02:56,484 --> 00:02:59,373
+Encima lleva el sello de tu marca, con tu nombre,
+
+44
+00:02:59,373 --> 00:03:02,261
+y debajo los botones que tu cliente puede pulsar.
+
+45
+00:03:02,619 --> 00:03:06,715
+Con «Otros idiomas» la traduce. Por ejemplo, al inglés y al alemán,
+
+46
+00:03:06,715 --> 00:03:08,609
+juntos en la misma publicación.
+
+47
+00:03:12,675 --> 00:03:17,257
+Y si tienes un texto largo, un artículo o el guion de un vídeo, «Reaprovechar»
+
+48
+00:03:17,257 --> 00:03:20,312
+lo convierte en varias publicaciones, para cada red.
+
+49
+00:03:22,861 --> 00:03:27,704
+De cada publicación, Chispa te hace también un vídeo vertical, para historias,
+
+50
+00:03:27,704 --> 00:03:28,636
+reels o TikTok.
+
+51
+00:03:28,988 --> 00:03:33,502
+Lleva voz en off de la inteligencia artificial y subtítulos palabra a palabra.
+
+52
+00:03:33,502 --> 00:03:35,412
+Y lo que dice, lo puedes cambiar.
+
+53
+00:03:35,772 --> 00:03:39,504
+Pulsas «Descargar vídeo vertical», y Chispa lo graba en un momento.
+
+54
+00:03:43,323 --> 00:03:44,849
+Así queda. Escúchalo.
+
+55
+00:03:59,943 --> 00:04:02,749
+Antes de publicar, pulsas «Así lo ve tu cliente».
+
+56
+00:04:03,756 --> 00:04:07,805
+Y ves la publicación tal como saldrá en cada sitio: Instagram,
+
+57
+00:04:07,805 --> 00:04:12,768
+con sus historias y sus reels, TikTok, Facebook, WhatsApp, Google y YouTube.
+
+58
+00:04:13,120 --> 00:04:17,876
+Para publicar, eliges las redes y pulsas un botón. Esto es la demostración:
+
+59
+00:04:17,876 --> 00:04:19,841
+aquí no se sube nada de verdad.
+
+60
+00:04:22,709 --> 00:04:27,388
+Cuando conectes tus cuentas y cada red dé su permiso, se publica solo, a su hora.
+
+61
+00:04:30,135 --> 00:04:33,370
+En el calendario ves tu semana. Cada color es una red,
+
+62
+00:04:33,370 --> 00:04:37,443
+y cada publicación dice si está en borrador, programada o publicada.
+
+63
+00:04:37,794 --> 00:04:41,879
+Ahora entiende franjas: una promoción de seis a nueve de la tarde,
+
+64
+00:04:41,879 --> 00:04:44,912
+con varias historias repartidas, o un día entero.
+
+65
+00:04:45,274 --> 00:04:49,553
+Con «Promo para llenar», Chispa la monta en tus horas flojas: historias,
+
+66
+00:04:49,553 --> 00:04:54,425
+una publicación y un aviso en el estado de WhatsApp, todo con el botón «Reservar».
+
+67
+00:04:54,776 --> 00:04:59,018
+Y comprueba que no se pisa con nada. Pulsas «Crear la promo», y listo.
+
+68
+00:05:01,593 --> 00:05:05,424
+También se lo pides con tus palabras: «promo el sábado todo el día»,
+
+69
+00:05:05,424 --> 00:05:06,888
+y la pone como día entero.
+
+70
+00:05:09,713 --> 00:05:12,862
+En «Comentarios y DMs» tienes juntos los comentarios,
+
+71
+00:05:12,862 --> 00:05:16,130
+los mensajes privados y las reseñas de todas tus redes.
+
+72
+00:05:16,481 --> 00:05:21,541
+Chispa les pone etiquetas, reserva, pregunta, queja, y te propone la respuesta.
+
+73
+00:05:21,893 --> 00:05:24,115
+Si alguien quiere reservar para ocho,
+
+74
+00:05:24,115 --> 00:05:26,937
+la contestación ya lleva tu enlace de reservas.
+
+75
+00:05:27,286 --> 00:05:31,536
+Pero nada sale sin tu visto bueno: la envías con un toque, o la cambias.
+
+76
+00:05:31,946 --> 00:05:36,434
+Estos mensajes son de ejemplo. Cuando entras con tu negocio, ves los de verdad.
+
+77
+00:05:38,689 --> 00:05:43,155
+En Reseñas, Chispa junta las opiniones de Google, TripAdvisor y TheFork,
+
+78
+00:05:43,155 --> 00:05:45,699
+y te propone una respuesta para cada una.
+
+79
+00:05:46,049 --> 00:05:49,515
+Contesta en el tono de tu negocio y en el idioma del cliente:
+
+80
+00:05:49,515 --> 00:05:52,071
+si te escriben en inglés, responde en inglés.
+
+81
+00:05:52,422 --> 00:05:56,464
+Las buenas se pueden contestar solas. Las negativas, nunca:
+
+82
+00:05:56,464 --> 00:05:59,821
+Chispa te avisa para que las mires tú, con calma.
+
+83
+00:06:00,172 --> 00:06:03,609
+Estas reseñas son de ejemplo. Al conectar tu ficha de Google,
+
+84
+00:06:03,609 --> 00:06:05,075
+trabaja con las de verdad.
+
+85
+00:06:07,343 --> 00:06:10,242
+En Automatizaciones decides lo que Chispa hace sola.
+
+86
+00:06:10,592 --> 00:06:13,748
+Por ejemplo: alguien comenta «CARTA» en tu publicación,
+
+87
+00:06:13,748 --> 00:06:16,273
+y le llega por privado el enlace a tu carta.
+
+88
+00:06:16,624 --> 00:06:21,775
+Las reseñas de cuatro y cinco estrellas se pueden contestar solas. Las negativas,
+
+89
+00:06:21,775 --> 00:06:24,128
+nunca: te avisa para que las veas tú.
+
+90
+00:06:24,480 --> 00:06:27,396
+Te recuerda publicar si no tienes nada programado,
+
+91
+00:06:27,396 --> 00:06:29,380
+y te manda un resumen cada semana.
+
+92
+00:06:29,729 --> 00:06:34,076
+Con tu cuenta, todo esto lo hace el servidor, aunque tengas la app cerrada.
+
+93
+00:06:36,344 --> 00:06:39,708
+En Anuncios preparas una campaña para Instagram y Facebook,
+
+94
+00:06:39,708 --> 00:06:41,476
+o para las búsquedas de Google.
+
+95
+00:06:41,826 --> 00:06:46,377
+Eliges el objetivo, el texto, el presupuesto al día, cuántos días,
+
+96
+00:06:46,377 --> 00:06:48,584
+y la zona alrededor de tu local.
+
+97
+00:06:48,935 --> 00:06:53,099
+Y Chispa te dice el tope: nunca se gasta ni un euro más de lo que pones.
+
+98
+00:06:53,450 --> 00:06:57,079
+En la demostración solo se simula. Con tu cuenta conectada,
+
+99
+00:06:57,079 --> 00:07:00,708
+la campaña se crea en pausa, y la lanzas tú cuando quieras.
+
+100
+00:07:03,226 --> 00:07:07,063
+En Estadísticas ves el día a día: alcance, visualizaciones,
+
+101
+00:07:07,063 --> 00:07:12,396
+interacciones y seguidores. Y de Google, cuánta gente pide cómo llegar o te llama.
+
+102
+00:07:12,747 --> 00:07:17,424
+Estas cifras son de ejemplo, y lo pone bien claro. Con tus redes conectadas,
+
+103
+00:07:17,424 --> 00:07:19,885
+el servidor las recoge solo cada mañana.
+
+104
+00:07:20,237 --> 00:07:24,118
+Lo mejor son los consejos hechos con tus datos: tus días fuertes,
+
+105
+00:07:24,118 --> 00:07:26,387
+y qué hacer para que te vea más gente.
+
+106
+00:07:26,738 --> 00:07:28,664
+Y los de Instagram sí son reales:
+
+107
+00:07:28,664 --> 00:07:31,698
+El Paraíso tiene hoy mil doscientos seis seguidores.
+
+108
+00:07:34,210 --> 00:07:38,366
+Para creadores de contenido, y para negocios que quieren hacer vídeos,
+
+109
+00:07:38,366 --> 00:07:40,207
+está el Estudio para creadores.
+
+110
+00:07:40,557 --> 00:07:44,652
+Le dices un tema, por ejemplo: recetas de café para hacer en casa.
+
+111
+00:07:44,652 --> 00:07:49,118
+Y la inteligencia artificial escribe una miniserie, episodio a episodio,
+
+112
+00:07:49,118 --> 00:07:50,731
+con el gancho de cada uno.
+
+113
+00:07:58,924 --> 00:08:03,068
+Luego la pasas al calendario: entra como borrador, con fecha y hora,
+
+114
+00:08:03,068 --> 00:08:05,139
+esperando a que grabes cada vídeo.
+
+115
+00:08:05,490 --> 00:08:09,524
+Viene en los planes Pro y Agencia, y escribe en el idioma que elijas.
+
+116
+00:08:15,426 --> 00:08:19,366
+En «Crecer» tienes una guía para conseguir más clientes desde las redes,
+
+117
+00:08:19,366 --> 00:08:21,007
+hecha para tu tipo de negocio.
+
+118
+00:08:21,358 --> 00:08:26,395
+Cada consejo dice de dónde sale: si lo dice la propia red, si lo mide un estudio,
+
+119
+00:08:26,395 --> 00:08:28,198
+o si es una opinión razonada.
+
+120
+00:08:28,548 --> 00:08:32,104
+Cómo hacer un vídeo que enganche, cuánto publicar, a qué hora,
+
+121
+00:08:32,104 --> 00:08:34,398
+y qué no hacer para que no te penalicen.
+
+122
+00:08:37,253 --> 00:08:41,403
+Y si quieres que la propia Chispa te lo enseñe, pulsa «Ver cómo funciona».
+
+123
+00:08:41,754 --> 00:08:46,166
+Eliges un tipo de negocio, un restaurante, una peluquería, un gimnasio,
+
+124
+00:08:46,166 --> 00:08:50,577
+y te lleva paso a paso por la app de verdad, con un negocio de ejemplo.
+
+125
+00:08:50,934 --> 00:08:55,525
+En cada paso te señala qué es cada cosa. Vas con «Siguiente», a tu ritmo.
+
+126
+00:09:00,429 --> 00:09:03,635
+En «Mi plan» ves tu plan, los días de prueba que te quedan,
+
+127
+00:09:03,635 --> 00:09:05,320
+y lo que llevas usado este mes.
+
+128
+00:09:07,576 --> 00:09:09,798
+Puedes cambiar de plan cuando quieras.
+
+129
+00:09:09,798 --> 00:09:14,710
+De momento el pago con tarjeta no está activado, así que la prueba no te cobra nada.
+
+130
+00:09:15,060 --> 00:09:19,515
+Y sin permanencia: te das de baja cuando quieras, y se borran todos tus datos.
+
+131
+00:09:21,624 --> 00:09:24,830
+Chispa: para tu negocio o para tu canal, y en tu idioma.
+
+132
+00:09:25,182 --> 00:09:29,234
+Cuando conectes tus cuentas y cada red dé su permiso, se publica solo.
+
+133
+00:09:29,585 --> 00:09:33,597
+Pruébalo 14 días gratis, sin tarjeta. Tú atiendes tu negocio;
+
+134
+00:09:33,597 --> 00:09:35,110
+Chispa llena tus redes.
+

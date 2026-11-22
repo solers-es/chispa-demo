@@ -1,0 +1,50 @@
+{
+  "titulo": "Sabor Caribe en 60s",
+  "premisa": "Descubre recetas caribeñas rápidas y deliciosas en solo 60 segundos.",
+  "episodios": [
+    {
+      "titulo": "Arroz con Pollo",
+      "gancho": "¡Vamos a cocinar!",
+      "guion": "Ingredientes: arroz, pollo, cebolla\nSofríe la cebolla y el pollo\nAgrega arroz y especias",
+      "cliffhanger": "¿Qué especias usar?",
+      "texto_pantalla": "Arroz Listo"
+    },
+    {
+      "titulo": "Salsa de Mango",
+      "gancho": "La salsa perfecta",
+      "guion": "Mezcla mango, cebolla, cilantro\nAgrega jugo de limón y sal\nRevuelve bien",
+      "cliffhanger": "¿Con qué acompañar?",
+      "texto_pantalla": "Salsa Rica"
+    },
+    {
+      "titulo": "Tostones Fritos",
+      "gancho": "Crujientes y deliciosos",
+      "guion": "Pela y corta plátanos verdes\nFríe en aceite caliente\nEscurre y sazona",
+      "cliffhanger": "¿Cómo servirlos?",
+      "texto_pantalla": "Tostones Calientes"
+    },
+    {
+      "titulo": "Empanadas de Pescado",
+      "gancho": "Rellenas de sabor",
+      "guion": "Mezcla pescado, cebolla, ajo\nColoca en masa de empanada\nHornea hasta dorar",
+      "cliffhanger": "¿Qué bebida combina?",
+      "texto_pantalla": "Empanadas Listas"
+    },
+    {
+      "titulo": "Mojito Caribeño",
+      "gancho": "Refrescante y aromático",
+      "guion": "Mezcla ron, limón, menta\nAgrega soda y hielo\nRevuelve suavemente",
+      "cliffhanger": "¡Disfruta tu mojito!",
+      "texto_pantalla": "Mojito Perfecto"
+    }
+  ],
+  "hashtags": [
+    "#RecetasCaribenas",
+    "#CocinaRapida",
+    "#SaborCaribe"
+  ],
+  "plataforma": "tiktok",
+  "idioma": "es",
+  "aviso": null,
+  "modelo": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+}

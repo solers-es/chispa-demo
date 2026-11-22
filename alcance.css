@@ -1,0 +1,43 @@
+/* Chispa · 🚀 Llegar a gente nueva gratis (alcance.js) — prefijo al- */
+.al-intro{background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(52,211,153,.07));border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;font-size:14px;color:var(--tx2)}
+.al-intro b{color:var(--tx)}.al-intro a{color:var(--purple2,#a78bfa)}
+.al-honesto{display:block;margin-top:8px;font-size:13px}
+.al-aviso{border:1px solid rgba(139,92,246,.4);background:rgba(139,92,246,.08);border-radius:12px;padding:10px 13px;font-size:13px;color:var(--tx2);margin-bottom:12px}
+.al-sub{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.al-sub button{background:var(--panel2);border:1px solid var(--line);color:var(--tx2);font-weight:700;font-size:13px;padding:8px 14px;border-radius:30px;cursor:pointer;min-height:38px}
+.al-sub button.on{background:rgba(139,92,246,.18);border-color:var(--purple);color:var(--tx)}
+.al-card h3{margin:0 0 8px;font-size:17px}
+.al-p{color:var(--tx2);font-size:13.5px;margin:4px 0 10px}
+.al-sec{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:18px 0 6px}
+.al-chips{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}
+.al-chip{font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:30px;border:1px solid var(--line);background:var(--panel2);color:var(--tx);cursor:pointer;text-align:left;max-width:100%}
+.al-chip.off{cursor:default;color:var(--tx2)}
+button.al-chip:hover{border-color:var(--purple)}
+.al-fila{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 12px}
+.al-fila select.inp,.al-card select.inp{width:100%}
+.al-acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.al-nota{font-size:12.5px;color:var(--tx2);background:var(--bg2);border:1px dashed var(--line);border-radius:10px;padding:9px 12px;margin-top:10px}
+.al-nota code,.al-p code{font-size:11.5px}
+.al-lista{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.al-it{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg2)}
+.al-it .al-acc{margin-top:8px}
+.al-itt{font-size:14px;color:var(--tx);overflow-wrap:anywhere}
+.al-u{font-size:12px;color:var(--tx3)}.al-u.falta{color:#fb7185}
+.al-cita{font-size:13px;color:var(--tx2);margin-top:4px;font-style:italic}
+.al-est{font-size:11px;font-weight:800;padding:2px 9px;border-radius:30px;border:1px solid var(--line);color:var(--tx2);white-space:nowrap}
+.al-est.escrito,.al-est.aceptado,.al-est.acepto{color:var(--amber);border-color:rgba(255,204,51,.4)}
+.al-est.publicado,.al-est.visita{color:#34d399;border-color:rgba(52,211,153,.45)}
+.al-check{list-style:none;padding:0;margin:6px 0;font-size:13px;color:var(--tx2)}
+.al-check li{margin:6px 0;padding-left:22px;position:relative}.al-check li>b:first-child{position:absolute;left:0;color:#34d399}
+.al-ol{margin:4px 0;padding-left:20px;font-size:13px;color:var(--tx2)}
+.al-txt{width:100%;min-height:96px;font-size:13.5px;line-height:1.4;resize:vertical}
+.al-fuente{font-size:11.5px;color:var(--tx3);margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+.al-fuente a,.al-it a{color:var(--purple2,#a78bfa)}
+.al-pasos{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--tx2);margin:10px 0}
+.al-pasos ol{margin:6px 0 0;padding-left:20px}.al-pasos li{margin:4px 0}
+.al-cb{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--tx2);margin:6px 0;cursor:pointer}
+.al-cb input{margin-top:3px;flex:none}
+.al-pie{margin:6px 0 20px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,204,51,.35);background:rgba(255,204,51,.07);font-size:13.5px;color:var(--tx2)}
+.al-pie b{color:var(--tx)}.al-pie a{color:var(--amber)}
+@media(max-width:640px){.al-acc .btn{flex:1 1 auto}.al-sub button{font-size:12.5px;padding:7px 11px}}
+.al-acc .btn[aria-label="Quitar"]{flex:none!important}
